@@ -115,17 +115,21 @@ export default function MediaPage() {
 				borderBottomWidth: Spacing.xs,
 				borderColor: colors.primary,
 			}}
-			renderTabBarItem={({ route }) => (
-				<View
-					style={{
-						paddingVertical: Spacing.m,
-						width: Dimensions.get("window").width / routes.length,
-						alignItems: "center",
-					}}
-				>
-					<Icon name={route.icon as IconName} size={TextSizes.l} />
-				</View>
-			)}
+			renderTabBarItem={({ route }) => {
+				const routeIndex = routes.findIndex((r) => r.key === route.key);
+				return (
+					<View
+						style={{
+							paddingVertical: Spacing.m,
+							width: Dimensions.get("window").width / routes.length,
+							alignItems: "center",
+						}}
+						onTouchStart={() => setIndex(routeIndex)}
+					>
+						<Icon name={route.icon as IconName} size={TextSizes.l} />
+					</View>
+				);
+			}}
 			activeColor={colors.accent}
 			inactiveColor={colors.text}
 		/>
