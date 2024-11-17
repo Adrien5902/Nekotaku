@@ -1,36 +1,58 @@
 {
-  "expo": {
-    "name": "Nekotaku",
-    "slug": "Nekotaku",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+  "name": "Nekotaku",
+  "slug": "Nekotaku",
+  "owner": "adrien5902",
+  "version": "1.0.0",
+  "icon": "./assets/app-icons/icon.png",
+  "scheme": "nekotaku",
+  "userInterfaceStyle": "automatic",
+  "githubUrl": "https://github.com/Adrien5902/Nekotaku",
+  "backgroundColor": "#151718",
+  "primaryColor": "#e38fbf",
+  // "orientation": "portrait",
+  "splash": {
+    "image": "./assets/app-icons/splash.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#151718"
+  },
+  "androidStatusBar": {
+    "barStyle": "light-content",
+    "translucent": true
+  },
+  "ios": {
+    "supportsTablet": true,
+    "bundleIdentifier": "net.ddns.adrien5902.nekotaku"
+  },
+  "notification": {
+    "icon": "./assets/app-icons/icon-notifications.png",
+    "color": "#e38fbf"
+  },
+  "android": {
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/app-icons/icon-foreground.png",
+      "monochromeImage": "./assets/app-icons/icon-monochrome.png",
+      "backgroundColor": "#151718"
     },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router"
-    ],
-    "experiments": {
-      "typedRoutes": true
+    "package": "net.ddns.adrien5902.nekotaku"
+  },
+  "web": {
+    "bundler": "metro",
+    "output": "static",
+    "icon": "./assets/app-icons/icon.png"
+  },
+  "plugins": [
+    "expo-router",
+    "expo-video",
+    "expo-build-properties",
+    "expo-secure-store",
+    "react-native-google-cast"
+  ],
+  "experiments": {
+    "typedRoutes": true
+  },
+  "extra": {
+    "eas": {
+      "projectId": "d073d778-dde5-4cc0-904f-644fefd1c7d3"
     }
   }
 }

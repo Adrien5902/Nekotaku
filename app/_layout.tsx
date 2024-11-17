@@ -1,37 +1,83 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { Stack } from "expo-router";
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { useThemeColors } from "@/hooks/useThemeColor";
+import DownloadingProvider, {
+	Downloader,
+} from "@/components/DownloadingContext";
+import notifee from "@notifee/react-native";
+import { ToggleProvider } from "@/components/ToggleContext";
+import SettingsProvider from "@/components/Settings/Context";
+import AnilistLoginProvider, {
+	useAnilistToken,
+} from "@/components/AnilistAccountProvider";
+import AnilistUserInfoProvider from "@/components/AnilistUserInfoProvider";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+const downloader = new Downloader();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+	notifee.requestPermission();
+	notifee.onBackgroundEvent(async (e) => {
+		downloader.onEvent(e);
+	});
+	notifee.onForegroundEvent(async (e) => {
+		downloader.onEvent(e);
+	});
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+	return (
+		<GestureHandlerRootView>
+			<AnilistLoginProvider>
+				<SettingsProvider>
+					<DownloadingProvider downloader={downloader}>
+						<StackScreens />
+					</DownloadingProvider>
+				</SettingsProvider>
+			</AnilistLoginProvider>
+		</GestureHandlerRootView>
+	);
+}
 
-  if (!loaded) {
-    return null;
-  }
+function StackScreens() {
+	const colors = useThemeColors();
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
-  );
+	const { token } = useAnilistToken() ?? {};
+
+	if (!token) return null;
+
+	return (
+		<ApolloProvider
+			client={
+				new ApolloClient({
+					uri: "https://graphql.anilist.co",
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+					cache: new InMemoryCache(),
+				})
+			}
+		>
+			<AnilistUserInfoProvider>
+				<ToggleProvider>
+					<Stack
+						initialRouteName="(tabs)"
+						screenOptions={{
+							contentStyle: { backgroundColor: colors.background },
+						}}
+					>
+						<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+						<Stack.Screen
+							name="mediadetails/[id]"
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen name="player" options={{ headerShown: false }} />
+						<Stack.Screen name="settings" options={{ headerShown: false }} />
+						<Stack.Screen
+							name="downloaded-episodes"
+							options={{ headerShown: false }}
+						/>
+					</Stack>
+				</ToggleProvider>
+			</AnilistUserInfoProvider>
+		</ApolloProvider>
+	);
 }
