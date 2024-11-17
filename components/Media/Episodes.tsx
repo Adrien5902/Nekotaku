@@ -108,7 +108,7 @@ export default function EpisodesCollection({
 			{errorEpisodes ? (
 				<ThemedText>{errorEpisodes.message}</ThemedText>
 			) : !loadingEpisodes && lecteurs ? (
-				<EpidosesList
+				<EpisodesList
 					{...{ mediaList, url, lang }}
 					lecteur={
 						lecteurs.find((l) => l.hostname.includes("sibnet.ru")) ??
@@ -122,7 +122,7 @@ export default function EpisodesCollection({
 	);
 }
 
-export function EpidosesList({
+export function EpisodesList({
 	mediaList,
 	lecteur,
 	selected,

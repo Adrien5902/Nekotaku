@@ -7,7 +7,7 @@ import * as NavigationBar from "expo-navigation-bar";
 import * as StatusBar from "expo-status-bar";
 import Player from "@/components/Player.tsx/Player";
 import { ThemedView } from "@/components/ThemedView";
-import { EpidosesList } from "@/components/Media/Epidoses";
+import { EpisodesList } from "@/components/Media/Episodes";
 import type { Lecteur } from "@/types/AnimeSama";
 import { DownloadingContext } from "@/components/DownloadingContext";
 import type { MediaList } from "@/types/Anilist";
@@ -19,7 +19,7 @@ const VideoPlayer = () => {
 		mediaList: mediaListJSON,
 		lecteur: lecteurJSON,
 	} = useLocalSearchParams() as Record<string, string>;
-	const meidaList: MediaList = JSON.parse(mediaListJSON);
+	const mediaList: MediaList = JSON.parse(mediaListJSON);
 	const lecteur: Lecteur = JSON.parse(lecteurJSON);
 	const episode = lecteur.episodes[Number.parseInt(episodeIdParam)];
 
@@ -27,7 +27,7 @@ const VideoPlayer = () => {
 	const { loading: isGetVideoSourceLoading, data: videoUri } =
 		useGetVideoSource(
 			downloadingContext,
-			meidaList.media?.id as number,
+			mediaList.media?.id as number,
 			episode,
 		);
 	const [isFullscreen, setIsFullscreen] = useState(false);
@@ -99,7 +99,7 @@ const VideoPlayer = () => {
 					setIsFullscreen,
 					loading,
 					episode,
-					mediaList: meidaList,
+					mediaList: mediaList,
 					toggleFullscreen,
 					videoUri,
 					setIsLoadingVid,
@@ -108,16 +108,16 @@ const VideoPlayer = () => {
 			{!isFullscreen ? (
 				<View style={{ flexDirection: "column", flex: 1 }}>
 					<Image
-						source={{ uri: meidaList.media?.bannerImage ?? undefined }}
+						source={{ uri: mediaList.media?.bannerImage ?? undefined }}
 						style={{
 							width: "100%",
 							aspectRatio: 14 / 3,
 							resizeMode: "contain",
 						}}
 					/>
-					<EpidosesList
+					<EpisodesList
 						lecteur={lecteur}
-						mediaList={meidaList}
+						mediaList={mediaList}
 						selected={episode.id}
 					/>
 				</View>

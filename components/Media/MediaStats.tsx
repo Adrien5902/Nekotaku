@@ -1,9 +1,9 @@
-import type { Media } from "@/types/Anilist";
-import { ThemedView } from "./ThemedView";
-import { ThemedText } from "./ThemedText";
-import Icon, { type IconName } from "./Icon";
+import { ThemedView } from "../ThemedView";
+import { ThemedText } from "../ThemedText";
+import Icon, { type IconName } from "../Icon";
 import useStyles from "@/hooks/useStyles";
 import { Spacing } from "@/constants/Sizes";
+import type { Media } from "@/types/Anilist";
 
 export default function MediaStats({ media }: { media: Media }) {
 	const styles = useStyles();

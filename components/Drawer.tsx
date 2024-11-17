@@ -1,7 +1,6 @@
 import {
 	Animated,
 	ScrollView,
-	Text,
 	TextInput,
 	TouchableHighlight,
 	TouchableWithoutFeedback,

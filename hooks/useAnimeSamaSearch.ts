@@ -1,6 +1,6 @@
 import type { Media } from "@/types/Anilist";
 import { DOMParser } from 'react-native-html-parser';
-import { useMemoryCachedPromise, type UsePromise } from "./usePromise";
+import { useMemoryCachedPromise } from "./usePromise";
 
 interface SeasonData {
     season: number;

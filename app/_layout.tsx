@@ -66,7 +66,7 @@ function StackScreens() {
 					>
 						<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 						<Stack.Screen
-							name="mediadetails/[id]"
+							name="media_details/[id]"
 							options={{ headerShown: false }}
 						/>
 						<Stack.Screen name="player" options={{ headerShown: false }} />

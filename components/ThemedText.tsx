@@ -1,4 +1,4 @@
-import type { Color, Colors } from "@/constants/Colors";
+import type { Color } from "@/constants/Colors";
 import { TextSizes } from "@/constants/Sizes";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { Text, type TextStyle, type TextProps } from "react-native";

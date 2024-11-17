@@ -23,7 +23,7 @@ function EntryButton({ entry }: Props) {
 	return (
 		<TouchableOpacity
 			onPress={() => {
-				router.navigate(`/mediadetails/${entry.id ?? 0}` as Href<string>);
+				router.navigate(`/media_details/${entry.id ?? 0}` as Href<string>);
 			}}
 			activeOpacity={0.7}
 		>

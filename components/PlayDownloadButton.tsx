@@ -41,15 +41,15 @@ export default function PlayDownloadButton({
 		currentlyDownloadingState: DownloadingState | null,
 	) => {
 		return downloaded
-			? DonwloadState.Downloaded
+			? DownloadState.Downloaded
 			: currentlyDownloadingState
 				? currentlyDownloadingState.paused
-					? DonwloadState.PausedDownloading
-					: DonwloadState.Downloading
-				: DonwloadState.NotDownloaded;
+					? DownloadState.PausedDownloading
+					: DownloadState.Downloading
+				: DownloadState.NotDownloaded;
 	};
 
-	const [state, setState] = useState<DonwloadState>();
+	const [state, setState] = useState<DownloadState>();
 
 	const globalHref = useUnstableGlobalHref();
 
@@ -109,7 +109,7 @@ export default function PlayDownloadButton({
 	};
 
 	let child: React.ReactNode;
-	if (state === DonwloadState.Downloaded) {
+	if (state === DownloadState.Downloaded) {
 		child = (
 			<>
 				<Icon
@@ -133,12 +133,12 @@ export default function PlayDownloadButton({
 				/>
 			</>
 		);
-	} else if (state === DonwloadState.NotDownloaded) {
+	} else if (state === DownloadState.NotDownloaded) {
 		child = (
 			<>
 				<Icon
 					onPress={async () => {
-						setState(DonwloadState.Downloading);
+						setState(DownloadState.Downloading);
 						await downloadingContext.startDownload(
 							mediaList.media as Media,
 							episode,
@@ -188,11 +188,11 @@ export default function PlayDownloadButton({
 				</View>
 
 				<Icon
-					name={state === DonwloadState.PausedDownloading ? "play" : "pause"}
+					name={state === DownloadState.PausedDownloading ? "play" : "pause"}
 					size={TextSizes.xl}
 					style={{ marginRight: Spacing.xl }}
 					onPress={() => {
-						if (state === DonwloadState.PausedDownloading) {
+						if (state === DownloadState.PausedDownloading) {
 							downloadingContext.resumeDownload(mediaId, episode.id);
 						} else {
 							downloadingContext.pauseDownload(mediaId, episode.id);
@@ -206,7 +206,7 @@ export default function PlayDownloadButton({
 					size={TextSizes.xl}
 					onPress={async () => {
 						await downloadingContext.cancelDownload(mediaId, episode.id);
-						setState(DonwloadState.NotDownloaded);
+						setState(DownloadState.NotDownloaded);
 						updateDownloadState();
 					}}
 					color={iconColor}
@@ -228,7 +228,7 @@ export default function PlayDownloadButton({
 	);
 }
 
-enum DonwloadState {
+enum DownloadState {
 	NotDownloaded = 0,
 	Downloading = 1,
 	PausedDownloading = 2,

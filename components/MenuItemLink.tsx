@@ -1,10 +1,9 @@
-import { Spacing, TextSizes } from "@/constants/Sizes";
+import { TextSizes } from "@/constants/Sizes";
 import Icon, { type IconName } from "./Icon";
 import { ThemedText } from "./ThemedText";
 import { TouchableOpacity } from "react-native";
 import { type Href, router } from "expo-router";
 import { ThemedView } from "./ThemedView";
-import { useThemeColors } from "@/hooks/useThemeColor";
 import useStyles from "@/hooks/useStyles";
 
 interface Props<T extends string | object> {

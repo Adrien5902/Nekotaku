@@ -20,13 +20,13 @@ export async function getAnimeSamaLecteurs(url: AnimeSamaUrl, customEpisodes?: {
         throw new Error("Must specify a lang to get lecteur")
     }
 
-    const epidosesJs = await (await fetch(`${url.makeURL()}/episodes.js`)).text();
+    const episodesJs = await (await fetch(`${url.makeURL()}/episodes.js`)).text();
     const result: Lecteur[] = []
     const regex = /var\s+eps(\d+)\s*=\s*\[\s*([\s\S]*?)\s*\];/g;
     let match: RegExpExecArray | null;
 
     // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
-    while ((match = regex.exec(epidosesJs)) !== null) {
+    while ((match = regex.exec(episodesJs)) !== null) {
         const id = Number.parseInt(match[1], 10);
         const links = match[2]
             .split("\n")

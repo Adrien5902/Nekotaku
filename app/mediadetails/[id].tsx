@@ -1,4 +1,4 @@
-import EpisodesCollection from "@/components/Media/Epidoses";
+import EpisodesCollection from "@/components/Media/Episodes";
 import MediaListStatusDisplay from "@/components/Media/Status";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -18,7 +18,7 @@ import {
 } from "react-native-tab-view";
 import { useState } from "react";
 import { useThemeColors } from "@/hooks/useThemeColor";
-import MediaDetails from "@/components/MediaDetails";
+import MediaDetails from "@/components/Media/MediaDetails";
 import { Dimensions, View } from "react-native";
 import Icon, { type IconName } from "@/components/Icon";
 
