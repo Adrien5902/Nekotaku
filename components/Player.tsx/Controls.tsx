@@ -16,7 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Colors } from "@/constants/Colors";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { Spacing, TextSizes } from "@/constants/Sizes";
-import type { MediaList } from "@/types/Anilist";
+import type { MediaList } from "@/types/Anilist/graphql";
 import type { Episode } from "@/types/AnimeSama";
 import Icon from "../Icon";
 import GoogleCast, { useDevices } from "react-native-google-cast";

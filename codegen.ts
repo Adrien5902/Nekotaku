@@ -2,13 +2,18 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-  overwrite: true,
-  schema: "./schema.graphql",
-  generates: {
-    "./types/Anilist.ts": {
-      plugins: ["typescript"]
+    overwrite: true,
+    schema: "https://graphql.anilist.co",
+    documents: ['./{app,components,hooks,types}/**/*.{ts,tsx}'],
+    generates: {
+        "./types/Anilist/": {
+            plugins: ["typescript"],
+            preset: "client",
+            presetConfig: {
+                gqlTagName: "gql"
+            }
+        }
     }
-  }
 };
 
 export default config;

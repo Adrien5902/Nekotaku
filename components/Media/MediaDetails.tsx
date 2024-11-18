@@ -1,4 +1,4 @@
-import type { Media } from "@/types/Anilist";
+import type { Media } from "@/types/Anilist/graphql";
 import useStyles from "@/hooks/useStyles";
 import MediaStats from "./MediaStats";
 import { Dimensions, ScrollView, View } from "react-native";

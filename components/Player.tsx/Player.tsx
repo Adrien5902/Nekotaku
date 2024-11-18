@@ -9,7 +9,7 @@ import {
 import Controls from "./Controls";
 import { type AVPlaybackStatusSuccess, ResizeMode, Video } from "expo-av";
 import { useEffect, useRef } from "react";
-import type { MediaList } from "@/types/Anilist";
+import type { MediaList } from "@/types/Anilist/graphql";
 import type { Episode } from "@/types/AnimeSama";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import {

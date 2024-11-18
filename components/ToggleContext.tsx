@@ -1,10 +1,11 @@
-import { MediaListStatus, type MediaListGroup } from "@/types/Anilist";
-import { type ApolloError, gql, useQuery } from "@apollo/client";
+import { MediaListCollectionQuery, MediaListStatus, MediaType, type MediaListGroup } from "@/types/Anilist/graphql";
+import { type ApolloError, useQuery } from "@apollo/client";
 import type React from "react";
 import { createContext, useContext, useState } from "react";
 import { useAnilistUserInfo } from "./AnilistUserInfoProvider";
+import { gql } from "@/types/Anilist";
 
-const QUERY = gql`
+const QUERY = gql(`
 	query MediaListCollection($userId: Int, $type: MediaType, $version: Int) {
 		MediaListCollection(userId: $userId, type: $type) {
 			lists {
@@ -15,7 +16,7 @@ const QUERY = gql`
 						id
 						title {
 							english
-							userPreferred
+							romaji
 						}
 						coverImage {
 							large
@@ -38,14 +39,14 @@ const QUERY = gql`
 			}
 		}
 	}
-`;
+`);
 
 const ToggleContext = createContext<{
 	isManga: boolean;
 	setIsManga: React.Dispatch<React.SetStateAction<boolean>> | null;
 	listsData: {
-		error: ApolloError | undefined;
-		data: MediaListGroup[] | undefined;
+		error?: ApolloError;
+		data?: NonNullable<NonNullable<NonNullable<MediaListCollectionQuery["MediaListCollection"]>["lists"]>>;
 		loading: boolean;
 		refetch: () => void;
 	};
@@ -59,18 +60,16 @@ export const ToggleProvider = ({ children }: { children: React.ReactNode }) => {
 	const [isManga, setIsManga] = useState(false);
 	const UserInfo = useAnilistUserInfo();
 
-	const { error, data, loading, refetch } = useQuery<{
-		MediaListCollection: { lists: MediaListGroup[] };
-	}>(QUERY, {
-		variables: { userId: UserInfo?.id, type: isManga ? "MANGA" : "ANIME" },
+	const { error, data, loading, refetch } = useQuery(QUERY, {
+		variables: { userId: UserInfo?.id, type: isManga ? MediaType.Manga : MediaType.Anime },
 	});
 
-	const lists = data
+	const lists = data?.MediaListCollection?.lists
 		? [...data.MediaListCollection.lists].map((list) => {
-				const entries = [...list.entries];
+				const entries = [...list?.entries ??[]];
 				entries.sort((a, b) =>
-					(a.media?.title.english ?? a.media?.title.romaji ?? a.id) >
-					(b.media?.title.english ?? a.media?.title.romaji ?? b.id)
+					(a?.media?.title?.english ?? a?.media?.title?.romaji ?? a?.id ?? 0) >
+					(b?.media?.title?.english ?? a?.media?.title?.romaji ?? b?.id ?? 0)
 						? 1
 						: -1,
 				);

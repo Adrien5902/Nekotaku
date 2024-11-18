@@ -10,7 +10,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { EpisodesList } from "@/components/Media/Episodes";
 import type { Lecteur } from "@/types/AnimeSama";
 import { DownloadingContext } from "@/components/DownloadingContext";
-import type { MediaList } from "@/types/Anilist";
+import type { MediaList } from "@/types/Anilist/graphql";
 import { Spacing } from "@/constants/Sizes";
 
 const VideoPlayer = () => {

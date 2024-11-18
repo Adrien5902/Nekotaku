@@ -14,7 +14,7 @@ export default function Settings() {
 	return (
 		<ScrollView style={{ paddingTop: Spacing.xl }}>
 			<BigTitle icon={"gears"} title="Setting" />
-			<Collapsible title="Appearence">
+			<Collapsible title="Appearance">
 				<View>
 					<ThemedText>{settings.lang}</ThemedText>
 				</View>

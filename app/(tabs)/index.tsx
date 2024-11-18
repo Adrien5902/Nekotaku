@@ -18,7 +18,7 @@ export default function ListScreen() {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (listStatus === undefined && lists) {
-			setListStatus(lists?.findIndex((list) => list.status === "CURRENT") ?? 0);
+			setListStatus(lists?.findIndex((list) => list?.status === "CURRENT") ?? 0);
 		}
 	}, [loading]);
 
@@ -35,7 +35,7 @@ export default function ListScreen() {
 	return (
 		<ThemedView style={styles.container}>
 			<MediaListCollection
-				list={list ?? lists?.[0]}
+				list={list?.entries ?? lists?.[0]?.entries}
 				refreshing={loading}
 				refresh={refetch}
 			/>

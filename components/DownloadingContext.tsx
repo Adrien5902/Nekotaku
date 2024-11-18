@@ -6,7 +6,7 @@ import notifee, {
 	type Event as NotificationEvent,
 	type Notification,
 } from "@notifee/react-native";
-import type { Media } from "@/types/Anilist";
+import type { Media } from "@/types/Anilist/graphql";
 import { Colors } from "@/constants/Colors";
 import type { Episode, EpisodeId } from "@/types/AnimeSama";
 

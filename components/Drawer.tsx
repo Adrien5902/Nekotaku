@@ -10,7 +10,7 @@ import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { useRef, useState } from "react";
-import type { MediaListGroup } from "@/types/Anilist";
+import type { MediaListGroup } from "@/types/Anilist/graphql";
 import Icon from "./Icon";
 import { Spacing } from "@/constants/Sizes";
 
@@ -19,7 +19,7 @@ export default function Drawer({
 	listStatus,
 	setListStatus,
 }: {
-	lists: MediaListGroup[] | undefined;
+	lists?: (Pick<MediaListGroup, "name" | "status"> | undefined | null)[] | undefined|null;
 	listStatus: number | undefined;
 	setListStatus: React.Dispatch<React.SetStateAction<number | undefined>>;
 }) {
@@ -105,7 +105,7 @@ export default function Drawer({
 						return (
 							<TouchableHighlight
 								underlayColor={colors.primary}
-								key={list.name}
+								key={list?.name}
 								onPress={(e) => {
 									setListStatus(i);
 									toggleDrawer();
@@ -125,7 +125,7 @@ export default function Drawer({
 									weight={isFocused ? "bold" : undefined}
 									color={isFocused ? "background" : "text"}
 								>
-									{list.name}
+									{list?.name}
 								</ThemedText>
 							</TouchableHighlight>
 						);

@@ -5,7 +5,7 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import { ThemedText } from "./ThemedText";
 import { type Href, router, useUnstableGlobalHref } from "expo-router";
 import type { Episode, Lecteur } from "@/types/AnimeSama";
-import type { MediaList, Media } from "@/types/Anilist";
+import type { MediaList, Media } from "@/types/Anilist/graphql";
 import { useContext, useEffect, useState } from "react";
 import {
 	DownloadingContext,
