@@ -1,4 +1,8 @@
-import { MediaListCollectionQuery, MediaListStatus, MediaType, type MediaListGroup } from "@/types/Anilist/graphql";
+import {
+	type MediaListCollectionQuery,
+	MediaListStatus,
+	MediaType,
+} from "@/types/Anilist/graphql";
 import { type ApolloError, useQuery } from "@apollo/client";
 import type React from "react";
 import { createContext, useContext, useState } from "react";
@@ -46,7 +50,11 @@ const ToggleContext = createContext<{
 	setIsManga: React.Dispatch<React.SetStateAction<boolean>> | null;
 	listsData: {
 		error?: ApolloError;
-		data?: NonNullable<NonNullable<NonNullable<MediaListCollectionQuery["MediaListCollection"]>["lists"]>>;
+		data?: NonNullable<
+			NonNullable<
+				NonNullable<MediaListCollectionQuery["MediaListCollection"]>["lists"]
+			>
+		>;
 		loading: boolean;
 		refetch: () => void;
 	};
@@ -61,12 +69,15 @@ export const ToggleProvider = ({ children }: { children: React.ReactNode }) => {
 	const UserInfo = useAnilistUserInfo();
 
 	const { error, data, loading, refetch } = useQuery(QUERY, {
-		variables: { userId: UserInfo?.id, type: isManga ? MediaType.Manga : MediaType.Anime },
+		variables: {
+			userId: UserInfo?.id,
+			type: isManga ? MediaType.Manga : MediaType.Anime,
+		},
 	});
 
 	const lists = data?.MediaListCollection?.lists
 		? [...data.MediaListCollection.lists].map((list) => {
-				const entries = [...list?.entries ??[]];
+				const entries = [...(list?.entries ?? [])];
 				entries.sort((a, b) =>
 					(a?.media?.title?.english ?? a?.media?.title?.romaji ?? a?.id ?? 0) >
 					(b?.media?.title?.english ?? a?.media?.title?.romaji ?? b?.id ?? 0)

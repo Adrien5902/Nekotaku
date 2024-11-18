@@ -3,9 +3,11 @@ import { QueryResult, useQuery } from "@apollo/client";
 import { ThemedText } from "./ThemedText";
 import { RefreshControl } from "react-native";
 import { gql } from "@/types/Anilist";
-import { ViewerQuery } from "@/types/Anilist/graphql";
+import type { ViewerQuery } from "@/types/Anilist/graphql";
 
-const AnilistUserInfoContext = createContext<ViewerQuery["Viewer"] | null>(null);
+const AnilistUserInfoContext = createContext<ViewerQuery["Viewer"] | null>(
+	null,
+);
 
 interface Props {
 	children: React.ReactNode;

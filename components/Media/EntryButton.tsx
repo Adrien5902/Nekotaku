@@ -15,15 +15,18 @@ import type { Media, MediaList } from "@/types/Anilist/graphql";
 import useStyles from "@/hooks/useStyles";
 
 export interface Props {
-	entry?: Pick<
-		MediaList,
-		"id" | "progress" | "score" | "repeat"
-		> & {
-		media?: Pick<
-			Media,
-			"episodes" | "coverImage" | "title" | "status" | "format"
-		>|null|undefined;
-	}|null|undefined;
+	entry?:
+		| (Pick<MediaList, "id" | "progress" | "score" | "repeat"> & {
+				media?:
+					| Pick<
+							Media,
+							"episodes" | "coverImage" | "title" | "status" | "format"
+					  >
+					| null
+					| undefined;
+		  })
+		| null
+		| undefined;
 }
 
 function EntryButton({ entry }: Props) {
@@ -91,9 +94,9 @@ function EntryButton({ entry }: Props) {
 								</ThemedText>
 							) : null}
 						</View>
-						{entry.repeat ? (
+						{entry?.repeat ? (
 							<ThemedText>
-								{entry.repeat}
+								{entry?.repeat}
 								<Icon size={TextSizes.m} name="repeat" />
 							</ThemedText>
 						) : null}
@@ -111,6 +114,7 @@ function EntryButton({ entry }: Props) {
 									alignItems: "center",
 									padding: Spacing.xs,
 								}}
+							>
 								<ThemedText>
 									{entry?.progress}/{entry?.media?.episodes}
 								</ThemedText>
