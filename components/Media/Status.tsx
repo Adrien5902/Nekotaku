@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { ThemedText, type ThemedTextProps } from "../ThemedText";
-import type { MediaList } from "@/types/Anilist";
+import type { MediaList } from "@/types/Anilist/graphql";
 
 interface Props extends ThemedTextProps {
 	mediaList: MediaList | undefined;

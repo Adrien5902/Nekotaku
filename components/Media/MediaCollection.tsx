@@ -1,6 +1,6 @@
 import { ThemedView } from "@/components/ThemedView";
 import EntryButton from "./EntryButton";
-import type { MediaListGroup } from "@/types/Anilist";
+import type { MediaListGroup } from "@/types/Anilist/graphql";
 import { RefreshControl, VirtualizedList } from "react-native";
 
 interface Props {

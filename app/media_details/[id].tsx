@@ -3,7 +3,7 @@ import MediaListStatusDisplay from "@/components/Media/Status";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
-import type { Media, MediaList } from "@/types/Anilist";
+import type { Media, MediaList } from "@/types/Anilist/graphql.ts";
 import { gql, useQuery } from "@apollo/client";
 import { useLocalSearchParams } from "expo-router";
 import BannerTitleDisplay from "@/components/BannerTitleDisplay";
@@ -157,21 +157,21 @@ export default function MediaPage() {
 				flex: 1,
 			}}
 		>
-			{!loading ? (
+			{!loading && mediaList?.media ? (
 				<>
 					<BannerTitleDisplay
 						avatarAspectRatio={AspectRatios.cover}
 						avatarSource={{
-							uri: mediaList?.media?.coverImage?.large ?? undefined,
+							uri: mediaList.media.coverImage?.large ?? undefined,
 						}}
-						bannerSource={{ uri: mediaList?.media?.bannerImage ?? undefined }}
+						bannerSource={{ uri: mediaList.media.bannerImage ?? undefined }}
 						text={
 							<>
 								<ThemedText numberOfLines={2} size="m">
-									{mediaList?.media?.title?.english}
+									{mediaList.media.title?.english}
 								</ThemedText>
 								<ThemedText numberOfLines={1} size="s" style={{ opacity: 0.6 }}>
-									{mediaList?.media?.title?.romaji}
+									{mediaList.media.title?.romaji}
 								</ThemedText>
 								<MediaListStatusDisplay {...{ mediaList }} size="s" />
 							</>

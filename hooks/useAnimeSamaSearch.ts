@@ -1,4 +1,4 @@
-import type { Media } from "@/types/Anilist";
+import type { Media } from "@/types/Anilist/graphql";
 import { DOMParser } from 'react-native-html-parser';
 import { useMemoryCachedPromise } from "./usePromise";
 

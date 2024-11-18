@@ -11,7 +11,7 @@ import { type Href, router } from "expo-router";
 import MediaListStatusDisplay from "./Status";
 import Icon from "../Icon";
 import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
-import type { MediaList } from "@/types/Anilist";
+import type { MediaList } from "@/types/Anilist/graphql";
 import useStyles from "@/hooks/useStyles";
 
 interface Props {

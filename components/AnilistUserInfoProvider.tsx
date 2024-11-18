@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { ThemedText } from "./ThemedText";
-import type { User } from "@/types/Anilist";
+import type { User } from "@/types/Anilist/graphql";
 import { RefreshControl } from "react-native";
 
 const AnilistUserInfoContext = createContext<User | null>(null);

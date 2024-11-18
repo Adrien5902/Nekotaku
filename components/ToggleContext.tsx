@@ -1,4 +1,4 @@
-import { MediaListStatus, type MediaListGroup } from "@/types/Anilist";
+import { MediaListStatus, type MediaListGroup } from "@/types/Anilist/graphql";
 import { type ApolloError, gql, useQuery } from "@apollo/client";
 import type React from "react";
 import { createContext, useContext, useState } from "react";

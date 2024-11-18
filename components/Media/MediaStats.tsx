@@ -3,7 +3,7 @@ import { ThemedText } from "../ThemedText";
 import Icon, { type IconName } from "../Icon";
 import useStyles from "@/hooks/useStyles";
 import { Spacing } from "@/constants/Sizes";
-import type { Media } from "@/types/Anilist";
+import type { Media } from "@/types/Anilist/graphql";
 
 export default function MediaStats({ media }: { media: Media }) {
 	const styles = useStyles();

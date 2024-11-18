@@ -10,7 +10,7 @@ import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { useRef, useState } from "react";
-import type { MediaListGroup } from "@/types/Anilist";
+import type { MediaListGroup } from "@/types/Anilist/graphql";
 import Icon from "./Icon";
 import { Spacing } from "@/constants/Sizes";
 
