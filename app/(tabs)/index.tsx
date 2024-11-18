@@ -18,7 +18,9 @@ export default function ListScreen() {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (listStatus === undefined && lists) {
-			setListStatus(lists?.findIndex((list) => list?.status === "CURRENT") ?? 0);
+			setListStatus(
+				lists?.findIndex((list) => list?.status === "CURRENT") ?? 0,
+			);
 		}
 	}, [loading]);
 

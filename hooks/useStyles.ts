@@ -7,6 +7,7 @@ export function useStyles() {
     const { width, height } = Dimensions.get("window")
     const Styles = StyleSheet.create({
         PrimaryElement: {
+            color: colors.text,
             padding: Spacing.m,
             flexDirection: "row",
             margin: Spacing.s,

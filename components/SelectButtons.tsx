@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+	ScrollView,
 	type TextStyle,
 	TouchableHighlight,
 	View,
@@ -7,18 +8,21 @@ import {
 } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { useThemeColors } from "@/hooks/useThemeColor";
+import { Spacing, TextSizes } from "@/constants/Sizes";
+import Icon from "./Icon";
 
-interface Props {
-	buttonStyle: ViewStyle;
-	activeStyle: ViewStyle;
-	textStyle: TextStyle;
-	activeTextStyle: TextStyle;
-	buttons: string[];
-	defaultValue?: string;
-	onValueChange: (newVal: string) => void;
+interface Props<T extends string> {
+	buttonStyle?: ViewStyle;
+	activeStyle?: ViewStyle;
+	textStyle?: TextStyle;
+	activeTextStyle?: TextStyle;
+	buttons: T[];
+	defaultValue?: T;
+	onValueChange: (newVal: T) => void;
+	checkMark?: boolean;
 }
 
-export function SelectButtons({
+export function SelectButtons<T extends string>({
 	defaultValue,
 	buttonStyle,
 	textStyle,
@@ -26,14 +30,45 @@ export function SelectButtons({
 	onValueChange,
 	activeStyle,
 	activeTextStyle,
-}: Props) {
+	checkMark,
+}: Props<T>) {
 	const colors = useThemeColors();
 	const [value, setValue] = useState(defaultValue ?? buttons[0]);
 
 	return (
-		<View style={{ flexDirection: "row" }}>
+		<ScrollView horizontal={true}>
 			{buttons.map((buttonName) => {
 				const active = value === buttonName;
+
+				const buttonStyle2 = [
+					buttonStyle ?? {
+						marginHorizontal: Spacing.m,
+						marginBottom: Spacing.m,
+						padding: Spacing.m,
+						borderRadius: Spacing.s,
+						borderColor: colors.text,
+						borderWidth: Spacing.xs,
+					},
+				];
+
+				const textStyle2 = [textStyle ?? { color: colors.text }];
+
+				if (active) {
+					buttonStyle2.push(
+						activeStyle ?? {
+							backgroundColor: colors.accent,
+							borderColor: colors.accent,
+						},
+					);
+
+					textStyle2.push(
+						activeTextStyle ?? {
+							color: colors.background,
+							fontWeight: "800",
+						},
+					);
+				}
+
 				return (
 					<TouchableHighlight
 						onPress={() => {
@@ -41,17 +76,22 @@ export function SelectButtons({
 							setValue(buttonName);
 						}}
 						key={buttonName}
-						style={active ? { ...buttonStyle, ...activeStyle } : buttonStyle}
+						style={buttonStyle2}
 						underlayColor={colors.primary}
 					>
-						<ThemedText
-							style={active ? { ...textStyle, ...activeTextStyle } : textStyle}
-						>
-							{buttonName}
-						</ThemedText>
+						<View style={{ flexDirection: "row", alignItems: "center" }}>
+							{active && checkMark ? (
+								<Icon
+									name="check"
+									style={[textStyle2, { paddingRight: Spacing.s }]}
+									size={TextSizes.s}
+								/>
+							) : null}
+							<ThemedText style={textStyle2}>{buttonName}</ThemedText>
+						</View>
 					</TouchableHighlight>
 				);
 			})}
-		</View>
+		</ScrollView>
 	);
 }

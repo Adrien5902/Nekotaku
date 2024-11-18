@@ -3,8 +3,11 @@ import MediaListStatusDisplay from "@/components/Media/Status";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
-import type { Media, MediaList } from "@/types/Anilist/graphql";
-import { gql } from "@/types/Anilist/gql";
+import {
+	ScoreFormat,
+	type Media,
+	type MediaList,
+} from "@/types/Anilist/graphql";
 import { useQuery } from "@apollo/client";
 import { useLocalSearchParams } from "expo-router";
 import BannerTitleDisplay from "@/components/BannerTitleDisplay";
@@ -22,21 +25,22 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import MediaDetails from "@/components/Media/MediaDetails";
 import { Dimensions, View } from "react-native";
 import Icon, { type IconName } from "@/components/Icon";
+import EditMediaListStatus from "@/components/EditMediaListStatus";
+import { gql } from "@/types/Anilist";
+import { useAnilistUserInfo } from "@/components/AnilistUserInfoProvider";
 
 const QUERY = gql(`
-	query MediaList($mediaListId: Int) {
-		MediaList(id: $mediaListId) {
+	query MediaList($format: ScoreFormat, $mediaListId: Int, $userId: Int) {
+		MediaList(id: $mediaListId, userId: $userId) {
 			status
-			score
+			score(format: $format)
 			progress
 			progressVolumes
 			repeat
-			priority
 			private
 			notes
 			hiddenFromStatusLists
 			customLists
-			advancedScores
 			startedAt {
 				year
 				month
@@ -58,6 +62,7 @@ const QUERY = gql(`
 					favourites
 					meanScore
 					averageScore
+					episodes
 					coverImage{
 						large
 						color
@@ -79,12 +84,20 @@ export default function MediaPage() {
 	const colors = useThemeColors();
 	const [index, setIndex] = useState(0);
 	const { id } = useLocalSearchParams();
+
+	const userId = useAnilistUserInfo()?.id;
+
 	const {
 		loading,
 		data: mediaListData,
 		error,
+		refetch,
 	} = useQuery(QUERY, {
-		variables: { mediaListId: Number.parseInt(id.toString()) },
+		variables: {
+			userId,
+			mediaListId: Number.parseInt(id.toString()),
+			format: ScoreFormat.Point_10Decimal,
+		},
 	});
 
 	const mediaList = mediaListData?.MediaList;
@@ -185,6 +198,11 @@ export default function MediaPage() {
 						onIndexChange={setIndex}
 						renderScene={renderScene}
 						navigationState={{ index, routes }}
+					/>
+					<EditMediaListStatus
+						currentStatus={mediaList}
+						media={mediaList.media}
+						refetch={refetch}
 					/>
 				</>
 			) : null}

@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import { SelectButtons } from "../SelectButtons";
 import { RefreshControl, ScrollView, View } from "react-native";
 import type { Media, MediaList } from "@/types/Anilist/graphql.ts";
-import { useThemeColors } from "@/hooks/useThemeColor";
 import { useAnimeSamaGetLecteurs } from "@/hooks/useAnimeSamaGetEpisodes";
 import { useMemoryCachedPromise } from "@/hooks/usePromise";
 import PlayDownloadButton from "../PlayDownloadButton";
@@ -34,7 +33,6 @@ export default function EpisodesCollection({
 		? (AnimeSamaUrl.fromURL(searchResult?.url) ?? undefined)
 		: undefined;
 
-	const colors = useThemeColors();
 	const {
 		data,
 		loading: loadingLangs,
@@ -89,20 +87,6 @@ export default function EpisodesCollection({
 					onValueChange={(value) => {
 						setLang(value as keyof typeof Lang);
 					}}
-					buttonStyle={{
-						marginHorizontal: Spacing.m,
-						marginBottom: Spacing.m,
-						padding: 8,
-						borderRadius: 8,
-						borderColor: colors.text,
-						borderWidth: 1,
-					}}
-					textStyle={{ color: colors.text }}
-					activeStyle={{
-						backgroundColor: colors.accent,
-						borderColor: colors.accent,
-					}}
-					activeTextStyle={{ color: colors.background, fontWeight: "800" }}
 				/>
 			) : null}
 			{errorEpisodes ? (
@@ -118,6 +102,7 @@ export default function EpisodesCollection({
 			) : (
 				<ThemedText>Retrieving episodes...</ThemedText>
 			)}
+			<View style={{ height: Spacing.l * 3 }} />
 		</ScrollView>
 	);
 }
