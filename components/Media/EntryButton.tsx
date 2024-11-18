@@ -11,11 +11,19 @@ import { type Href, router } from "expo-router";
 import MediaListStatusDisplay from "./Status";
 import Icon from "../Icon";
 import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
-import type { MediaList } from "@/types/Anilist/graphql";
+import type { Media, MediaList } from "@/types/Anilist/graphql";
 import useStyles from "@/hooks/useStyles";
 
-interface Props {
-	entry: MediaList;
+export interface Props {
+	entry?: Pick<
+		MediaList,
+		"id" | "progress" | "score" | "repeat"
+		> & {
+		media?: Pick<
+			Media,
+			"episodes" | "coverImage" | "title" | "status" | "format"
+		>|null|undefined;
+	}|null|undefined;
 }
 
 function EntryButton({ entry }: Props) {
@@ -23,13 +31,13 @@ function EntryButton({ entry }: Props) {
 	return (
 		<TouchableOpacity
 			onPress={() => {
-				router.navigate(`/media_details/${entry.id ?? 0}` as Href<string>);
+				router.navigate(`/media_details/${entry?.id ?? 0}` as Href<string>);
 			}}
 			activeOpacity={0.7}
 		>
 			<ThemedView style={[styles.PrimaryElement, { flex: 1, padding: 0 }]}>
 				<Image
-					source={{ uri: entry.media?.coverImage?.large ?? undefined }}
+					source={{ uri: entry?.media?.coverImage?.large ?? undefined }}
 					style={{ width: 80, aspectRatio: AspectRatios.cover }}
 					progressiveRenderingEnabled={true}
 				/>
@@ -42,7 +50,7 @@ function EntryButton({ entry }: Props) {
 					}}
 				>
 					<ThemedText numberOfLines={1}>
-						{entry.media?.title?.english ?? entry.media?.title?.romaji}
+						{entry?.media?.title?.english ?? entry?.media?.title?.romaji}
 					</ThemedText>
 
 					<MediaListStatusDisplay mediaList={entry} />
@@ -57,12 +65,12 @@ function EntryButton({ entry }: Props) {
 							overflow: "hidden",
 						}}
 					>
-						{entry.progress && entry.media?.episodes ? (
+						{entry?.progress && entry?.media?.episodes ? (
 							<ThemedView
 								color="accent"
 								style={{
 									height: 5,
-									width: `${(entry.progress / entry.media?.episodes) * 100}%`,
+									width: `${(entry?.progress / entry?.media?.episodes) * 100}%`,
 								}}
 							/>
 						) : null}
@@ -76,9 +84,9 @@ function EntryButton({ entry }: Props) {
 						}}
 					>
 						<View>
-							{entry.score ? (
+							{entry?.score ? (
 								<ThemedText>
-									{entry.score}
+									{entry?.score}
 									<Icon size={TextSizes.m} name="star-half-stroke" />
 								</ThemedText>
 							) : null}
@@ -98,16 +106,16 @@ function EntryButton({ entry }: Props) {
 									padding: Spacing.xs,
 								}}
 							>
-								{entry.repeat ? (
+								{entry?.repeat ? (
 									<ThemedText>
-										{entry.repeat}
+										{entry?.repeat}
 										<Icon size={TextSizes.m} name="repeat" />
 									</ThemedText>
 								) : null}
 								<ThemedText>
-									{entry.progress}/{entry.media?.episodes}
+									{entry?.progress}/{entry?.media?.episodes}
 								</ThemedText>
-								{entry.progress !== entry.media?.episodes ? (
+								{entry?.progress !== entry?.media?.episodes ? (
 									<ThemedText>
 										{" "}
 										<Icon size={TextSizes.m} name="plus" />

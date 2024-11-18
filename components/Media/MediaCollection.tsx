@@ -1,12 +1,11 @@
 import { ThemedView } from "@/components/ThemedView";
-import EntryButton from "./EntryButton";
-import type { MediaListGroup } from "@/types/Anilist/graphql";
+import EntryButton, {type Props as EntryButtonProps} from "./EntryButton";
 import { RefreshControl, VirtualizedList } from "react-native";
 
 interface Props {
 	refreshing: boolean;
 	refresh: () => unknown;
-	list?: MediaListGroup;
+	list?: EntryButtonProps["entry"][] |null|undefined;
 }
 
 export default function MediaListCollection({
@@ -28,7 +27,7 @@ export default function MediaListCollection({
 					<RefreshControl refreshing={refreshing} onRefresh={() => refresh()} />
 				}
 				initialNumToRender={6}
-				getItem={(_, index) => list?.entries?.[index]}
+				getItem={(_, index) => list?.[index]}
 				renderItem={({ item }) => (item ? <EntryButton entry={item} /> : null)}
 				keyExtractor={(entry, _index) => entry?.id.toString() ?? ""}
 				getItemCount={() => list?.entries?.length ?? 0}

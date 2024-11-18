@@ -3,8 +3,9 @@ import MediaListStatusDisplay from "@/components/Media/Status";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
-import type { Media, MediaList } from "@/types/Anilist/graphql.ts";
-import { gql, useQuery } from "@apollo/client";
+import type { Media, MediaList } from "@/types/Anilist/graphql";
+import { gql } from "@/types/Anilist/gql";
+import { useQuery } from "@apollo/client";
 import { useLocalSearchParams } from "expo-router";
 import BannerTitleDisplay from "@/components/BannerTitleDisplay";
 import {
@@ -22,55 +23,57 @@ import MediaDetails from "@/components/Media/MediaDetails";
 import { Dimensions, View } from "react-native";
 import Icon, { type IconName } from "@/components/Icon";
 
-const QUERY = gql`query MediaList($mediaListId: Int) {
-	MediaList(id: $mediaListId) {
-		status
-		score
-		progress
-		progressVolumes
-		repeat
-		priority
-		private
-		notes
-		hiddenFromStatusLists
-		customLists
-		advancedScores
-		startedAt {
-			year
-			month
-			day
-		}
-		completedAt {
-			year
-			month
-			day
-		}
-		updatedAt
-		createdAt
-		media {
-			id
-			format
+const QUERY = gql(`
+	query MediaList($mediaListId: Int) {
+		MediaList(id: $mediaListId) {
 			status
-			description
-			popularity
-			favourites
-			meanScore
-			averageScore
-			coverImage{
-				large
-				color
+			score
+			progress
+			progressVolumes
+			repeat
+			priority
+			private
+			notes
+			hiddenFromStatusLists
+			customLists
+			advancedScores
+			startedAt {
+				year
+				month
+				day
 			}
-			bannerImage
-			title {
-				romaji
-				english
-				userPreferred
+			completedAt {
+				year
+				month
+				day
 			}
-			isFavourite
-			synonyms
+			updatedAt
+			createdAt
+			media {
+					id
+					format
+					status
+					description
+					popularity
+					favourites
+					meanScore
+					averageScore
+					coverImage{
+						large
+						color
+					}
+					bannerImage
+					title {
+					romaji
+					english
+					userPreferred
+				}
+				isFavourite
+				synonyms
+			}
 		}
 	}
-}`;
+`);
 
 export default function MediaPage() {
 	const colors = useThemeColors();
@@ -80,8 +83,8 @@ export default function MediaPage() {
 		loading,
 		data: mediaListData,
 		error,
-	} = useQuery<{ MediaList: MediaList }>(QUERY, {
-		variables: { mediaListId: id },
+	} = useQuery(QUERY, {
+		variables: { mediaListId: Number.parseInt(id.toString()) },
 	});
 
 	const mediaList = mediaListData?.MediaList;
@@ -173,7 +176,7 @@ export default function MediaPage() {
 								<ThemedText numberOfLines={1} size="s" style={{ opacity: 0.6 }}>
 									{mediaList.media.title?.romaji}
 								</ThemedText>
-								<MediaListStatusDisplay {...{ mediaList }} size="s" />
+								<MediaListStatusDisplay mediaList={mediaList} size="s" />
 							</>
 						}
 					/>

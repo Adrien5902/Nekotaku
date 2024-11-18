@@ -1,9 +1,11 @@
 import { View } from "react-native";
 import { ThemedText, type ThemedTextProps } from "../ThemedText";
-import type { MediaList } from "@/types/Anilist/graphql";
+import type { Media, MediaList} from "@/types/Anilist/graphql";
 
 interface Props extends ThemedTextProps {
-	mediaList: MediaList | undefined;
+	mediaList?: Pick<MediaList, "status"> & {
+		media?: Pick<Media, "format" | "status">|null|undefined
+	}|null|undefined;
 }
 
 export default function MediaListStatusDisplay({ mediaList, ...props }: Props) {

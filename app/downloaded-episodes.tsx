@@ -6,7 +6,6 @@ import { useContext } from "react";
 import { useToggle } from "../components/ToggleContext";
 import EntryButton from "@/components/Media/EntryButton";
 import { RefreshControl, ScrollView } from "react-native";
-import Icon from "@/components/Icon";
 import BigTitle from "@/components/BigTitle";
 
 export default function DownloadedEpisodes() {
@@ -24,7 +23,7 @@ export default function DownloadedEpisodes() {
 		);
 	}
 
-	const entries = data?.flatMap((m) => m.entries);
+	const entries = data?.flatMap((m) => m?.entries ?? []);
 	const downloadedMediaIds = Object.keys(downloader.downloadedEpisodes);
 
 	return (
@@ -40,15 +39,16 @@ export default function DownloadedEpisodes() {
 					const entry = entries?.find(
 						(mediaList) => mediaList?.media?.id === mediaId,
 					);
-					if (!entry) {
+					
+					if (entry?.media) {
 						return (
 							<ThemedText>
 								Error could not get media with id : {mediaId}
 							</ThemedText>
 						);
 					}
-
 					return <EntryButton key={mediaId} entry={entry} />;
+
 				})
 			) : (
 				<ThemedText>No downloaded Episodes {":("}</ThemedText>
