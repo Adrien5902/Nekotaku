@@ -36,7 +36,7 @@ export function usePromise<R>(fn: () => Promise<R | undefined>, deps?: unknown[]
 }
 
 export interface UseCachedPromise<R> extends UsePromise<R> {
-    refresh: () => Promise<true>
+    refresh: () => Promise<boolean>
 }
 
 const cache = new Map<string, unknown>();
@@ -54,7 +54,7 @@ export function useMemoryCachedPromise<R>(
     const cacheKey = key + deps ? JSON.stringify(deps) : "default";
 
     function refresh() {
-        return new Promise<true>((resolve, reject) => {
+        return new Promise<boolean>((resolve, reject) => {
             dataRef.current = undefined
             setLoading(true);
             fn()
@@ -69,7 +69,7 @@ export function useMemoryCachedPromise<R>(
                 .catch((err) => {
                     errorRef.current = err;
                     setLoading(false);
-                    reject(err)
+                    resolve(false)
                 });
         })
     }
