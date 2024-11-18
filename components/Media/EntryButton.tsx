@@ -91,6 +91,12 @@ function EntryButton({ entry }: Props) {
 								</ThemedText>
 							) : null}
 						</View>
+						{entry.repeat ? (
+							<ThemedText>
+								{entry.repeat}
+								<Icon size={TextSizes.m} name="repeat" />
+							</ThemedText>
+						) : null}
 						<TouchableHighlight
 							onPress={() => {
 								Vibration.vibrate([70, 40]);
@@ -105,13 +111,6 @@ function EntryButton({ entry }: Props) {
 									alignItems: "center",
 									padding: Spacing.xs,
 								}}
-							>
-								{entry?.repeat ? (
-									<ThemedText>
-										{entry?.repeat}
-										<Icon size={TextSizes.m} name="repeat" />
-									</ThemedText>
-								) : null}
 								<ThemedText>
 									{entry?.progress}/{entry?.media?.episodes}
 								</ThemedText>
