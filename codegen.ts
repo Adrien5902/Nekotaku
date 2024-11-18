@@ -7,7 +7,6 @@ const config: CodegenConfig = {
     documents: ['./{app,components,hooks,types}/**/*.{ts,tsx}'],
     generates: {
         "./types/Anilist/": {
-            plugins: ["typescript"],
             preset: "client",
             presetConfig: {
                 gqlTagName: "gql"
