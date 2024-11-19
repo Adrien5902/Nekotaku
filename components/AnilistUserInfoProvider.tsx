@@ -23,6 +23,11 @@ const QUERY = gql(`
 				medium
 			}
 			bannerImage
+			mediaListOptions {
+				animeList {
+					sectionOrder
+				}
+			}
 		}
 	}
 `);

@@ -89,15 +89,15 @@ export const ToggleProvider = ({ children }: { children: React.ReactNode }) => {
 		: undefined;
 
 	lists?.sort((a, b) => {
-		if (!a.status || !b.status) return 0;
-		const diff =
-			(Object.values(MediaListStatus).indexOf(a.status) ?? Number.MAX_VALUE) -
-			(Object.values(MediaListStatus).indexOf(b.status) ?? Number.MAX_VALUE);
-
-		if (diff === 0 && a.name && b.name) {
-			return a.name > b.name ? 1 : -1;
+		if (a.name && b.name) {
+			return (
+				(UserInfo?.mediaListOptions?.animeList?.sectionOrder?.indexOf(a.name) ??
+					0) -
+				(UserInfo?.mediaListOptions?.animeList?.sectionOrder?.indexOf(b.name) ??
+					0)
+			);
 		}
-		return diff;
+		return 0;
 	});
 
 	return (
