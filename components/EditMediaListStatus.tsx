@@ -305,22 +305,25 @@ function EditMediaListStatusModal({
 							)
 						: null}
 
-					<TextInput
+					<View
 						style={[
 							styles.PrimaryElement,
 							{
 								borderColor: colors.text,
-								width: "95%",
 							},
 						]}
-						placeholderTextColor={`${colors.text}60`}
-						cursorColor={colors.accent}
-						defaultValue={newStatus.current.notes ?? undefined}
-						onChange={(e) => {
-							newStatus.current.notes = e.nativeEvent.text;
-						}}
-						placeholder="Notes..."
-					/>
+					>
+						<TextInput
+							style={{ flex: 1 }}
+							placeholderTextColor={`${colors.text}60`}
+							cursorColor={colors.accent}
+							defaultValue={newStatus.current.notes ?? undefined}
+							onChange={(e) => {
+								newStatus.current.notes = e.nativeEvent.text;
+							}}
+							placeholder="Notes..."
+						/>
+					</View>
 					<View style={{ height: Spacing.xl * 3 }} />
 				</ThemedView>
 			</ScrollView>
