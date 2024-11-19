@@ -45,6 +45,10 @@ const QUERY = gql(`
 			episodes
 			isFavourite
 			synonyms
+			trailer {
+				id
+				site
+			}
 			coverImage {
 				large
 				color
