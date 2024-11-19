@@ -32,7 +32,7 @@ export default function EditMediaListStatus({
 	refetch,
 }: {
 	media: ModalProps["media"];
-	currentStatus?: MutationSaveMediaListEntryArgs;
+	currentStatus?: MutationSaveMediaListEntryArgs | null | undefined;
 	refetch: () => void;
 }) {
 	const colors = useThemeColors();
@@ -105,7 +105,7 @@ const QUERY = gql(`
 
 interface ModalProps {
 	media: Pick<Media, "isFavourite" | "id" | "title" | "episodes">;
-	currentStatus: MutationSaveMediaListEntryArgs | undefined;
+	currentStatus?: MutationSaveMediaListEntryArgs | null | undefined;
 	modalVisible: boolean;
 	setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 	refetch: () => void;

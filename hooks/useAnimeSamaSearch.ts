@@ -1,4 +1,4 @@
-import type { Media } from "@/types/Anilist/graphql";
+import type { Media, MediaTitle } from "@/types/Anilist/graphql";
 import { DOMParser } from 'react-native-html-parser';
 import { useMemoryCachedPromise } from "./usePromise";
 
@@ -7,7 +7,11 @@ interface SeasonData {
     part: number | null;
 }
 
-export function useAnimeSamaSearch(media?: Media) {
+export type AnimeSamaSearchMediaType = Pick<Media, "synonyms" | "format"> & {
+    title?: Pick<MediaTitle, "english" | "romaji"> | null | undefined
+} | null | undefined
+
+export function useAnimeSamaSearch(media?: AnimeSamaSearchMediaType) {
     return useMemoryCachedPromise("useAnimeSamaSearch", async () => {
         if (!media) {
             return undefined
@@ -106,11 +110,11 @@ function getSeasonFromString(s: string): ApplyTitleResult<SeasonData> | null {
     return { newString, data: { season: 1, part } }
 }
 
-function getFormatData(media: Media): {
+function getFormatData(media: AnimeSamaSearchMediaType): {
     urlAppending: (data?: SeasonData) => string
     searchResultApplyTitle?: (s: string) => ApplyTitleResult<SeasonData> | null,
 } {
-    switch (media.format) {
+    switch (media?.format) {
         case "MOVIE":
             return {
                 urlAppending: () => "film"
@@ -141,8 +145,8 @@ function getFormatData(media: Media): {
 
 interface ApplyTitleResult<T> { newString: string, data: T };
 type ApplyTitle<T> = (s: string) => ApplyTitleResult<T> | null;
-async function searchTitles<T>(media: Media, apply?: ApplyTitle<T>) {
-    for (const synonym of [[media.title?.romaji, media.title?.english], media.synonyms].flat().map(s => searchFriendly(s ?? ""))) {
+async function searchTitles<T>(media: AnimeSamaSearchMediaType, apply?: ApplyTitle<T>) {
+    for (const synonym of [[media?.title?.romaji, media?.title?.english], media?.synonyms].flat().map(s => searchFriendly(s ?? ""))) {
         const { newString, ...data } = apply ? apply(synonym) ?? { newString: null } : { newString: synonym };
         if (!newString) {
             continue
@@ -155,7 +159,7 @@ async function searchTitles<T>(media: Media, apply?: ApplyTitle<T>) {
     }
 }
 
-export async function searchMedia(media: Media) {
+export async function searchMedia(media: AnimeSamaSearchMediaType) {
     const { urlAppending, searchResultApplyTitle } = getFormatData(media)
     const searchResult = await searchTitles(media, searchResultApplyTitle)
     if (!searchResult) {

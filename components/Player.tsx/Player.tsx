@@ -9,7 +9,7 @@ import {
 import Controls from "./Controls";
 import { type AVPlaybackStatusSuccess, ResizeMode, Video } from "expo-av";
 import { useEffect, useRef } from "react";
-import type { MediaList } from "@/types/Anilist/graphql";
+import type { Media, MediaList, MediaTitle } from "@/types/Anilist/graphql";
 import type { Episode } from "@/types/AnimeSama";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import {
@@ -31,7 +31,9 @@ interface Props {
 	isFullscreen: boolean;
 	loading: boolean;
 	episode: Episode;
-	mediaList: MediaList;
+	media: Pick<Media, "id"> & {
+		title: Pick<MediaTitle, "english" | "romaji">;
+	};
 	toggleFullscreen: (force?: boolean) => void;
 	setIsLoadingVid: React.Dispatch<React.SetStateAction<boolean>>;
 	videoUri?: string;
@@ -41,7 +43,7 @@ export default function Player({
 	isFullscreen,
 	loading,
 	episode,
-	mediaList,
+	media,
 	toggleFullscreen,
 	setIsLoadingVid,
 	videoUri,
@@ -52,7 +54,7 @@ export default function Player({
 	async function savePos() {
 		await DiskCache.write(
 			"episodePositionMillis",
-			[mediaList.media?.id, episode.id],
+			[media?.id, episode.id],
 			statusRef.current.positionMillis,
 		);
 	}
@@ -82,7 +84,7 @@ export default function Player({
 	}, []);
 
 	const { data: startPos } = DiskCache.use<number>("episodePositionMillis", [
-		mediaList.media?.id,
+		media?.id,
 		episode.id,
 	]);
 
@@ -135,9 +137,9 @@ export default function Player({
 						statusRef,
 						loading,
 						episode,
-						mediaList,
 						toggleFullscreen,
 					}}
+					mediaTitle={media?.title}
 					forceView={!!googleCastMedia}
 				/>
 				{!googleCastMedia ? (

@@ -5,14 +5,21 @@ import useStyles from "@/hooks/useStyles";
 import { Spacing } from "@/constants/Sizes";
 import type { Media } from "@/types/Anilist/graphql";
 
-export default function MediaStats({ media }: { media: Media }) {
+export interface Props {
+	media?:
+		| Pick<Media, "popularity" | "favourites" | "meanScore" | "averageScore">
+		| null
+		| undefined;
+}
+
+export default function MediaStats({ media }: Props) {
 	const styles = useStyles();
 	return (
 		<ThemedView style={styles.PrimaryElement}>
-			<Child icon={"users"} data={media.popularity} />
-			<Child icon={"heart"} data={media.favourites} />
-			<Child icon={"star-half-stroke"} data={media.meanScore} />
-			<Child icon={"percentage"} data={media.averageScore} />
+			<Child icon={"users"} data={media?.popularity} />
+			<Child icon={"heart"} data={media?.favourites} />
+			<Child icon={"star-half-stroke"} data={media?.meanScore} />
+			<Child icon={"percentage"} data={media?.averageScore} />
 		</ThemedView>
 	);
 }

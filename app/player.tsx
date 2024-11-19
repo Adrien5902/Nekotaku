@@ -10,26 +10,26 @@ import { ThemedView } from "@/components/ThemedView";
 import { EpisodesList } from "@/components/Media/Episodes";
 import type { Lecteur } from "@/types/AnimeSama";
 import { DownloadingContext } from "@/components/DownloadingContext";
-import type { MediaList } from "@/types/Anilist/graphql";
+import type { Media, MediaList, MediaTitle } from "@/types/Anilist/graphql";
 import { Spacing } from "@/constants/Sizes";
+
+export type VideoPlayerMedia = Pick<Media, "bannerImage" | "id"> & {
+	title: Pick<MediaTitle, "english" | "romaji">;
+};
 
 const VideoPlayer = () => {
 	const {
 		episodeId: episodeIdParam,
-		mediaList: mediaListJSON,
+		media: mediaJSON,
 		lecteur: lecteurJSON,
 	} = useLocalSearchParams() as Record<string, string>;
-	const mediaList: MediaList = JSON.parse(mediaListJSON);
+	const media: VideoPlayerMedia = JSON.parse(mediaJSON);
 	const lecteur: Lecteur = JSON.parse(lecteurJSON);
 	const episode = lecteur.episodes[Number.parseInt(episodeIdParam)];
 
 	const downloadingContext = useContext(DownloadingContext);
 	const { loading: isGetVideoSourceLoading, data: videoUri } =
-		useGetVideoSource(
-			downloadingContext,
-			mediaList.media?.id as number,
-			episode,
-		);
+		useGetVideoSource(downloadingContext, media?.id, episode);
 	const [isFullscreen, setIsFullscreen] = useState(false);
 	const [isLoadingVid, setIsLoadingVid] = useState(true);
 
@@ -99,27 +99,23 @@ const VideoPlayer = () => {
 					setIsFullscreen,
 					loading,
 					episode,
-					mediaList: mediaList,
 					toggleFullscreen,
 					videoUri,
 					setIsLoadingVid,
+					media,
 				}}
 			/>
 			{!isFullscreen ? (
 				<View style={{ flexDirection: "column", flex: 1 }}>
 					<Image
-						source={{ uri: mediaList.media?.bannerImage ?? undefined }}
+						source={{ uri: media?.bannerImage ?? undefined }}
 						style={{
 							width: "100%",
 							aspectRatio: 14 / 3,
 							resizeMode: "contain",
 						}}
 					/>
-					<EpisodesList
-						lecteur={lecteur}
-						mediaList={mediaList}
-						selected={episode.id}
-					/>
+					<EpisodesList lecteur={lecteur} media={media} selected={episode.id} />
 				</View>
 			) : null}
 		</ThemedView>

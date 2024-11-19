@@ -6,7 +6,7 @@ import notifee, {
 	type Event as NotificationEvent,
 	type Notification,
 } from "@notifee/react-native";
-import type { Media } from "@/types/Anilist/graphql";
+import type { Media, MediaTitle } from "@/types/Anilist/graphql";
 import { Colors } from "@/constants/Colors";
 import type { Episode, EpisodeId } from "@/types/AnimeSama";
 
@@ -116,8 +116,16 @@ export class Downloader {
 		}
 	}
 
-	async startDownload(media: Media, episode: Episode) {
-		if (!media.id) {
+	async startDownload(
+		media:
+			| (Pick<Media, "id"> & {
+					title?: Pick<MediaTitle, "english" | "romaji"> | null | undefined;
+			  })
+			| null
+			| undefined,
+		episode: Episode,
+	) {
+		if (!media?.id) {
 			return null;
 		}
 

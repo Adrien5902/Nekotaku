@@ -11,36 +11,36 @@ import { type Href, router } from "expo-router";
 import MediaListStatusDisplay from "./Status";
 import Icon from "../Icon";
 import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
-import type { Media, MediaList } from "@/types/Anilist/graphql";
+import type { Media, MediaList, MediaRelation } from "@/types/Anilist/graphql";
 import useStyles from "@/hooks/useStyles";
 
 export interface Props {
-	entry?:
-		| (Pick<MediaList, "id" | "progress" | "score" | "repeat"> & {
-				media?:
-					| Pick<
-							Media,
-							"episodes" | "coverImage" | "title" | "status" | "format"
-					  >
-					| null
-					| undefined;
-		  })
+	media?:
+		| Pick<
+				Media,
+				"id" | "episodes" | "coverImage" | "title" | "status" | "format"
+		  >
 		| null
 		| undefined;
+	mediaList?:
+		| Pick<MediaList, "progress" | "score" | "repeat" | "status">
+		| null
+		| undefined;
+	relationType?: MediaRelation | null | undefined;
 }
 
-function EntryButton({ entry }: Props) {
+function EntryButton({ media, mediaList, relationType }: Props) {
 	const styles = useStyles();
 	return (
 		<TouchableOpacity
 			onPress={() => {
-				router.navigate(`/media_details/${entry?.id ?? 0}` as Href<string>);
+				router.push(`/media_details/${media?.id ?? 0}` as Href<string>);
 			}}
 			activeOpacity={0.7}
 		>
 			<ThemedView style={[styles.PrimaryElement, { flex: 1, padding: 0 }]}>
 				<Image
-					source={{ uri: entry?.media?.coverImage?.large ?? undefined }}
+					source={{ uri: media?.coverImage?.large ?? undefined }}
 					style={{ width: 80, aspectRatio: AspectRatios.cover }}
 					progressiveRenderingEnabled={true}
 				/>
@@ -52,11 +52,19 @@ function EntryButton({ entry }: Props) {
 						justifyContent: "space-around",
 					}}
 				>
-					<ThemedText numberOfLines={1}>
-						{entry?.media?.title?.english ?? entry?.media?.title?.romaji}
-					</ThemedText>
+					<View style={{ flexDirection: "row" }}>
+						{relationType ? (
+							<>
+								<ThemedText color="accent">{relationType}</ThemedText>
+								<ThemedText> • </ThemedText>
+							</>
+						) : null}
+						<ThemedText numberOfLines={1}>
+							{media?.title?.english ?? media?.title?.romaji}
+						</ThemedText>
+					</View>
 
-					<MediaListStatusDisplay mediaList={entry} />
+					<MediaListStatusDisplay mediaList={mediaList} media={media} />
 
 					<ThemedView
 						color="primary"
@@ -68,12 +76,12 @@ function EntryButton({ entry }: Props) {
 							overflow: "hidden",
 						}}
 					>
-						{entry?.progress && entry?.media?.episodes ? (
+						{mediaList?.progress && media?.episodes ? (
 							<ThemedView
 								color="accent"
 								style={{
 									height: 5,
-									width: `${(entry?.progress / entry?.media?.episodes) * 100}%`,
+									width: `${(mediaList.progress / media?.episodes) * 100}%`,
 								}}
 							/>
 						) : null}
@@ -87,45 +95,47 @@ function EntryButton({ entry }: Props) {
 						}}
 					>
 						<View>
-							{entry?.score ? (
+							{mediaList?.score ? (
 								<ThemedText>
-									{entry?.score}
+									{mediaList?.score}
 									<Icon size={TextSizes.m} name="star-half-stroke" />
 								</ThemedText>
 							) : null}
 						</View>
-						{entry?.repeat ? (
+						{mediaList?.repeat ? (
 							<ThemedText>
-								{entry?.repeat}
+								{mediaList?.repeat}
 								<Icon size={TextSizes.m} name="repeat" />
 							</ThemedText>
 						) : null}
-						<TouchableHighlight
-							onPress={() => {
-								Vibration.vibrate([70, 40]);
-							}}
-							style={{
-								borderRadius: Spacing.s,
-							}}
-						>
-							<View
+						{media?.episodes && mediaList?.progress ? (
+							<TouchableHighlight
+								onPress={() => {
+									Vibration.vibrate([70, 40]);
+								}}
 								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									padding: Spacing.xs,
+									borderRadius: Spacing.s,
 								}}
 							>
-								<ThemedText>
-									{entry?.progress}/{entry?.media?.episodes}
-								</ThemedText>
-								{entry?.progress !== entry?.media?.episodes ? (
+								<View
+									style={{
+										flexDirection: "row",
+										alignItems: "center",
+										padding: Spacing.xs,
+									}}
+								>
 									<ThemedText>
-										{" "}
-										<Icon size={TextSizes.m} name="plus" />
+										{mediaList.progress}/{media.episodes}
 									</ThemedText>
-								) : null}
-							</View>
-						</TouchableHighlight>
+									{mediaList.progress !== media.episodes ? (
+										<ThemedText>
+											{" "}
+											<Icon size={TextSizes.m} name="plus" />
+										</ThemedText>
+									) : null}
+								</View>
+							</TouchableHighlight>
+						) : null}
 					</View>
 				</View>
 			</ThemedView>

@@ -5,7 +5,7 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import { ThemedText } from "./ThemedText";
 import { type Href, router, useUnstableGlobalHref } from "expo-router";
 import type { Episode, Lecteur } from "@/types/AnimeSama";
-import type { MediaList, Media } from "@/types/Anilist/graphql";
+import type { Media, MediaList } from "@/types/Anilist/graphql";
 import { useContext, useEffect, useState } from "react";
 import {
 	DownloadingContext,
@@ -13,20 +13,20 @@ import {
 } from "./DownloadingContext";
 import type { Color } from "@/constants/Colors";
 
-interface Props {
-	mediaList: MediaList;
+export interface Props {
+	media: Pick<Media, "id"> | null | undefined;
 	episode: Episode;
 	lecteur: Lecteur;
 	color?: Color;
 }
 
 export default function PlayDownloadButton({
-	mediaList,
+	media,
 	episode,
 	lecteur,
 	color,
 }: Props) {
-	const mediaId = mediaList.media?.id;
+	const mediaId = media?.id;
 	if (!mediaId) {
 		return <ThemedText>Error</ThemedText>;
 	}
@@ -104,7 +104,7 @@ export default function PlayDownloadButton({
 		params: {
 			episodeId: episode.id,
 			lecteur: JSON.stringify(lecteur),
-			mediaList: JSON.stringify(mediaList),
+			media: JSON.stringify(media),
 		},
 	};
 
@@ -139,10 +139,7 @@ export default function PlayDownloadButton({
 				<Icon
 					onPress={async () => {
 						setState(DownloadState.Downloading);
-						await downloadingContext.startDownload(
-							mediaList.media as Media,
-							episode,
-						);
+						await downloadingContext.startDownload(media, episode);
 						updateDownloadState();
 					}}
 					size={TextSizes.xl}

@@ -39,7 +39,7 @@ export default function DownloadedEpisodes() {
 					const entry = entries?.find(
 						(mediaList) => mediaList?.media?.id === mediaId,
 					);
-					
+
 					if (entry?.media) {
 						return (
 							<ThemedText>
@@ -47,8 +47,9 @@ export default function DownloadedEpisodes() {
 							</ThemedText>
 						);
 					}
-					return <EntryButton key={mediaId} entry={entry} />;
-
+					return (
+						<EntryButton key={mediaId} media={entry?.media} mediaList={entry} />
+					);
 				})
 			) : (
 				<ThemedText>No downloaded Episodes {":("}</ThemedText>

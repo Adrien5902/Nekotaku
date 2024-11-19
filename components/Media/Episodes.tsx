@@ -12,15 +12,24 @@ import { RefreshControl, ScrollView, View } from "react-native";
 import type { Media, MediaList } from "@/types/Anilist/graphql.ts";
 import { useAnimeSamaGetLecteurs } from "@/hooks/useAnimeSamaGetEpisodes";
 import { useMemoryCachedPromise } from "@/hooks/usePromise";
-import PlayDownloadButton from "../PlayDownloadButton";
+import PlayDownloadButton, {
+	type Props as PlayDownloadButtonProps,
+} from "../PlayDownloadButton";
 import { Spacing } from "@/constants/Sizes";
 import useStyles from "@/hooks/useStyles";
-import { useAnimeSamaSearch } from "@/hooks/useAnimeSamaSearch";
+import {
+	type AnimeSamaSearchMediaType,
+	useAnimeSamaSearch,
+} from "@/hooks/useAnimeSamaSearch";
 
 export default function EpisodesCollection({
-	mediaList,
-}: { mediaList: MediaList }) {
-	const media = mediaList?.media as Media;
+	media,
+}: {
+	media?:
+		| (PlayDownloadButtonProps["media"] & AnimeSamaSearchMediaType)
+		| undefined
+		| null;
+}) {
 	const {
 		loading: loadingAnimeSama,
 		data: animeSamaData,
@@ -93,7 +102,7 @@ export default function EpisodesCollection({
 				<ThemedText>{errorEpisodes.message}</ThemedText>
 			) : !loadingEpisodes && lecteurs ? (
 				<EpisodesList
-					{...{ mediaList, url, lang }}
+					{...{ media, url, lang }}
 					lecteur={
 						lecteurs.find((l) => l.hostname.includes("sibnet.ru")) ??
 						lecteurs[0]
@@ -108,11 +117,11 @@ export default function EpisodesCollection({
 }
 
 export function EpisodesList({
-	mediaList,
+	media,
 	lecteur,
 	selected,
 }: {
-	mediaList: MediaList;
+	media: PlayDownloadButtonProps["media"];
 	lecteur: Lecteur;
 	selected?: number;
 }) {
@@ -121,7 +130,7 @@ export function EpisodesList({
 			{lecteur.episodes.map((episode) => (
 				<EpisodeButton
 					episode={episode}
-					{...{ mediaList, lecteur }}
+					{...{ media, lecteur }}
 					key={episode.id}
 					selected={selected === episode.id}
 				/>
@@ -132,12 +141,12 @@ export function EpisodesList({
 }
 
 function EpisodeButton({
-	mediaList,
+	media,
 	episode,
 	selected,
 	lecteur,
 }: {
-	mediaList: MediaList;
+	media: PlayDownloadButtonProps["media"];
 	selected?: boolean;
 	episode: Episode;
 	lecteur: Lecteur;
@@ -161,9 +170,9 @@ function EpisodeButton({
 						: `Épisode ${episode.name}`}
 				</ThemedText>
 			</View>
-			{mediaList.media ? (
+			{media ? (
 				<PlayDownloadButton
-					mediaList={mediaList}
+					media={media}
 					lecteur={lecteur}
 					episode={episode}
 					color={selected ? "background" : "text"}

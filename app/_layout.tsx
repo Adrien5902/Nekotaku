@@ -52,7 +52,13 @@ function StackScreens() {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
-					cache: new InMemoryCache(),
+					cache: new InMemoryCache({
+						typePolicies: {
+							MediaCoverImage: {
+								keyFields: ["large"],
+							},
+						},
+					}),
 				})
 			}
 		>

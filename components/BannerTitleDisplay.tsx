@@ -9,8 +9,8 @@ import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
 
 export interface Props {
 	text: React.ReactNode;
-	bannerSource: ImageSourcePropType;
-	avatarSource: ImageSourcePropType;
+	bannerSource?: ImageSourcePropType;
+	avatarSource?: ImageSourcePropType;
 	avatarAspectRatio: number;
 	avatarStyle?: ImageStyle;
 }
@@ -26,14 +26,16 @@ export default function BannerTitleDisplay({
 
 	return (
 		<View>
-			<Image
-				source={bannerSource}
-				style={{
-					width,
-					aspectRatio: AspectRatios.banner,
-					position: "absolute",
-				}}
-			/>
+			{bannerSource ? (
+				<Image
+					source={bannerSource}
+					style={{
+						width,
+						aspectRatio: AspectRatios.banner,
+						position: "absolute",
+					}}
+				/>
+			) : null}
 			<View
 				style={{
 					marginTop:
@@ -44,7 +46,7 @@ export default function BannerTitleDisplay({
 				}}
 			>
 				<Image
-					source={avatarSource}
+					source={avatarSource ?? undefined}
 					style={[
 						{
 							width: width / 4,

@@ -4,9 +4,9 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
 import {
+	type MediaQuery,
+	MediaType,
 	ScoreFormat,
-	type Media,
-	type MediaList,
 } from "@/types/Anilist/graphql";
 import { useQuery } from "@apollo/client";
 import { useLocalSearchParams } from "expo-router";
@@ -20,90 +20,192 @@ import {
 	type NavigationState,
 	type TabDescriptor,
 } from "react-native-tab-view";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import MediaDetails from "@/components/Media/MediaDetails";
 import { Dimensions, View } from "react-native";
 import Icon, { type IconName } from "@/components/Icon";
 import EditMediaListStatus from "@/components/EditMediaListStatus";
 import { gql } from "@/types/Anilist";
-import { useAnilistUserInfo } from "@/components/AnilistUserInfoProvider";
+import MediaRelations from "@/components/Media/MediaRelations";
 
 const QUERY = gql(`
-	query MediaList($format: ScoreFormat, $mediaListId: Int, $userId: Int) {
-		MediaList(id: $mediaListId, userId: $userId) {
+	query Media($format: ScoreFormat, $mediaId: Int) {
+		Media(id: $mediaId) {
+			id
+			type
+			format
 			status
-			score(format: $format)
-			progress
-			progressVolumes
-			repeat
-			private
-			notes
-			hiddenFromStatusLists
-			customLists
-			startedAt {
-				year
-				month
-				day
+			description
+			popularity
+			favourites
+			meanScore
+			averageScore
+			episodes
+			isFavourite
+			synonyms
+			coverImage {
+				large
+				color
 			}
-			completedAt {
-				year
-				month
-				day
+			bannerImage
+			title {
+				romaji
+				english
 			}
-			updatedAt
-			createdAt
-			media {
-					id
-					format
-					status
-					description
-					popularity
-					favourites
-					meanScore
-					averageScore
-					episodes
-					coverImage{
-						large
-						color
-					}
-					bannerImage
-					title {
-					romaji
-					english
-					userPreferred
+			relations {
+				edges {
+					relationType
 				}
-				isFavourite
-				synonyms
+				nodes {
+					id
+					episodes
+					coverImage {
+						large
+					}
+					title {
+						english
+						romaji
+					}
+					status
+					format
+			
+					mediaListEntry {
+						id
+						progress
+						score
+						repeat
+					}
+				}
+			}
+		
+			mediaListEntry {
+				id
+				status
+				score(format: $format)
+				progress
+				progressVolumes
+				repeat
+				private
+				notes
+				hiddenFromStatusLists
+				customLists
+				startedAt {
+					year
+					month
+					day
+				}
+				completedAt {
+					year
+					month
+					day
+				}
+				updatedAt
+				createdAt
 			}
 		}
-	}
+		}
 `);
 
 export default function MediaPage() {
-	const colors = useThemeColors();
-	const [index, setIndex] = useState(0);
 	const { id } = useLocalSearchParams();
-
-	const userId = useAnilistUserInfo()?.id;
 
 	const {
 		loading,
-		data: mediaListData,
+		data: mediaData,
 		error,
 		refetch,
 	} = useQuery(QUERY, {
 		variables: {
-			userId,
-			mediaListId: Number.parseInt(id.toString()),
+			mediaId: Number.parseInt(id.toString()),
 			format: ScoreFormat.Point_10Decimal,
 		},
 	});
 
-	const mediaList = mediaListData?.MediaList;
+	const media = mediaData?.Media;
+
+	if (error) {
+		return <ThemedText>{error.message}</ThemedText>;
+	}
+
+	return (
+		<ThemedView
+			style={{
+				paddingTop: Spacing.xl,
+				flexDirection: "column",
+				height: "100%",
+				flex: 1,
+			}}
+		>
+			{!loading && media ? (
+				<>
+					<BannerTitleDisplay
+						avatarAspectRatio={AspectRatios.cover}
+						avatarSource={
+							media.coverImage?.large
+								? { uri: media.coverImage.large }
+								: undefined
+						}
+						bannerSource={
+							media.bannerImage ? { uri: media.bannerImage } : undefined
+						}
+						text={
+							<>
+								<ThemedText numberOfLines={2} size="m">
+									{media.title?.english}
+								</ThemedText>
+								<ThemedText numberOfLines={1} size="s" style={{ opacity: 0.6 }}>
+									{media.title?.romaji}
+								</ThemedText>
+								<MediaListStatusDisplay
+									mediaList={media.mediaListEntry}
+									media={media}
+									size="s"
+								/>
+							</>
+						}
+					/>
+					<MediaPageTabBar media={media} />
+					<EditMediaListStatus
+						currentStatus={media.mediaListEntry}
+						media={media}
+						refetch={refetch}
+					/>
+				</>
+			) : null}
+		</ThemedView>
+	);
+}
+
+function MediaPageTabBar({
+	media,
+}: {
+	media: NonNullable<MediaQuery["Media"]>;
+}) {
+	const [index, setIndex] = useState(0);
+	const colors = useThemeColors();
+
+	const renderScene = SceneMap({
+		episodes: () => <EpisodesCollection media={media} />,
+		details: () => <MediaDetails media={media} />,
+		relations: () => (
+			<MediaRelations
+				nodes={media?.relations?.edges?.map((edge, index) => ({
+					media: media.relations?.nodes?.[index],
+					mediaList: media.relations?.nodes?.[index]?.mediaListEntry,
+					relationType: edge?.relationType,
+				}))}
+			/>
+		),
+		following: () => <ThemedText>following</ThemedText>,
+		characters: () => <ThemedText>Characters</ThemedText>,
+		staff: () => <ThemedText>staff</ThemedText>,
+	});
 
 	const [routes] = useState<Route[]>([
-		{ key: "episodes", icon: "film" },
+		...(media.type === MediaType.Anime
+			? [{ key: "episodes", icon: "film" }]
+			: []),
 		{ key: "details", icon: "align-left" },
 		{ key: "relations", icon: "link" },
 		{ key: "following", icon: "user-plus" },
@@ -151,61 +253,12 @@ export default function MediaPage() {
 		/>
 	);
 
-	const renderScene = SceneMap({
-		episodes: () => <EpisodesCollection mediaList={mediaList as MediaList} />,
-		details: () => <MediaDetails media={mediaList?.media as Media} />,
-		following: () => <ThemedText>following</ThemedText>,
-		relations: () => <ThemedText>Relations</ThemedText>,
-		characters: () => <ThemedText>Characters</ThemedText>,
-		staff: () => <ThemedText>staff</ThemedText>,
-	});
-
-	if (error) {
-		return <ThemedText>{error.message}</ThemedText>;
-	}
-
 	return (
-		<ThemedView
-			style={{
-				paddingTop: Spacing.xl,
-				flexDirection: "column",
-				height: "100%",
-				flex: 1,
-			}}
-		>
-			{!loading && mediaList?.media ? (
-				<>
-					<BannerTitleDisplay
-						avatarAspectRatio={AspectRatios.cover}
-						avatarSource={{
-							uri: mediaList.media.coverImage?.large ?? undefined,
-						}}
-						bannerSource={{ uri: mediaList.media.bannerImage ?? undefined }}
-						text={
-							<>
-								<ThemedText numberOfLines={2} size="m">
-									{mediaList.media.title?.english}
-								</ThemedText>
-								<ThemedText numberOfLines={1} size="s" style={{ opacity: 0.6 }}>
-									{mediaList.media.title?.romaji}
-								</ThemedText>
-								<MediaListStatusDisplay mediaList={mediaList} size="s" />
-							</>
-						}
-					/>
-					<TabView
-						renderTabBar={renderTabBar}
-						onIndexChange={setIndex}
-						renderScene={renderScene}
-						navigationState={{ index, routes }}
-					/>
-					<EditMediaListStatus
-						currentStatus={mediaList}
-						media={mediaList.media}
-						refetch={refetch}
-					/>
-				</>
-			) : null}
-		</ThemedView>
+		<TabView
+			renderTabBar={renderTabBar}
+			onIndexChange={setIndex}
+			renderScene={renderScene}
+			navigationState={{ index, routes }}
+		/>
 	);
 }

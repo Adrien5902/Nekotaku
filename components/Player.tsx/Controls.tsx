@@ -16,7 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Colors } from "@/constants/Colors";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { Spacing, TextSizes } from "@/constants/Sizes";
-import type { MediaList } from "@/types/Anilist/graphql";
+import type { Media, MediaTitle } from "@/types/Anilist/graphql";
 import type { Episode } from "@/types/AnimeSama";
 import Icon from "../Icon";
 import GoogleCast, { useDevices } from "react-native-google-cast";
@@ -28,7 +28,7 @@ export default function Controls({
 	isFullscreen,
 	loading,
 	episode,
-	mediaList,
+	mediaTitle,
 	playerRef,
 	toggleFullscreen,
 	forceView,
@@ -38,7 +38,7 @@ export default function Controls({
 	loading: boolean;
 	isFullscreen: boolean;
 	episode: Episode;
-	mediaList: MediaList;
+	mediaTitle?: Pick<MediaTitle, "romaji" | "english"> | undefined | null;
 	toggleFullscreen: (force?: boolean) => void;
 	forceView?: boolean;
 }) {
@@ -164,7 +164,7 @@ export default function Controls({
 										paddingLeft: Spacing.m,
 									}}
 								>
-									{mediaList.media?.title?.english} -{" "}
+									{mediaTitle?.english ?? mediaTitle?.romaji} -{" "}
 									{typeof episode.name === "number"
 										? `Ep. ${episode.name}`
 										: episode.name}
