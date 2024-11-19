@@ -2,7 +2,7 @@
         "name": "Nekotaku",
         "slug": "Nekotaku",
         "owner": "adrien5902",
-        "version": "0.3.0",
+        "version": "0.3.1",
         "icon": "./assets/app-icons/icon.png",
         "scheme": "nekotaku",
         "userInterfaceStyle": "automatic",
