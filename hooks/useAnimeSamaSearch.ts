@@ -146,7 +146,7 @@ function getFormatData(media: AnimeSamaSearchMediaType): {
 interface ApplyTitleResult<T> { newString: string, data: T };
 type ApplyTitle<T> = (s: string) => ApplyTitleResult<T> | null;
 async function searchTitles<T>(media: AnimeSamaSearchMediaType, apply?: ApplyTitle<T>) {
-    for (const synonym of [[media?.title?.romaji, media?.title?.english], media?.synonyms].flat().map(s => searchFriendly(s ?? ""))) {
+    for (const synonym of searchFriendlyMediaNames(media)) {
         const { newString, ...data } = apply ? apply(synonym) ?? { newString: null } : { newString: synonym };
         if (!newString) {
             continue
@@ -157,6 +157,14 @@ async function searchTitles<T>(media: AnimeSamaSearchMediaType, apply?: ApplyTit
             return { result, ...data }
         }
     }
+}
+
+export function mediaNames(media: AnimeSamaSearchMediaType) {
+    return [[media?.title?.romaji, media?.title?.english], media?.synonyms].flat()
+}
+
+export function searchFriendlyMediaNames(media: AnimeSamaSearchMediaType) {
+    return mediaNames(media).map(s => searchFriendly(s ?? ""))
 }
 
 export async function searchMedia(media: AnimeSamaSearchMediaType) {

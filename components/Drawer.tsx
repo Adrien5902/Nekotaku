@@ -13,16 +13,32 @@ import { useRef, useState } from "react";
 import type { MediaListGroup } from "@/types/Anilist/graphql";
 import Icon from "./Icon";
 import { Spacing } from "@/constants/Sizes";
+import type { Entry } from "@/app/(tabs)";
+import {
+	searchFriendly,
+	searchFriendlyMediaNames,
+} from "@/hooks/useAnimeSamaSearch";
+
+type ListsType =
+	| (Pick<MediaListGroup, "name" | "status"> | undefined | null)[]
+	| undefined
+	| null;
+
+export interface Props {
+	lists?: ListsType;
+	listStatus: number | undefined;
+	setFilterEntries: React.Dispatch<
+		React.SetStateAction<((entry: Entry) => boolean) | undefined>
+	>;
+	setListStatus: React.Dispatch<React.SetStateAction<number | undefined>>;
+}
 
 export default function Drawer({
 	lists,
 	listStatus,
 	setListStatus,
-}: {
-	lists?: (Pick<MediaListGroup, "name" | "status"> | undefined | null)[] | undefined|null;
-	listStatus: number | undefined;
-	setListStatus: React.Dispatch<React.SetStateAction<number | undefined>>;
-}) {
+	setFilterEntries,
+}: Props) {
 	const colors = useThemeColors();
 	const [drawerOpened, setDrawerOpen] = useState(false);
 	const drawerHeightAnim = useRef(new Animated.Value(0)).current;
@@ -56,10 +72,10 @@ export default function Drawer({
 					padding: 10,
 				}}
 			>
-				{/* TODO : search feature */}
 				<TextInput
 					style={[
 						{
+							color: colors.text,
 							flex: 1,
 							borderRadius: 10,
 							marginRight: 10,
@@ -70,6 +86,19 @@ export default function Drawer({
 					]}
 					placeholderTextColor={colors.text}
 					placeholder="Search..."
+					onChange={(event) => {
+						const searchStr = searchFriendly(event.nativeEvent.text);
+						if (searchStr) {
+							setFilterEntries(
+								() => (entry: Entry) =>
+									searchFriendlyMediaNames(entry?.media)
+										.map((s) => s.includes(searchStr))
+										.reduce((prev, curr) => prev || curr),
+							);
+						} else {
+							setFilterEntries(undefined);
+						}
+					}}
 				/>
 				<TouchableWithoutFeedback onPress={toggleDrawer}>
 					<ThemedView

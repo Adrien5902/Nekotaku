@@ -5,7 +5,7 @@ import { RefreshControl, VirtualizedList } from "react-native";
 interface Props {
 	refreshing: boolean;
 	refresh: () => unknown;
-	list?:
+	entries?:
 		| (
 				| (EntryButtonProps["mediaList"] & {
 						media?: EntryButtonProps["media"];
@@ -20,7 +20,7 @@ interface Props {
 export default function MediaListCollection({
 	refreshing,
 	refresh,
-	list,
+	entries,
 }: Props) {
 	return (
 		<ThemedView
@@ -36,12 +36,12 @@ export default function MediaListCollection({
 					<RefreshControl refreshing={refreshing} onRefresh={() => refresh()} />
 				}
 				initialNumToRender={6}
-				getItem={(_, index) => list?.[index]}
+				getItem={(_, index) => entries?.[index]}
 				renderItem={({ item }) =>
 					item ? <EntryButton mediaList={item} media={item.media} /> : null
 				}
 				keyExtractor={(entry, _index) => entry?.media?.id.toString() ?? ""}
-				getItemCount={() => list?.length ?? 0}
+				getItemCount={() => entries?.length ?? 0}
 				style={{
 					width: "100%",
 				}}

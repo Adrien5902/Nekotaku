@@ -45,16 +45,18 @@ const QUERY = gql(`
 	}
 `);
 
+export type MediaCollectionData = NonNullable<
+	NonNullable<
+		NonNullable<MediaListCollectionQuery["MediaListCollection"]>["lists"]
+	>
+>;
+
 const ToggleContext = createContext<{
 	isManga: boolean;
 	setIsManga: React.Dispatch<React.SetStateAction<boolean>> | null;
 	listsData: {
 		error?: ApolloError;
-		data?: NonNullable<
-			NonNullable<
-				NonNullable<MediaListCollectionQuery["MediaListCollection"]>["lists"]
-			>
-		>;
+		data?: MediaCollectionData;
 		loading: boolean;
 		refetch: () => void;
 	};
