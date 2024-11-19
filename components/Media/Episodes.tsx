@@ -9,7 +9,6 @@ import { ThemedText } from "../ThemedText";
 import { useEffect, useState } from "react";
 import { SelectButtons } from "../SelectButtons";
 import { RefreshControl, ScrollView, View } from "react-native";
-import type { Media, MediaList } from "@/types/Anilist/graphql.ts";
 import { useAnimeSamaGetLecteurs } from "@/hooks/useAnimeSamaGetEpisodes";
 import { useMemoryCachedPromise } from "@/hooks/usePromise";
 import PlayDownloadButton, {

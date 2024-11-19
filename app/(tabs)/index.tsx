@@ -28,8 +28,6 @@ export default function ListScreen() {
 		? (list?.entries ?? lists?.[0]?.entries)?.filter(filterEntries)
 		: (list?.entries ?? lists?.[0]?.entries);
 
-	console.log(filterEntries);
-
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (listStatus === undefined && lists) {
