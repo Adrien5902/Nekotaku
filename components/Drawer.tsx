@@ -12,7 +12,7 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import { useRef, useState } from "react";
 import type { MediaListGroup } from "@/types/Anilist/graphql";
 import Icon from "./Icon";
-import { Spacing } from "@/constants/Sizes";
+import { Spacing, TextSizes } from "@/constants/Sizes";
 import type { Entry } from "@/app/(tabs)";
 import {
 	searchFriendly,
@@ -56,8 +56,8 @@ export default function Drawer({
 		<ThemedView
 			color="primary"
 			style={{
-				borderTopLeftRadius: 10,
-				borderTopRightRadius: 10,
+				borderTopLeftRadius: Spacing.m,
+				borderTopRightRadius: Spacing.m,
 				borderBottomWidth: Spacing.xs,
 				borderColor: colors.background,
 			}}
@@ -65,49 +65,22 @@ export default function Drawer({
 			<View
 				style={{
 					width: "100%",
-					borderTopLeftRadius: 10,
-					borderTopRightRadius: 10,
+					borderTopLeftRadius: Spacing.m,
+					borderTopRightRadius: Spacing.m,
 					flexDirection: "row",
 					justifyContent: "space-between",
-					padding: 10,
+					padding: Spacing.m,
 				}}
 			>
-				<TextInput
-					style={[
-						{
-							color: colors.text,
-							flex: 1,
-							borderRadius: 10,
-							marginRight: 10,
-							fontSize: 16,
-							padding: 10,
-						},
-						{ backgroundColor: colors.background },
-					]}
-					placeholderTextColor={colors.text}
-					placeholder="Search..."
-					onChange={(event) => {
-						const searchStr = searchFriendly(event.nativeEvent.text);
-						if (searchStr) {
-							setFilterEntries(
-								() => (entry: Entry) =>
-									searchFriendlyMediaNames(entry?.media)
-										.map((s) => s.includes(searchStr))
-										.reduce((prev, curr) => prev || curr),
-							);
-						} else {
-							setFilterEntries(undefined);
-						}
-					}}
-				/>
+				<SearchBar setFilterEntries={setFilterEntries} />
 				<TouchableWithoutFeedback onPress={toggleDrawer}>
 					<ThemedView
 						color="background"
 						style={{
 							justifyContent: "center",
 							alignItems: "center",
-							padding: 10,
-							borderRadius: 10,
+							padding: Spacing.m,
+							borderRadius: Spacing.m,
 							aspectRatio: 1,
 						}}
 					>
@@ -126,7 +99,7 @@ export default function Drawer({
 				<ScrollView
 					style={{
 						flex: 1,
-						paddingHorizontal: 10,
+						paddingHorizontal: Spacing.m,
 					}}
 				>
 					{lists?.map((list, i) => {
@@ -141,7 +114,7 @@ export default function Drawer({
 								}}
 								style={{
 									backgroundColor: isFocused ? colors.accent : undefined,
-									borderRadius: 10,
+									borderRadius: Spacing.m,
 									margin: 2,
 								}}
 							>
@@ -161,6 +134,73 @@ export default function Drawer({
 					})}
 				</ScrollView>
 			</Animated.View>
+		</ThemedView>
+	);
+}
+
+function SearchBar({ setFilterEntries }: Pick<Props, "setFilterEntries">) {
+	const [searchValue, setSearchValue] = useState<string>();
+	const [clearTextVisible, setClearTextVisible] = useState(false);
+	const colors = useThemeColors();
+
+	return (
+		<ThemedView
+			style={{
+				flex: 1,
+				marginRight: Spacing.m,
+				padding: Spacing.m,
+				borderRadius: Spacing.m,
+				justifyContent: "center",
+			}}
+		>
+			<TextInput
+				style={{
+					color: colors.text,
+					fontSize: TextSizes.m,
+				}}
+				placeholderTextColor={colors.text}
+				placeholder="Search..."
+				value={searchValue}
+				onChange={(event) => {
+					const searchStr = searchFriendly(event.nativeEvent.text);
+					if (searchStr) {
+						setClearTextVisible(true);
+						setFilterEntries(
+							() => (entry: Entry) =>
+								searchFriendlyMediaNames(entry?.media)
+									.map((s) => s.includes(searchStr))
+									.reduce((prev, curr) => prev || curr),
+						);
+					} else {
+						setClearTextVisible(false);
+						setFilterEntries(undefined);
+					}
+				}}
+			/>
+			{clearTextVisible ? (
+				<ThemedView
+					color="text"
+					style={{
+						position: "absolute",
+						borderRadius: Spacing.xl,
+						aspectRatio: 1,
+						width: Spacing.l * 1.5,
+						justifyContent: "center",
+						alignItems: "center",
+						right: Spacing.m,
+					}}
+					onTouchEnd={() => {
+						setFilterEntries(undefined);
+						setSearchValue("");
+						setClearTextVisible(false);
+						setTimeout(() => {
+							setSearchValue(undefined);
+						});
+					}}
+				>
+					<Icon name="xmark" color={colors.background} size={TextSizes.m} />
+				</ThemedView>
+			) : null}
 		</ThemedView>
 	);
 }
