@@ -34,7 +34,10 @@ export default function MediaDetails({
 					{ height: Dimensions.get("window").height / 4 },
 				]}
 			>
-				<WebView source={{ html: style + (media?.description ?? "") }} />
+				<WebView
+					source={{ html: style + (media?.description ?? "") }}
+					style={{ backgroundColor: colors.background }}
+				/>
 			</View>
 
 			<MediaStats media={media} />
@@ -44,7 +47,11 @@ export default function MediaDetails({
 					style={[styles.PrimaryElement, { margin: Spacing.l, padding: 0 }]}
 				>
 					<WebView
-						style={{ width: "100%", aspectRatio: 16 / 9 }}
+						style={{
+							width: "100%",
+							aspectRatio: 16 / 9,
+							backgroundColor: colors.background,
+						}}
 						source={{ html: style + iframe }}
 						injectedJavaScript="let iframe = document.querySelector('iframe'); iframe.width = window.innerWidth; iframe.height = window.innerHeight;"
 					/>
