@@ -2,7 +2,7 @@ import { useGetVideoSource } from "@/hooks/useGetVideoSource";
 import { useLocalSearchParams } from "expo-router";
 import * as ScreenOrientation from "expo-screen-orientation";
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, Dimensions, Image } from "react-native";
+import { Text, Dimensions, Image, ScrollView } from "react-native";
 import * as NavigationBar from "expo-navigation-bar";
 import * as StatusBar from "expo-status-bar";
 import Player from "@/components/Player.tsx/Player";
@@ -106,7 +106,7 @@ const VideoPlayer = () => {
 				}}
 			/>
 			{!isFullscreen ? (
-				<View style={{ flexDirection: "column", flex: 1 }}>
+				<>
 					<Image
 						source={{ uri: media?.bannerImage ?? undefined }}
 						style={{
@@ -115,8 +115,14 @@ const VideoPlayer = () => {
 							resizeMode: "contain",
 						}}
 					/>
-					<EpisodesList lecteur={lecteur} media={media} selected={episode.id} />
-				</View>
+					<ScrollView style={{ flexDirection: "column", flex: 1 }}>
+						<EpisodesList
+							lecteur={lecteur}
+							media={media}
+							selected={episode.id}
+						/>
+					</ScrollView>
+				</>
 			) : null}
 		</ThemedView>
 	) : (
