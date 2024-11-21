@@ -9,6 +9,8 @@ import MediaListCollection from "@/components/Media/MediaCollection";
 import { useEffect, useState } from "react";
 import Drawer from "@/components/Drawer";
 import { Spacing } from "@/constants/Sizes";
+import Icon from "@/components/Icon";
+import BigTitle from "@/components/BigTitle";
 
 export type Entry = NonNullable<
 	NonNullable<MediaCollectionData[number]>["entries"]
@@ -49,11 +51,17 @@ export default function ListScreen() {
 
 	return (
 		<ThemedView style={styles.container}>
-			<MediaListCollection
-				entries={entries}
-				refreshing={loading}
-				refresh={refetch}
-			/>
+			{entries?.length ? (
+				<MediaListCollection
+					entries={entries}
+					refreshing={loading}
+					refresh={refetch}
+				/>
+			) : filterEntries ? (
+				<BigTitle icon="face-frown" title="No results for your search" />
+			) : (
+				<BigTitle icon="face-frown" title="No medias in this category" />
+			)}
 			<Drawer {...{ lists, listStatus, setListStatus, setFilterEntries }} />
 		</ThemedView>
 	);
