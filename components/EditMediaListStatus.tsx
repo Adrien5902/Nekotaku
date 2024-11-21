@@ -63,7 +63,7 @@ export default function EditMediaListStatus({
 				bottom: Spacing.xl,
 				right: Spacing.xl,
 			}}
-			name="pencil"
+			name={currentStatus ? "pencil" : "plus"}
 			onPress={() => {
 				setModalVisible(true);
 			}}
@@ -123,6 +123,10 @@ function EditMediaListStatusModal({
 
 	const isFavourite = useRef(media.isFavourite);
 
+	const customLists = currentStatus?.customLists as unknown as
+		| Record<string, boolean>
+		| undefined;
+
 	const newStatus = useRef<MutationSaveMediaListEntryArgs>({
 		mediaId: media.id,
 		status: currentStatus?.status,
@@ -132,14 +136,9 @@ function EditMediaListStatusModal({
 		private: currentStatus?.private,
 		notes: currentStatus?.notes,
 		hiddenFromStatusLists: currentStatus?.hiddenFromStatusLists,
-		customLists: Object.keys(
-			currentStatus?.customLists as unknown as Record<string, boolean>,
-		).filter(
-			(customList) =>
-				(currentStatus?.customLists as unknown as Record<string, boolean>)[
-					customList
-				],
-		),
+		customLists: customLists
+			? Object.keys(customLists).filter((customList) => customLists[customList])
+			: undefined,
 		completedAt: {
 			day: currentStatus?.completedAt?.day,
 			month: currentStatus?.completedAt?.month,
