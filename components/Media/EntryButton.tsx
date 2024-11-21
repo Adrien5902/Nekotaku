@@ -55,11 +55,13 @@ function EntryButton({ media, mediaList, relationType }: Props) {
 					<View style={{ flexDirection: "row" }}>
 						{relationType ? (
 							<>
-								<ThemedText color="accent">{relationType}</ThemedText>
-								<ThemedText> • </ThemedText>
+								<ThemedText color="accent" numberOfLines={1}>
+									{relationType}
+								</ThemedText>
+								<ThemedText numberOfLines={1}> • </ThemedText>
 							</>
 						) : null}
-						<ThemedText numberOfLines={1}>
+						<ThemedText numberOfLines={1} style={{ flex: 1 }}>
 							{media?.title?.english ?? media?.title?.romaji}
 						</ThemedText>
 					</View>
