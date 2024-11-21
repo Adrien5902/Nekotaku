@@ -1,4 +1,4 @@
-import type { Media, MediaTitle } from "@/types/Anilist/graphql";
+import { MediaStatus, type Media, type MediaTitle } from "@/types/Anilist/graphql";
 import { DOMParser } from 'react-native-html-parser';
 import { useMemoryCachedPromise } from "./usePromise";
 
@@ -7,7 +7,7 @@ interface SeasonData {
     part: number | null;
 }
 
-export type AnimeSamaSearchMediaType = Pick<Media, "synonyms" | "format"> & {
+export type AnimeSamaSearchMediaType = Pick<Media, "synonyms" | "format" | "status"> & {
     title?: Pick<MediaTitle, "english" | "romaji"> | null | undefined
 } | null | undefined
 
@@ -15,6 +15,10 @@ export function useAnimeSamaSearch(media?: AnimeSamaSearchMediaType) {
     return useMemoryCachedPromise("useAnimeSamaSearch", async () => {
         if (!media) {
             return undefined
+        }
+
+        if (media.status === MediaStatus.Cancelled || media.status === MediaStatus.NotYetReleased) {
+            throw new Error("Media not yet released")
         }
 
         const searchRes = await searchMedia(media)

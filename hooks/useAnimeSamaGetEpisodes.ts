@@ -46,6 +46,10 @@ export async function getAnimeSamaLecteurs(url: AnimeSamaUrl, customEpisodes?: {
         });
     }
 
+    if (!result.length) {
+        throw new Error("Season's episodes not found on AnimeSama")
+    }
+
 
     return result
 }
