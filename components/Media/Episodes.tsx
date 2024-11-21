@@ -121,12 +121,12 @@ export function EpisodesList({
 	selected,
 }: {
 	media: PlayDownloadButtonProps["media"];
-	lecteur: Lecteur;
+	lecteur: Lecteur | undefined;
 	selected?: number;
 }) {
 	return (
 		<>
-			{lecteur.episodes.map((episode) => (
+			{lecteur?.episodes.map((episode) => (
 				<EpisodeButton
 					episode={episode}
 					{...{ media, lecteur }}

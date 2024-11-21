@@ -82,7 +82,7 @@ export async function searchExactMatch(query: string) {
 function getSeasonFromString(s: string): ApplyTitleResult<SeasonData> | null {
     const seasonDigitRegex = /season (\d+)/gim;
     const seasonDigitThRegex = /(\d+)(?:st|nd|rd|th) season/gim;
-    const seasonEndOfStrDigitRegex = /(\b\d)$/gim
+    const seasonEndOfStrDigitRegex = / (\b\d)$/gim
     const seasonNameRegex = /(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) season/gim;
 
     const partRegex = /part (\d+)/gim

@@ -10,7 +10,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { EpisodesList } from "@/components/Media/Episodes";
 import type { Lecteur } from "@/types/AnimeSama";
 import { DownloadingContext } from "@/components/DownloadingContext";
-import type { Media, MediaList, MediaTitle } from "@/types/Anilist/graphql";
+import type { Media, MediaTitle } from "@/types/Anilist/graphql";
 import { Spacing } from "@/constants/Sizes";
 
 export type VideoPlayerMedia = Pick<Media, "bannerImage" | "id"> & {
