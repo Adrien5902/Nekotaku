@@ -200,7 +200,7 @@ export default function Controls({
 						{dataAniskip?.map((aniskip) => {
 							if (
 								positionSecs > aniskip.interval.startTime &&
-								(viewControls
+								(shouldDisplayControls
 									? positionSecs < aniskip.interval.endTime
 									: positionSecs < aniskip.interval.startTime + 10)
 							) {
