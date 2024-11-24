@@ -1,15 +1,8 @@
-import {
-	AppState,
-	Dimensions,
-	StyleSheet,
-	type TextStyle,
-	View,
-	type ViewStyle,
-} from "react-native";
+import { AppState, View } from "react-native";
 import Controls from "./Controls";
 import { type AVPlaybackStatusSuccess, ResizeMode, Video } from "expo-av";
 import { useEffect, useRef } from "react";
-import type { Media, MediaList, MediaTitle } from "@/types/Anilist/graphql";
+import type { Media, MediaTitle } from "@/types/Anilist/graphql";
 import type { Episode } from "@/types/AnimeSama";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import {
@@ -17,11 +10,7 @@ import {
 	Gesture,
 	GestureDetector,
 } from "react-native-gesture-handler";
-import {
-	MediaPlayerState,
-	type RemoteMediaClient,
-	useRemoteMediaClient,
-} from "react-native-google-cast";
+import { useRemoteMediaClient } from "react-native-google-cast";
 import useStyles from "@/hooks/useStyles";
 import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
 import CastControls from "./CastControls";
@@ -52,11 +41,14 @@ export default function Player({
 	const styles = useStyles();
 
 	async function savePos() {
-		await DiskCache.write(
-			"episodePositionMillis",
-			[media?.id, episode.id],
-			statusRef.current.positionMillis,
-		);
+		// Do not save if position is 0
+		if (statusRef.current.positionMillis) {
+			await DiskCache.write(
+				"episodePositionMillis",
+				[media?.id, episode.id],
+				statusRef.current.positionMillis,
+			);
+		}
 	}
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
@@ -167,6 +159,7 @@ export default function Player({
 							}
 						}}
 						onLoad={() => {
+							videoPlayerRef.current?.setPositionAsync(startPos ?? 0);
 							setIsLoadingVid(false);
 						}}
 					/>

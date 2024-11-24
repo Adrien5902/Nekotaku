@@ -1,7 +1,8 @@
 import { useGetVideoSource } from "@/hooks/useGetVideoSource";
 import { useLocalSearchParams } from "expo-router";
 import * as ScreenOrientation from "expo-screen-orientation";
-import React, { useContext, useEffect, useState } from "react";
+import type React from "react";
+import { useContext, useEffect, useState } from "react";
 import { Text, Dimensions, Image, ScrollView } from "react-native";
 import * as NavigationBar from "expo-navigation-bar";
 import * as StatusBar from "expo-status-bar";
@@ -104,6 +105,7 @@ const VideoPlayer = () => {
 					setIsLoadingVid,
 					media,
 				}}
+				key={episode.id}
 			/>
 			{!isFullscreen ? (
 				<>

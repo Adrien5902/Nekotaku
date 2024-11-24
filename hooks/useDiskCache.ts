@@ -13,17 +13,17 @@ async function readCache<T>(key: string) {
 }
 
 function use<T>(key: string, deps: unknown[]) {
-    return usePromise(() => read<T>(key, deps), [])
+    return usePromise(() => read<T>(key, deps), deps)
 }
 
-function useAll<T>(key: string) {
-    return usePromise(() => readAll<T>(key), [])
+function useAll<T>(key: string, deps?: unknown[]) {
+    return usePromise(() => readAll<T>(key), deps ?? [])
 }
 
 async function readAll<T>(key: string) {
     const cache = await readCache<T>(key)
     if (!cache) {
-        return undefined
+        return null
     }
 
     return Object.values(cache)
@@ -32,7 +32,7 @@ async function readAll<T>(key: string) {
 async function read<T>(key: string, deps: unknown[]) {
     const cache = await readCache<T>(key)
     const data = cache?.[JSON.stringify(deps)] as T | undefined
-    return data
+    return data ?? null
 }
 
 async function write<T>(key: string, deps: unknown[], data: T) {

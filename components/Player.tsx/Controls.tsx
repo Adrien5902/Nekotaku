@@ -1,4 +1,3 @@
-import type { AVPlaybackStatusSuccess, Video } from "expo-av";
 import { useEffect, useRef, useState } from "react";
 import {
 	ActivityIndicator,
@@ -8,7 +7,6 @@ import {
 	TouchableWithoutFeedback,
 	useAnimatedValue,
 	View,
-	type ViewStyle,
 } from "react-native";
 import { ThemedText } from "../ThemedText";
 import Slider from "@react-native-community/slider";
@@ -16,7 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Colors } from "@/constants/Colors";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { Spacing, TextSizes } from "@/constants/Sizes";
-import type { Media, MediaTitle } from "@/types/Anilist/graphql";
+import type { MediaTitle } from "@/types/Anilist/graphql";
 import type { Episode } from "@/types/AnimeSama";
 import Icon from "../Icon";
 import GoogleCast, { useDevices } from "react-native-google-cast";
