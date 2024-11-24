@@ -34,6 +34,7 @@ const QUERY = gql(`
 	query Media($format: ScoreFormat, $mediaId: Int) {
 		Media(id: $mediaId) {
 			id
+			idMal
 			type
 			format
 			status

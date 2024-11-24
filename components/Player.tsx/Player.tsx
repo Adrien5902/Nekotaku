@@ -20,7 +20,7 @@ interface Props {
 	isFullscreen: boolean;
 	loading: boolean;
 	episode: Episode;
-	media: Pick<Media, "id"> & {
+	media: Pick<Media, "id" | "idMal"> & {
 		title: Pick<MediaTitle, "english" | "romaji">;
 	};
 	toggleFullscreen: (force?: boolean) => void;
@@ -130,8 +130,8 @@ export default function Player({
 						loading,
 						episode,
 						toggleFullscreen,
+						media,
 					}}
-					mediaTitle={media?.title}
 					forceView={!!googleCastMedia}
 				/>
 				{!googleCastMedia ? (

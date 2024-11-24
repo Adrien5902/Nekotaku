@@ -14,7 +14,7 @@ import { DownloadingContext } from "@/components/DownloadingContext";
 import type { Media, MediaTitle } from "@/types/Anilist/graphql";
 import { Spacing } from "@/constants/Sizes";
 
-export type VideoPlayerMedia = Pick<Media, "bannerImage" | "id"> & {
+export type VideoPlayerMedia = Pick<Media, "bannerImage" | "id" | "idMal"> & {
 	title: Pick<MediaTitle, "english" | "romaji">;
 };
 

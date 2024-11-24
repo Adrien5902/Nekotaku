@@ -4,6 +4,7 @@ import {
 	Animated,
 	Dimensions,
 	Easing,
+	Text,
 	TouchableWithoutFeedback,
 	useAnimatedValue,
 	View,
@@ -14,29 +15,33 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Colors } from "@/constants/Colors";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { Spacing, TextSizes } from "@/constants/Sizes";
-import type { MediaTitle } from "@/types/Anilist/graphql";
+import type { Media, MediaTitle } from "@/types/Anilist/graphql";
 import type { Episode } from "@/types/AnimeSama";
 import Icon from "../Icon";
 import GoogleCast, { useDevices } from "react-native-google-cast";
 import useStyles from "@/hooks/useStyles";
 import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
+import useAniskip from "@/hooks/useAniskip";
+import CustomButton from "../Button";
 
 export default function Controls({
 	statusRef,
 	isFullscreen,
 	loading,
 	episode,
-	mediaTitle,
 	playerRef,
 	toggleFullscreen,
 	forceView,
+	media,
 }: {
 	playerRef: React.RefObject<PlayerFunctions | undefined>;
 	statusRef: React.MutableRefObject<VideoPlayStatus | undefined>;
 	loading: boolean;
 	isFullscreen: boolean;
 	episode: Episode;
-	mediaTitle?: Pick<MediaTitle, "romaji" | "english"> | undefined | null;
+	media: Pick<Media, "idMal" | "id"> & {
+		title: Pick<MediaTitle, "romaji" | "english"> | undefined | null;
+	};
 	toggleFullscreen: (force?: boolean) => void;
 	forceView?: boolean;
 }) {
@@ -92,6 +97,15 @@ export default function Controls({
 	const SessionManager = GoogleCast.getSessionManager();
 	const devices = useDevices();
 
+	const { data: dataAniskip } = useAniskip(
+		media,
+		currentStatus?.durationMillis,
+		episode,
+	);
+
+	const positionSecs = (currentStatus?.positionMillis ?? 0) / 1000;
+	const shouldDisplayControls = loading || viewControls || forceView;
+
 	return (
 		<>
 			<TouchableWithoutFeedback
@@ -143,7 +157,7 @@ export default function Controls({
 						zIndex: 2,
 					}}
 				>
-					{loading || viewControls || forceView ? (
+					{shouldDisplayControls ? (
 						<>
 							<LinearGradient
 								colors={["#000000ff", "#00000000"]}
@@ -162,7 +176,7 @@ export default function Controls({
 										paddingLeft: Spacing.m,
 									}}
 								>
-									{mediaTitle?.english ?? mediaTitle?.romaji} -{" "}
+									{media.title?.english ?? media.title?.romaji} -{" "}
 									{typeof episode.name === "number"
 										? `Ep. ${episode.name}`
 										: episode.name}
@@ -179,7 +193,38 @@ export default function Controls({
 									}}
 								/>
 							</LinearGradient>
+						</>
+					) : null}
 
+					<View style={{ width: "100%", alignItems: "flex-end" }}>
+						{dataAniskip?.map((aniskip) => {
+							if (
+								positionSecs > aniskip.interval.startTime &&
+								(viewControls
+									? positionSecs < aniskip.interval.endTime
+									: positionSecs < aniskip.interval.startTime + 10)
+							) {
+								return (
+									<CustomButton
+										key={aniskip.skipType}
+										onPress={() => {
+											console.log("press");
+											playerRef.current?.setPositionAsync(
+												aniskip.interval.endTime * 1000,
+											);
+										}}
+										textColor="background"
+										backgroundColor="text"
+									>
+										{`Skip ${aniskip.skipType}`}
+									</CustomButton>
+								);
+							}
+						})}
+					</View>
+
+					{shouldDisplayControls ? (
+						<>
 							<View
 								style={{
 									flex: 1,
