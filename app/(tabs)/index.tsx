@@ -1,4 +1,4 @@
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
 import {
 	type MediaCollectionData,
 	useToggle,
@@ -6,11 +6,9 @@ import {
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import MediaListCollection from "@/components/Media/MediaCollection";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Drawer from "@/components/Drawer";
 import { Spacing } from "@/constants/Sizes";
-import Icon from "@/components/Icon";
-import BigTitle from "@/components/BigTitle";
 
 export type Entry = NonNullable<
 	NonNullable<MediaCollectionData[number]>["entries"]
@@ -20,25 +18,12 @@ export default function ListScreen() {
 	const { listsData } = useToggle();
 	const { data: lists, error, loading, refetch } = listsData;
 
-	const [listStatus, setListStatus] = useState<number>();
+	const [listStatus, setListStatus] = useState<number>(0);
 	const [filterEntries, setFilterEntries] =
 		useState<(entry: Entry) => boolean>();
 
 	const list =
 		lists && listStatus !== undefined ? lists[listStatus] : undefined;
-	const entries = filterEntries
-		? (list?.entries ?? lists?.[0]?.entries)?.filter(filterEntries)
-		: (list?.entries ?? lists?.[0]?.entries);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	useEffect(() => {
-		if (listStatus === undefined && lists) {
-			setListStatus(
-				lists?.findIndex((list) => list?.status === "CURRENT") ?? 0,
-			);
-		}
-	}, [loading]);
-
 	if (error) {
 		return (
 			<ThemedView
@@ -51,17 +36,12 @@ export default function ListScreen() {
 
 	return (
 		<ThemedView style={styles.container}>
-			{entries?.length ? (
-				<MediaListCollection
-					entries={entries}
-					refreshing={loading}
-					refresh={refetch}
-				/>
-			) : filterEntries ? (
-				<BigTitle icon="face-frown" title="No results for your search" />
-			) : (
-				<BigTitle icon="face-frown" title="No medias in this category" />
-			)}
+			<MediaListCollection
+				filterEntries={filterEntries}
+				entries={list?.entries}
+				refreshing={loading}
+				refresh={refetch}
+			/>
 			<Drawer {...{ lists, listStatus, setListStatus, setFilterEntries }} />
 		</ThemedView>
 	);

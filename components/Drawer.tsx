@@ -30,7 +30,7 @@ export interface Props {
 	setFilterEntries: React.Dispatch<
 		React.SetStateAction<((entry: Entry) => boolean) | undefined>
 	>;
-	setListStatus: React.Dispatch<React.SetStateAction<number | undefined>>;
+	setListStatus: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export default function Drawer({
