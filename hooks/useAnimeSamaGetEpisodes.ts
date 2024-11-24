@@ -1,8 +1,8 @@
 import type { AnimeSamaUrl, EpisodeId, EpisodeName, Lang, Lecteur } from "@/types/AnimeSama";
-import { useMemoryCachedPromise } from "./usePromise";
+import DiskCache from "./useDiskCache";
 
 export function useAnimeSamaGetLecteurs(url: AnimeSamaUrl | undefined, currentLang: keyof typeof Lang | null, customEpisodes?: { id: EpisodeId, name: EpisodeName }[]) {
-    return useMemoryCachedPromise(
+    return DiskCache.useWithMemory(
         "useAnimeSamaGetLecteurs",
         async () => {
             if (url && currentLang) {

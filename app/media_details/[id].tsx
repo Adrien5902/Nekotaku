@@ -114,6 +114,7 @@ const QUERY = gql(`
 
 export default function MediaPage() {
 	const { id } = useLocalSearchParams();
+	const mediaId = Number.parseInt(id.toString());
 
 	const {
 		loading: loadingApi,
@@ -122,7 +123,7 @@ export default function MediaPage() {
 		refetch,
 	} = useQuery(QUERY, {
 		variables: {
-			mediaId: Number.parseInt(id.toString()),
+			mediaId,
 			format: ScoreFormat.Point_10Decimal,
 		},
 	});
@@ -131,15 +132,9 @@ export default function MediaPage() {
 		loading: loadingCache,
 		error: cacheError,
 		data: cacheData,
-	} = DiskCache.use<MediaQuery["Media"] | undefined>("media", [id]);
+	} = DiskCache.use<MediaQuery["Media"] | undefined>("media", [mediaId]);
 
 	const media = mediaData?.Media ?? cacheData;
-
-	if (cacheError && apiError) {
-		return (
-			<ThemedText>{`${cacheError.message}\n${apiError.message}`}</ThemedText>
-		);
-	}
 	const loading = loadingApi ? loadingCache : false;
 
 	useEffect(() => {
@@ -147,6 +142,12 @@ export default function MediaPage() {
 			DiskCache.write("media", [mediaData.Media.id], mediaData.Media);
 		}
 	}, [mediaData]);
+
+	if (cacheError && apiError) {
+		return (
+			<ThemedText>{`${cacheError.message}\n${apiError.message}`}</ThemedText>
+		);
+	}
 
 	return (
 		<ThemedView

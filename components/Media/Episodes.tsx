@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import { SelectButtons } from "../SelectButtons";
 import { RefreshControl, ScrollView, View } from "react-native";
 import { useAnimeSamaGetLecteurs } from "@/hooks/useAnimeSamaGetEpisodes";
-import { useMemoryCachedPromise } from "@/hooks/usePromise";
 import PlayDownloadButton, {
 	type Props as PlayDownloadButtonProps,
 } from "../PlayDownloadButton";
@@ -20,6 +19,7 @@ import {
 	type AnimeSamaSearchMediaType,
 	useAnimeSamaSearch,
 } from "@/hooks/useAnimeSamaSearch";
+import DiskCache from "@/hooks/useDiskCache";
 
 export default function EpisodesCollection({
 	media,
@@ -46,7 +46,7 @@ export default function EpisodesCollection({
 		loading: loadingLangs,
 		error: errorLangs,
 		refresh: refreshLangsAndEpisodes,
-	} = useMemoryCachedPromise(
+	} = DiskCache.useWithMemory(
 		"getAvailableLangsAndEpisodes",
 		async () => await url?.getAvailableLangsAndEpisodes(),
 		[animeSamaData],

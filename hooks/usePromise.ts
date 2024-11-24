@@ -39,7 +39,7 @@ export interface UseCachedPromise<R> extends UsePromise<R> {
     refresh: () => Promise<boolean>
 }
 
-const cache = new Map<string, unknown>();
+export const cache = new Map<string, unknown>();
 
 export function useMemoryCachedPromise<R>(
     key: string,

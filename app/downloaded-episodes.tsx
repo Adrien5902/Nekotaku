@@ -1,16 +1,14 @@
 import { DownloadingContext } from "@/components/DownloadingContext";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { Spacing } from "@/constants/Sizes";
 import { useContext } from "react";
 import { useToggle } from "../components/ToggleContext";
-import EntryButton, {
-	type Props as EntryButtonProps,
-} from "@/components/Media/EntryButton";
-import { RefreshControl, ScrollView } from "react-native";
 import BigTitle from "@/components/BigTitle";
 import DiskCache from "@/hooks/useDiskCache";
 import type { MediaQuery } from "@/types/Anilist/graphql";
+import MediaListCollection from "@/components/Media/MediaCollection";
+import { Spacing } from "@/constants/Sizes";
+import { useNetworkState } from "expo-network";
 
 export default function DownloadedEpisodes() {
 	const downloader = useContext(DownloadingContext);
@@ -20,10 +18,18 @@ export default function DownloadedEpisodes() {
 		data: cacheData,
 		error: cacheError,
 	} = DiskCache.useAll<MediaQuery["Media"] | undefined>("media");
-	const { data: lists, error: listsError, loading: listsLoading } = listsData;
+	const {
+		data: lists,
+		error: listsError,
+		loading: listsLoading,
+		refetch,
+	} = listsData;
+
+	const networkState = useNetworkState();
 
 	const error = cacheError || listsError;
-	const loading = cacheLoading || listsLoading;
+	const loading =
+		cacheLoading || (networkState.isConnected ? listsLoading : false);
 
 	if (error) {
 		return (
@@ -36,46 +42,39 @@ export default function DownloadedEpisodes() {
 	}
 
 	const entries = lists?.flatMap((m) => m?.entries ?? []);
-	const downloadedMediaIds = Object.keys(downloader.downloadedEpisodes);
+	const downloadedMediaEntries = Object.keys(downloader.downloadedEpisodes).map(
+		(mediaIdString) => {
+			const mediaId = Number.parseInt(mediaIdString);
+
+			const cachedMedia = cacheData?.find((media) => media?.id === mediaId);
+
+			return (
+				entries?.find((mediaList) => mediaList?.media?.id === mediaId) ?? {
+					...cachedMedia?.mediaListEntry,
+					media: cachedMedia,
+				}
+			);
+		},
+	);
 
 	return (
-		<ScrollView
-			style={{ paddingTop: Spacing.xl }}
-			refreshControl={<RefreshControl refreshing={loading} />}
-		>
-			<BigTitle icon={"folder-open"} title="Downloaded Episodes" />
-			{downloadedMediaIds.length ? (
-				downloadedMediaIds.map((mediaIdString) => {
-					const mediaId = Number.parseInt(mediaIdString);
-
-					const cachedMedia = cacheData?.find((media) => media?.id === mediaId);
-
-					const entry = entries?.find(
-						(mediaList) => mediaList?.media?.id === mediaId,
-					) ?? {
-						...cachedMedia?.mediaListEntry,
-						media: cachedMedia,
-					};
-
-					if (!entry?.media) {
-						return (
-							<ThemedText>
-								Error could not get media with id : {mediaId}
-							</ThemedText>
-						);
-					}
-
-					return (
-						<EntryButton
-							key={mediaId}
-							media={entry?.media}
-							mediaList={"status" in entry ? entry : undefined}
-						/>
-					);
-				})
-			) : (
-				<ThemedText>No downloaded Episodes {":("}</ThemedText>
-			)}
-		</ScrollView>
+		<ThemedView style={{ paddingTop: Spacing.xl, flex: 1 }}>
+			<BigTitle
+				icon={networkState.isConnected ? "folder-open" : "plane"}
+				title={
+					networkState.isConnected ? "Downloaded Episodes" : "Offline mode"
+				}
+			/>
+			<MediaListCollection
+				header={
+					downloadedMediaEntries.length !== 0 ? null : (
+						<BigTitle icon={"face-frown"} title="No downloaded episodes" />
+					)
+				}
+				refreshing={loading ?? false}
+				refresh={refetch}
+				entries={downloadedMediaEntries}
+			/>
+		</ThemedView>
 	);
 }

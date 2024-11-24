@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import DownloadingProvider, {
@@ -12,6 +12,7 @@ import AnilistLoginProvider, {
 } from "@/components/AnilistAccountProvider";
 import AnilistUserInfoProvider from "@/components/AnilistUserInfoProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useNetworkState } from "expo-network";
 
 const downloader = new Downloader();
 
@@ -26,20 +27,20 @@ export default function RootLayout() {
 
 	return (
 		<GestureHandlerRootView>
-			<AnilistLoginProvider>
-				<SettingsProvider>
-					<DownloadingProvider downloader={downloader}>
-						<StackScreens />
-					</DownloadingProvider>
-				</SettingsProvider>
-			</AnilistLoginProvider>
+			<SettingsProvider>
+				<DownloadingProvider downloader={downloader}>
+					<AnilistLoginProvider>
+						<Providers>
+							<StackScreens />
+						</Providers>
+					</AnilistLoginProvider>
+				</DownloadingProvider>
+			</SettingsProvider>
 		</GestureHandlerRootView>
 	);
 }
 
-function StackScreens() {
-	const colors = useThemeColors();
-
+function Providers({ children }: { children: React.ReactNode }) {
 	const { token } = useAnilistToken() ?? {};
 
 	if (!token) return null;
@@ -63,27 +64,36 @@ function StackScreens() {
 			}
 		>
 			<AnilistUserInfoProvider>
-				<ToggleProvider>
-					<Stack
-						initialRouteName="(tabs)"
-						screenOptions={{
-							contentStyle: { backgroundColor: colors.background },
-						}}
-					>
-						<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-						<Stack.Screen
-							name="media_details/[id]"
-							options={{ headerShown: false }}
-						/>
-						<Stack.Screen name="player" options={{ headerShown: false }} />
-						<Stack.Screen name="settings" options={{ headerShown: false }} />
-						<Stack.Screen
-							name="downloaded-episodes"
-							options={{ headerShown: false }}
-						/>
-					</Stack>
-				</ToggleProvider>
+				<ToggleProvider>{children}</ToggleProvider>
 			</AnilistUserInfoProvider>
 		</ApolloProvider>
+	);
+}
+
+function StackScreens() {
+	const colors = useThemeColors();
+	const networkState = useNetworkState();
+
+	return (
+		<Stack
+			initialRouteName={
+				networkState.isConnected ? "(tabs)" : "downloaded-episodes"
+			}
+			screenOptions={{
+				contentStyle: { backgroundColor: colors.background },
+			}}
+		>
+			<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+			<Stack.Screen
+				name="media_details/[id]"
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen name="player" options={{ headerShown: false }} />
+			<Stack.Screen name="settings" options={{ headerShown: false }} />
+			<Stack.Screen
+				name="downloaded-episodes"
+				options={{ headerShown: false }}
+			/>
+		</Stack>
 	);
 }

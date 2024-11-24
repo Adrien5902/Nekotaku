@@ -1,6 +1,6 @@
 import { MediaStatus, type Media, type MediaTitle } from "@/types/Anilist/graphql";
 import { DOMParser } from 'react-native-html-parser';
-import { useMemoryCachedPromise } from "./usePromise";
+import DiskCache from "./useDiskCache";
 
 interface SeasonData {
     season: number;
@@ -12,7 +12,7 @@ export type AnimeSamaSearchMediaType = Pick<Media, "synonyms" | "format" | "stat
 } | null | undefined
 
 export function useAnimeSamaSearch(media?: AnimeSamaSearchMediaType) {
-    return useMemoryCachedPromise("useAnimeSamaSearch", async () => {
+    return DiskCache.useWithMemory("useAnimeSamaSearch", async () => {
         if (!media) {
             return undefined
         }

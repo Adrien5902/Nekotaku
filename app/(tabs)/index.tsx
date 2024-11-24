@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import {
 	type MediaCollectionData,
 	useToggle,
@@ -9,6 +9,7 @@ import MediaListCollection from "@/components/Media/MediaCollection";
 import { useState } from "react";
 import Drawer from "@/components/Drawer";
 import { Spacing } from "@/constants/Sizes";
+import BigTitle from "@/components/BigTitle";
 
 export type Entry = NonNullable<
 	NonNullable<MediaCollectionData[number]>["entries"]
@@ -34,12 +35,22 @@ export default function ListScreen() {
 		);
 	}
 
+	const filteredEntries = filterEntries
+		? (list?.entries as Entry[])?.filter(filterEntries)
+		: list?.entries;
+
 	return (
 		<ThemedView style={styles.container}>
 			<MediaListCollection
-				filterEntries={filterEntries}
-				entries={list?.entries}
-				refreshing={loading}
+				header={
+					filteredEntries?.length ? null : filterEntries ? (
+						<BigTitle icon="face-frown" title="No results for your search" />
+					) : (
+						<BigTitle icon="face-frown" title="No medias in this category" />
+					)
+				}
+				entries={filteredEntries}
+				refreshing={loading ?? true}
 				refresh={refetch}
 			/>
 			<Drawer {...{ lists, listStatus, setListStatus, setFilterEntries }} />

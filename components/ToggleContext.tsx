@@ -57,13 +57,18 @@ const ToggleContext = createContext<{
 	listsData: {
 		error?: ApolloError;
 		data?: MediaCollectionData;
-		loading: boolean;
+		loading?: boolean;
 		refetch: () => void;
 	};
 }>({
 	isManga: false,
 	setIsManga: null,
-	listsData: { error: undefined, data: undefined, loading: true, refetch() {} },
+	listsData: {
+		error: undefined,
+		data: undefined,
+		loading: undefined,
+		refetch() {},
+	},
 });
 
 export const ToggleProvider = ({ children }: { children: React.ReactNode }) => {
