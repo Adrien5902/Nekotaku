@@ -1,13 +1,12 @@
 import { createContext, useContext } from "react";
-import { QueryResult, useQuery } from "@apollo/client";
-import { ThemedText } from "./ThemedText";
-import { RefreshControl } from "react-native";
+import { type ApolloError, useQuery } from "@apollo/client";
 import { gql } from "@/types/Anilist";
 import type { ViewerQuery } from "@/types/Anilist/graphql";
 
-const AnilistUserInfoContext = createContext<ViewerQuery["Viewer"] | null>(
-	null,
-);
+const AnilistUserInfoContext = createContext<
+	| { data: ViewerQuery["Viewer"]; loading: boolean; error?: ApolloError }
+	| undefined
+>(undefined);
 
 interface Props {
 	children: React.ReactNode;
@@ -33,18 +32,12 @@ const QUERY = gql(`
 `);
 
 export default function AnilistUserInfoProvider({ children }: Props) {
-	const { error, data, loading } = useQuery(QUERY);
-	const Viewer = data?.Viewer;
+	const { error, data: v, loading } = useQuery(QUERY);
+	const data = v?.Viewer;
 
 	return (
-		<AnilistUserInfoContext.Provider value={Viewer ?? null}>
-			{loading ? (
-				<RefreshControl refreshing={true} />
-			) : error ? (
-				<ThemedText>{error.message}</ThemedText>
-			) : (
-				children
-			)}
+		<AnilistUserInfoContext.Provider value={{ error, loading, data }}>
+			{children}
 		</AnilistUserInfoContext.Provider>
 	);
 }

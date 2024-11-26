@@ -1,6 +1,5 @@
 import {
 	type MediaListCollectionQuery,
-	MediaListStatus,
 	MediaType,
 } from "@/types/Anilist/graphql";
 import { type ApolloError, useQuery } from "@apollo/client";
@@ -73,7 +72,7 @@ const ToggleContext = createContext<{
 
 export const ToggleProvider = ({ children }: { children: React.ReactNode }) => {
 	const [isManga, setIsManga] = useState(false);
-	const UserInfo = useAnilistUserInfo();
+	const { data: UserInfo } = useAnilistUserInfo() ?? {};
 
 	const { error, data, loading, refetch } = useQuery(QUERY, {
 		variables: {
