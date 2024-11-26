@@ -30,7 +30,7 @@ export class Downloader {
 						id: Downloader.PROGRESS_NOTIFICATION_CHANNEL_ID,
 						name: "Downloading Episodes Status",
 						description:
-							"Progress bar notification for episode dowloading status",
+							"Progress bar notification for episode downloading status",
 						vibration: false,
 						importance: AndroidImportance.LOW,
 						badge: false,
@@ -132,7 +132,7 @@ export class Downloader {
 		const [uriPromise, headers] = getVideoUri(episode.url);
 		const uri = await uriPromise;
 
-		const formatedFileName = Downloader.formatFileName(media.id, episode.id);
+		const formattedFileName = Downloader.formatFileName(media.id, episode.id);
 
 		await FileSystem.makeDirectoryAsync(
 			Downloader.DOWNLOADED_EPISODES_DIR + media.id,
@@ -140,7 +140,7 @@ export class Downloader {
 		);
 
 		const notificationData: Notification = {
-			id: Downloader.notificationId(formatedFileName),
+			id: Downloader.notificationId(formattedFileName),
 			title: "Downloading",
 			subtitle: `${media.title?.english} ep. ${episode.name}`,
 			body: `${media.title?.english} ep. ${episode.name}`,
@@ -165,13 +165,13 @@ export class Downloader {
 
 		const downloadResumable = FileSystem.createDownloadResumable(
 			uri,
-			Downloader.DOWNLOADED_EPISODES_DIR + formatedFileName,
+			Downloader.DOWNLOADED_EPISODES_DIR + formattedFileName,
 			{ headers },
 			(data: FileSystem.DownloadProgressData) =>
 				this.callback(media.id as number, episode.id, data),
 		);
 
-		this.currentlyDownloading[formatedFileName] = {
+		this.currentlyDownloading[formattedFileName] = {
 			url: uri,
 			progressData: {
 				totalBytesExpectedToWrite: 1,
@@ -245,10 +245,10 @@ export class Downloader {
 	}
 
 	private pushNewDownloadedEpisode(mediaId: number, episodeId: EpisodeId) {
-		const formatedFileName = Downloader.formatFileName(mediaId, episodeId);
+		const formattedFileName = Downloader.formatFileName(mediaId, episodeId);
 
 		notifee.cancelDisplayedNotification(
-			Downloader.notificationId(formatedFileName),
+			Downloader.notificationId(formattedFileName),
 		);
 
 		if (!this.downloadedEpisodes[mediaId]) {
@@ -256,7 +256,7 @@ export class Downloader {
 		}
 		this.downloadedEpisodes[mediaId].push(episodeId);
 
-		const downloadState = this.currentlyDownloading[formatedFileName];
+		const downloadState = this.currentlyDownloading[formattedFileName];
 
 		if (downloadState?.callback) {
 			downloadState.callback(null);
@@ -272,7 +272,7 @@ export class Downloader {
 			},
 		});
 
-		delete this.currentlyDownloading[formatedFileName];
+		delete this.currentlyDownloading[formattedFileName];
 	}
 
 	async deleteDownloadedEpisode(mediaId: number, episodeId: EpisodeId) {
@@ -291,20 +291,20 @@ export class Downloader {
 				delete this.downloadedEpisodes[mediaId];
 			}
 		} catch (error) {
-			console.error("Error Occured While Deleting");
+			console.error("Error Occurred While Deleting");
 		}
 	}
 
 	async cancelDownload(mediaId: number, episodeId: EpisodeId) {
-		const formatedFileName = Downloader.formatFileName(mediaId, episodeId);
-		const downloadingState = this.currentlyDownloading[formatedFileName];
-		delete this.currentlyDownloading[formatedFileName];
+		const formattedFileName = Downloader.formatFileName(mediaId, episodeId);
+		const downloadingState = this.currentlyDownloading[formattedFileName];
+		delete this.currentlyDownloading[formattedFileName];
 		await downloadingState?.downloadResumable.cancelAsync();
 		if (downloadingState?.callback) {
 			downloadingState?.callback(null);
 		}
 		notifee.cancelDisplayedNotification(
-			Downloader.notificationId(formatedFileName),
+			Downloader.notificationId(formattedFileName),
 		);
 	}
 
@@ -312,8 +312,8 @@ export class Downloader {
 		return `${mediaId}/${episodeId}`;
 	}
 
-	static notificationId(formatedFileName: string) {
-		return `downloading_${formatedFileName}`;
+	static notificationId(formattedFileName: string) {
+		return `downloading_${formattedFileName}`;
 	}
 
 	async getDownloadedEpisodeFileUri(mediaId: number, episodeId: EpisodeId) {

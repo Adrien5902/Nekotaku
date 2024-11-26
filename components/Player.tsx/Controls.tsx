@@ -54,7 +54,7 @@ export default function Controls({
 	);
 
 	const forwardGradientContainerRef = useRef<View>(null);
-	const forwardGradientOpactityAnim = useAnimatedValue(0);
+	const forwardGradientOpacityAnim = useAnimatedValue(0);
 	const [rightOrLeft, setRightOrLeft] = useState(false);
 
 	useEffect(() => {
@@ -123,14 +123,14 @@ export default function Controls({
 							const rightOrLeft = locationX / width > 0.5;
 							setRightOrLeft(rightOrLeft);
 
-							Animated.timing(forwardGradientOpactityAnim, {
+							Animated.timing(forwardGradientOpacityAnim, {
 								toValue: 1,
 								duration: 150,
 								easing: Easing.ease,
 								useNativeDriver: true,
 							}).start();
 							setTimeout(() => {
-								Animated.timing(forwardGradientOpactityAnim, {
+								Animated.timing(forwardGradientOpacityAnim, {
 									toValue: 0,
 									duration: 500,
 									easing: Easing.quad,
@@ -317,7 +317,7 @@ export default function Controls({
 					position: "absolute",
 					flex: 1,
 					zIndex: 3,
-					opacity: forwardGradientOpactityAnim,
+					opacity: forwardGradientOpacityAnim,
 					pointerEvents: "none",
 				}}
 				ref={forwardGradientContainerRef}
