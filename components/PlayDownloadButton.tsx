@@ -1,20 +1,20 @@
 import { Spacing, TextSizes } from "@/constants/Sizes";
 import Icon, { AnimatedIcon } from "./Icon";
-import { useAnimatedValue, View } from "react-native";
+import { StyleSheet, useAnimatedValue, View } from "react-native";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { ThemedText } from "./ThemedText";
 import { type Href, router, useUnstableGlobalHref } from "expo-router";
 import type { Episode, Lecteur } from "@/types/AnimeSama";
-import type { Media, MediaList } from "@/types/Anilist/graphql";
 import { useContext, useEffect, useState } from "react";
 import {
 	DownloadingContext,
 	type DownloadingState,
 } from "./DownloadingContext";
 import type { Color } from "@/constants/Colors";
+import type { VideoPlayerMedia } from "@/app/player";
 
 export interface Props {
-	media: Pick<Media, "id"> | null | undefined;
+	media: VideoPlayerMedia;
 	episode: Episode;
 	lecteur: Lecteur;
 	color?: Color;
@@ -114,9 +114,7 @@ export default function PlayDownloadButton({
 			<>
 				<Icon
 					name={"trash"}
-					style={{
-						marginRight: Spacing.xl,
-					}}
+					style={styles.icon}
 					onPress={() => {
 						downloadingContext.deleteDownloadedEpisode(mediaId, episode.id);
 						updateDownloadState();
@@ -130,6 +128,7 @@ export default function PlayDownloadButton({
 						router.navigate(playerPath);
 					}}
 					color={iconColor}
+					style={styles.icon}
 				/>
 			</>
 		);
@@ -144,9 +143,7 @@ export default function PlayDownloadButton({
 					}}
 					size={TextSizes.xl}
 					name="download"
-					style={{
-						marginRight: Spacing.xl,
-					}}
+					style={styles.icon}
 					color={iconColor}
 				/>
 				<Icon
@@ -156,17 +153,14 @@ export default function PlayDownloadButton({
 					size={TextSizes.xl}
 					color={iconColor}
 					name="play"
+					style={styles.icon}
 				/>
 			</>
 		);
 	} else {
 		child = (
 			<>
-				<View
-					style={{
-						marginRight: Spacing.xl,
-					}}
-				>
+				<View style={styles.icon}>
 					<Icon
 						name={"download"}
 						color={`${iconColor}60`}
@@ -187,7 +181,7 @@ export default function PlayDownloadButton({
 				<Icon
 					name={state === DownloadState.PausedDownloading ? "play" : "pause"}
 					size={TextSizes.xl}
-					style={{ marginRight: Spacing.xl }}
+					style={[{ marginRight: Spacing.xl }, styles.icon]}
 					onPress={() => {
 						if (state === DownloadState.PausedDownloading) {
 							downloadingContext.resumeDownload(mediaId, episode.id);
@@ -206,6 +200,7 @@ export default function PlayDownloadButton({
 						setState(DownloadState.NotDownloaded);
 						updateDownloadState();
 					}}
+					style={styles.icon}
 					color={iconColor}
 				/>
 			</>
@@ -218,6 +213,7 @@ export default function PlayDownloadButton({
 				flexDirection: "row",
 				alignItems: "center",
 				padding: Spacing.m,
+				gap: Spacing.xl,
 			}}
 		>
 			{child}
@@ -231,3 +227,7 @@ enum DownloadState {
 	PausedDownloading = 2,
 	Downloaded = 3,
 }
+
+const styles = StyleSheet.create({
+	icon: { padding: Spacing.m },
+});

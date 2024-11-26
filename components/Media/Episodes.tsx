@@ -25,11 +25,13 @@ import { useCachedPromise } from "@/hooks/usePromise";
 
 export default function EpisodesCollection({
 	media,
+	progress,
 }: {
 	media?:
 		| (PlayDownloadButtonProps["media"] & AnimeSamaSearchMediaType)
 		| undefined
 		| null;
+	progress: MediaList["progress"];
 }) {
 	const {
 		loading: loadingAnimeSama,
@@ -103,7 +105,7 @@ export default function EpisodesCollection({
 				<ThemedText>{errorEpisodes.message}</ThemedText>
 			) : !loadingEpisodes && lecteurs ? (
 				<EpisodesList
-					{...{ media, url, lang }}
+					{...{ media, url, lang, progress }}
 					lecteur={
 						lecteurs.find((l) => l.hostname.includes("sibnet.ru")) ??
 						lecteurs[0]
@@ -121,15 +123,28 @@ export function EpisodesList({
 	media,
 	lecteur,
 	selected,
+	progress,
 }: {
 	media: PlayDownloadButtonProps["media"];
+	progress: MediaList["progress"];
 	lecteur: Lecteur | undefined;
 	selected?: number;
 }) {
+	const lastWatchedEpisodeId = lecteur?.episodes.find((ep) => {
+		const num =
+			typeof ep.name === "number" ? ep.name : Number.parseInt(ep.name);
+		if (!Number.isNaN(num)) {
+			return num === progress;
+		}
+	})?.id;
+
 	return (
 		<>
 			{lecteur?.episodes.map((episode) => (
 				<EpisodeButton
+					watched={
+						lastWatchedEpisodeId ? lastWatchedEpisodeId >= episode.id : false
+					}
 					episode={episode}
 					{...{ media, lecteur }}
 					key={episode.id}
@@ -146,39 +161,69 @@ function EpisodeButton({
 	episode,
 	selected,
 	lecteur,
+	watched,
 }: {
 	media: PlayDownloadButtonProps["media"];
 	selected?: boolean;
 	episode: Episode;
 	lecteur: Lecteur;
+	watched: boolean;
 }) {
 	const styles = useStyles();
+	const { data: progress } = Cache.use(CacheReadType.Disk, "episodeProgress", [
+		media?.id ?? 0,
+		episode.id,
+	]);
 
 	return (
 		<ThemedView
-			color={selected !== undefined && selected ? "accent" : "background"}
-			style={styles.PrimaryElement}
+			color={selected !== undefined && selected ? "primary" : "background"}
+			style={[
+				styles.PrimaryElement,
+				{ padding: 0, flexDirection: "column", alignItems: "stretch" },
+			]}
 		>
-			<View>
+			<View
+				style={{
+					flexDirection: "row",
+					alignItems: "center",
+					justifyContent: "space-between",
+					flex: 1,
+				}}
+			>
 				<ThemedText
+					style={{ paddingLeft: Spacing.m }}
 					size="m"
 					weight={selected ? "bold" : undefined}
 					numberOfLines={1}
-					color={selected ? "background" : "text"}
 				>
 					{typeof episode.name === "string"
 						? episode.name
 						: `Épisode ${episode.name}`}
 				</ThemedText>
+				{media ? (
+					<PlayDownloadButton
+						media={media}
+						lecteur={lecteur}
+						episode={episode}
+					/>
+				) : null}
 			</View>
-			{media ? (
-				<PlayDownloadButton
-					media={media}
-					lecteur={lecteur}
-					episode={episode}
-					color={selected ? "background" : "text"}
+			<ThemedView
+				color="text"
+				style={{
+					height: Spacing.s,
+					width: "100%",
+				}}
+			>
+				<ThemedView
+					color="accent"
+					style={{
+						flex: 1,
+						width: `${watched ? 100 : (progress?.durationMillis ? progress.positionMillis / progress.durationMillis : 0) * 100}%`,
+					}}
 				/>
-			) : null}
+			</ThemedView>
 		</ThemedView>
 	);
 }

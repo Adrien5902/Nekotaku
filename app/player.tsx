@@ -11,12 +11,16 @@ import { ThemedView } from "@/components/ThemedView";
 import { EpisodesList } from "@/components/Media/Episodes";
 import type { Lecteur } from "@/types/AnimeSama";
 import { DownloadingContext } from "@/components/DownloadingContext";
-import type { Media, MediaTitle } from "@/types/Anilist/graphql";
+import type { Media, MediaList, MediaTitle } from "@/types/Anilist/graphql";
 import { Spacing } from "@/constants/Sizes";
 
-export type VideoPlayerMedia = Pick<Media, "bannerImage" | "id" | "idMal"> & {
-	title: Pick<MediaTitle, "english" | "romaji">;
-};
+export type VideoPlayerMedia =
+	| (Pick<Media, "bannerImage" | "id" | "idMal"> & {
+			title?: Pick<MediaTitle, "english" | "romaji"> | undefined | null;
+			mediaListEntry?: Pick<MediaList, "progress"> | undefined | null;
+	  })
+	| undefined
+	| null;
 
 const VideoPlayer = () => {
 	const {
@@ -119,6 +123,7 @@ const VideoPlayer = () => {
 					/>
 					<ScrollView style={{ flexDirection: "column", flex: 1 }}>
 						<EpisodesList
+							progress={media?.mediaListEntry?.progress}
 							lecteur={lecteur}
 							media={media}
 							selected={episode.id}

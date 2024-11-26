@@ -211,7 +211,12 @@ function MediaPageTabBar({
 	const colors = useThemeColors();
 
 	const renderScene = SceneMap({
-		episodes: () => <EpisodesCollection media={media} />,
+		episodes: () => (
+			<EpisodesCollection
+				media={media}
+				progress={media.mediaListEntry?.progress}
+			/>
+		),
 		details: () => <MediaDetails media={media} />,
 		relations: () => (
 			<MediaRelations
