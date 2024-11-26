@@ -1,8 +1,7 @@
 import { AppState, View } from "react-native";
-import Controls from "./Controls";
+import Controls, { type Props as ControlsProps } from "./Controls";
 import { type AVPlaybackStatusSuccess, ResizeMode, Video } from "expo-av";
 import { useEffect, useRef } from "react";
-import type { Media, MediaTitle } from "@/types/Anilist/graphql";
 import type { Episode } from "@/types/AnimeSama";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import {
@@ -14,15 +13,13 @@ import { useRemoteMediaClient } from "react-native-google-cast";
 import useStyles from "@/hooks/useStyles";
 import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
 import CastControls from "./CastControls";
-import DiskCache from "@/hooks/useDiskCache";
+import Cache, { CacheReadType } from "@/hooks/useCache";
 
 interface Props {
 	isFullscreen: boolean;
 	loading: boolean;
 	episode: Episode;
-	media: Pick<Media, "id" | "idMal"> & {
-		title: Pick<MediaTitle, "english" | "romaji">;
-	};
+	media: ControlsProps["media"];
 	toggleFullscreen: (force?: boolean) => void;
 	setIsLoadingVid: React.Dispatch<React.SetStateAction<boolean>>;
 	videoUri?: string;
@@ -43,10 +40,13 @@ export default function Player({
 	async function savePos() {
 		// Do not save if position is 0
 		if (statusRef.current.positionMillis) {
-			await DiskCache.write(
-				"episodePositionMillis",
-				[media?.id, episode.id],
-				statusRef.current.positionMillis,
+			await Cache.write(
+				CacheReadType.MemoryAndIfNotDisk,
+				"episodeProgress",
+				[media?.id ?? 0, episode.id],
+				{
+					...statusRef.current,
+				},
 			);
 		}
 	}
@@ -75,8 +75,8 @@ export default function Player({
 		};
 	}, []);
 
-	const { data: startPos } = DiskCache.use<number>("episodePositionMillis", [
-		media?.id,
+	const { data: startPos } = Cache.use(CacheReadType.Disk, "episodeProgress", [
+		media?.id ?? 0,
 		episode.id,
 	]);
 
@@ -145,7 +145,7 @@ export default function Player({
 						ref={videoPlayerRef}
 						shouldPlay
 						resizeMode={ResizeMode.CONTAIN}
-						positionMillis={startPos ?? 0}
+						positionMillis={startPos?.positionMillis ?? 0}
 						onPlaybackStatusUpdate={(s) => {
 							const status = s as AVPlaybackStatusSuccess;
 							statusRef.current = status;
@@ -159,7 +159,9 @@ export default function Player({
 							}
 						}}
 						onLoad={() => {
-							videoPlayerRef.current?.setPositionAsync(startPos ?? 0);
+							videoPlayerRef.current?.setPositionAsync(
+								startPos?.positionMillis ?? 0,
+							);
 							setIsLoadingVid(false);
 						}}
 					/>

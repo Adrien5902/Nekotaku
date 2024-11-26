@@ -1,14 +1,14 @@
 import type { Episode } from "@/types/AnimeSama";
-import { useMemoryCachedPromise, usePromise } from "./usePromise";
 import type { Downloader } from "@/components/DownloadingContext";
+import { useCachedPromise, usePromise } from "./usePromise";
+import { CacheReadType } from "./useCache";
 
 export function useGetVideoSource(downloadingContext: Downloader, mediaId: number, episode: Episode) {
     if (downloadingContext.downloadedEpisodes[mediaId]?.includes(episode.id)) {
         return usePromise(() => downloadingContext.getDownloadedEpisodeFileUri(mediaId, episode.id), [mediaId, episode.url]);
     }
 
-    return useMemoryCachedPromise("getVideoUri", () => getVideoUri(episode.url)[0], [mediaId, episode.url]);
-
+    return useCachedPromise(CacheReadType.Memory, "videoUri", () => getVideoUri(episode.url)[0], [mediaId, episode.url]);
 };
 
 export function getVideoUri(videoSource: string): [Promise<string>, Record<string, string>] {

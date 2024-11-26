@@ -1,6 +1,7 @@
 import { MediaStatus, type Media, type MediaTitle } from "@/types/Anilist/graphql";
 import { DOMParser } from 'react-native-html-parser';
-import DiskCache from "./useDiskCache";
+import Cache, { CacheReadType } from "./useCache";
+import { useCachedPromise } from "./usePromise";
 
 interface SeasonData {
     season: number;
@@ -12,7 +13,7 @@ export type AnimeSamaSearchMediaType = Pick<Media, "synonyms" | "format" | "stat
 } | null | undefined
 
 export function useAnimeSamaSearch(media?: AnimeSamaSearchMediaType) {
-    return DiskCache.useWithMemory("useAnimeSamaSearch", async () => {
+    return useCachedPromise(CacheReadType.MemoryAndIfNotDisk, "animeSamaSearch", async () => {
         if (!media) {
             return undefined
         }
@@ -149,7 +150,7 @@ function getFormatData(media: AnimeSamaSearchMediaType): {
 
 interface ApplyTitleResult<T> { newString: string, data: T };
 type ApplyTitle<T> = (s: string) => ApplyTitleResult<T> | null;
-async function searchTitles<T>(media: AnimeSamaSearchMediaType, apply?: ApplyTitle<T>) {
+async function searchTitles<T>(media: AnimeSamaSearchMediaType, apply?: ApplyTitle<T>): Promise<AnimeSamaSearch<T> | undefined> {
     for (const synonym of searchFriendlyMediaNames(media)) {
         const { newString, ...data } = apply ? apply(synonym) ?? { newString: null } : { newString: synonym };
         if (!newString) {
@@ -187,4 +188,9 @@ export async function searchMedia(media: AnimeSamaSearchMediaType) {
 
 export function searchFriendly(s: string) {
     return s.trim().replaceAll("-", "").toLowerCase()
+}
+
+export interface AnimeSamaSearch<T> {
+    data?: T | undefined;
+    result: SearchResult;
 }

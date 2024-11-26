@@ -4,7 +4,6 @@ import {
 	Animated,
 	Dimensions,
 	Easing,
-	Text,
 	TouchableWithoutFeedback,
 	useAnimatedValue,
 	View,
@@ -24,6 +23,22 @@ import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
 import useAniskip from "@/hooks/useAniskip";
 import CustomButton from "../Button";
 
+export interface Props {
+	playerRef: React.RefObject<PlayerFunctions | undefined>;
+	statusRef: React.MutableRefObject<VideoPlayStatus | undefined>;
+	loading: boolean;
+	isFullscreen: boolean;
+	episode: Episode;
+	media:
+		| (Pick<Media, "idMal" | "id"> & {
+				title?: Pick<MediaTitle, "romaji" | "english"> | undefined | null;
+		  })
+		| undefined
+		| null;
+	toggleFullscreen: (force?: boolean) => void;
+	forceView?: boolean;
+}
+
 export default function Controls({
 	statusRef,
 	isFullscreen,
@@ -33,18 +48,7 @@ export default function Controls({
 	toggleFullscreen,
 	forceView,
 	media,
-}: {
-	playerRef: React.RefObject<PlayerFunctions | undefined>;
-	statusRef: React.MutableRefObject<VideoPlayStatus | undefined>;
-	loading: boolean;
-	isFullscreen: boolean;
-	episode: Episode;
-	media: Pick<Media, "idMal" | "id"> & {
-		title: Pick<MediaTitle, "romaji" | "english"> | undefined | null;
-	};
-	toggleFullscreen: (force?: boolean) => void;
-	forceView?: boolean;
-}) {
+}: Props) {
 	const styles = useStyles();
 	const colors = useThemeColors();
 
@@ -176,7 +180,7 @@ export default function Controls({
 										paddingLeft: Spacing.m,
 									}}
 								>
-									{media.title?.english ?? media.title?.romaji} -{" "}
+									{media?.title?.english ?? media?.title?.romaji} -{" "}
 									{typeof episode.name === "number"
 										? `Ep. ${episode.name}`
 										: episode.name}
@@ -208,7 +212,6 @@ export default function Controls({
 									<CustomButton
 										key={aniskip.skipType}
 										onPress={() => {
-											console.log("press");
 											playerRef.current?.setPositionAsync(
 												aniskip.interval.endTime * 1000,
 											);

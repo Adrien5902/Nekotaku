@@ -28,7 +28,7 @@ import Icon, { type IconName } from "@/components/Icon";
 import EditMediaListStatus from "@/components/EditMediaListStatus";
 import { gql } from "@/types/Anilist";
 import MediaRelations from "@/components/Media/MediaRelations";
-import DiskCache from "@/hooks/useDiskCache";
+import Cache, { CacheReadType } from "@/hooks/useCache";
 
 const QUERY = gql(`
 	query Media($format: ScoreFormat, $mediaId: Int) {
@@ -129,25 +129,28 @@ export default function MediaPage() {
 		},
 	});
 
-	const {
-		loading: loadingCache,
-		error: cacheError,
-		data: cacheData,
-	} = DiskCache.use<MediaQuery["Media"] | undefined>("media", [mediaId]);
+	const { loading: loadingCache, data: cacheData } = Cache.use(
+		CacheReadType.Disk,
+		"media",
+		[mediaId],
+	);
 
 	const media = mediaData?.Media ?? cacheData;
 	const loading = loadingApi ? loadingCache : false;
 
 	useEffect(() => {
 		if (mediaData?.Media?.id) {
-			DiskCache.write("media", [mediaData.Media.id], mediaData.Media);
+			Cache.write(
+				CacheReadType.Disk,
+				"media",
+				[mediaData.Media.id],
+				mediaData.Media,
+			);
 		}
 	}, [mediaData]);
 
-	if (cacheError && apiError) {
-		return (
-			<ThemedText>{`${cacheError.message}\n${apiError.message}`}</ThemedText>
-		);
+	if (apiError) {
+		return <ThemedText>{apiError.message}</ThemedText>;
 	}
 
 	return (

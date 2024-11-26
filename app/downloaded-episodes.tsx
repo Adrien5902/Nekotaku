@@ -4,30 +4,23 @@ import { ThemedView } from "@/components/ThemedView";
 import { useContext } from "react";
 import { useToggle } from "../components/ToggleContext";
 import BigTitle from "@/components/BigTitle";
-import DiskCache from "@/hooks/useDiskCache";
 import type { MediaQuery } from "@/types/Anilist/graphql";
 import MediaListCollection from "@/components/Media/MediaCollection";
 import { Spacing } from "@/constants/Sizes";
 import { useNetworkState } from "expo-network";
+import Cache, { CacheReadType } from "@/hooks/useCache";
 
 export default function DownloadedEpisodes() {
 	const downloader = useContext(DownloadingContext);
 	const { listsData } = useToggle();
-	const {
-		loading: cacheLoading,
-		data: cacheData,
-		error: cacheError,
-	} = DiskCache.useAll<MediaQuery["Media"] | undefined>("media");
-	const {
-		data: lists,
-		error: listsError,
-		loading: listsLoading,
-		refetch,
-	} = listsData;
+	const { loading: cacheLoading, data: cacheData } = Cache.useAll(
+		CacheReadType.MemoryAndIfNotDisk,
+		"media",
+	);
+	const { data: lists, error, loading: listsLoading, refetch } = listsData;
 
 	const networkState = useNetworkState();
 
-	const error = cacheError || listsError;
 	const loading =
 		cacheLoading || (networkState.isConnected ? listsLoading : false);
 
@@ -41,19 +34,22 @@ export default function DownloadedEpisodes() {
 		);
 	}
 
+	const cachedMedias = cacheData ? Object.values(cacheData) : [];
 	const entries = lists?.flatMap((m) => m?.entries ?? []);
 	const downloadedMediaEntries = Object.keys(downloader.downloadedEpisodes).map(
 		(mediaIdString) => {
 			const mediaId = Number.parseInt(mediaIdString);
 
-			const cachedMedia = cacheData?.find((media) => media?.id === mediaId);
-
-			return (
-				entries?.find((mediaList) => mediaList?.media?.id === mediaId) ?? {
-					...cachedMedia?.mediaListEntry,
-					media: cachedMedia,
-				}
+			const entry = entries?.find(
+				(mediaList) => mediaList?.media?.id === mediaId,
 			);
+			if (entry) return entry;
+
+			const cachedMedia = cachedMedias.find((media) => media?.id === mediaId);
+			return {
+				...cachedMedia?.mediaListEntry,
+				media: cachedMedia,
+			};
 		},
 	);
 

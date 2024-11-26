@@ -1,12 +1,15 @@
 import type { Episode } from "@/types/AnimeSama";
-import DiskCache from "./useDiskCache";
 import type { Media } from "@/types/Anilist/graphql";
+import { useCachedPromise } from "./usePromise";
+import { CacheReadType } from "./useCache";
 
-export default function useAniskip(media: Pick<Media, "id" | "idMal">, durationMillis: number | undefined, episode: Episode) {
-    return DiskCache.useWithMemory(
+export default function useAniskip(media: Pick<Media, "id" | "idMal"> | undefined | null, durationMillis: number | undefined, episode: Episode) {
+    return useCachedPromise(
+        CacheReadType.MemoryAndIfNotDisk,
         "aniskip",
         async () => {
             if (
+                media?.idMal &&
                 durationMillis &&
                 durationMillis > 1 &&
                 (typeof episode.name === "number" ||
@@ -16,7 +19,7 @@ export default function useAniskip(media: Pick<Media, "id" | "idMal">, durationM
                 const res = await fetch(url, {
                     headers: { Accept: "application/json" },
                 });
-                const json: Res = await res.json();
+                const json: AniskipData = await res.json();
 
                 if (!json.found) {
                     return null
@@ -25,11 +28,11 @@ export default function useAniskip(media: Pick<Media, "id" | "idMal">, durationM
                 return json.results
             }
         },
-        [media.id, episode.id, durationMillis],
+        [media?.id ?? 0, episode.id, durationMillis],
     );
 }
 
-interface Res {
+export interface AniskipData {
     "statusCode": number,
     "message": "string",
     "found": boolean,

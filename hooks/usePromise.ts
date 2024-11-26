@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import Cache from "./useCache";
+import type { CacheDeps, CacheKey, CacheReadType, CacheValue } from "./useCache";
 
 export interface UsePromise<R> {
     loading: boolean,
@@ -35,57 +37,43 @@ export function usePromise<R>(fn: () => Promise<R | undefined>, deps?: unknown[]
     return { loading, data: dataRef.current, error: errorRef.current }
 }
 
-export interface UseCachedPromise<R> extends UsePromise<R> {
-    refresh: () => Promise<boolean>
-}
+export function useCachedPromise<T extends CacheKey>(readType: CacheReadType, key: T, fn: () => Promise<CacheValue<T> | undefined>, deps: CacheDeps<T>, onUnmounted?: () => void): UseCachedPromise<CacheValue<T>> {
+    const dataRef = useRef<CacheValue<T>>();
+    const [loading, setLoading] = useState<boolean>(true)
+    const errorRef = useRef<Error>()
 
-export const cache = new Map<string, unknown>();
+    const refresh = async () => {
+        setLoading(true)
 
-export function useMemoryCachedPromise<R>(
-    key: string,
-    fn: () => Promise<R | undefined>,
-    deps?: unknown[],
-    onUnmounted?: () => void
-): UseCachedPromise<R> {
-    const dataRef = useRef<R>();
-    const [loading, setLoading] = useState<boolean>(true);
-    const errorRef = useRef<Error>();
+        const cacheHit = await Cache.read(readType, key, deps) ?? undefined
+        if (cacheHit) {
+            dataRef.current = cacheHit
+            setLoading(false)
+        }
 
-    const cacheKey = key + deps ? JSON.stringify(deps) : "default";
-
-    function refresh() {
-        return new Promise<boolean>((resolve, reject) => {
-            dataRef.current = undefined
-            setLoading(true);
-            fn()
-                .then((res) => {
-                    if (res !== undefined) {
-                        dataRef.current = res;
-                        cache.set(cacheKey, res);
-                        setLoading(false);
-                        resolve(true)
-                    }
-                })
-                .catch((err) => {
-                    errorRef.current = err;
-                    setLoading(false);
-                    resolve(false)
-                });
-        })
+        try {
+            const res = await fn()
+            if (res !== undefined) {
+                dataRef.current = res
+                setLoading(false)
+            }
+            return true
+        } catch (error) {
+            errorRef.current = error as Error
+            setLoading(false)
+            return false
+        }
     }
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
     useEffect(() => {
-        if (cache.has(cacheKey)) {
-            dataRef.current = cache.get(cacheKey) as R;
-            setLoading(false);
-            return onUnmounted;
-        }
-
         refresh()
+        return onUnmounted
+    }, deps ?? [])
 
-        return onUnmounted;
-    }, deps ?? []);
+    return { loading, data: dataRef.current, error: errorRef.current, refresh }
+}
 
-    return { loading, data: dataRef.current, error: errorRef.current, refresh };
+export interface UseCachedPromise<R> extends UsePromise<R> {
+    refresh: () => Promise<boolean>
 }

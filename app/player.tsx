@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { Text, Dimensions, Image, ScrollView } from "react-native";
 import * as NavigationBar from "expo-navigation-bar";
 import * as StatusBar from "expo-status-bar";
-import Player from "@/components/Player.tsx/Player";
+import Player from "@/components/Player/Player";
 import { ThemedView } from "@/components/ThemedView";
 import { EpisodesList } from "@/components/Media/Episodes";
 import type { Lecteur } from "@/types/AnimeSama";
@@ -30,7 +30,7 @@ const VideoPlayer = () => {
 
 	const downloadingContext = useContext(DownloadingContext);
 	const { loading: isGetVideoSourceLoading, data: videoUri } =
-		useGetVideoSource(downloadingContext, media?.id, episode);
+		useGetVideoSource(downloadingContext, media?.id ?? 0, episode);
 	const [isFullscreen, setIsFullscreen] = useState(false);
 	const [isLoadingVid, setIsLoadingVid] = useState(true);
 
@@ -45,18 +45,18 @@ const VideoPlayer = () => {
 				e.orientationLock === ScreenOrientation.OrientationLock.ALL ||
 				e.orientationLock === ScreenOrientation.OrientationLock.DEFAULT;
 
-			const lanscaped =
+			const landscaped =
 				orientation === ScreenOrientation.Orientation.LANDSCAPE_LEFT ||
 				orientation === ScreenOrientation.Orientation.LANDSCAPE_RIGHT;
 
-			const portraited =
+			const portrait =
 				orientation === ScreenOrientation.Orientation.PORTRAIT_UP ||
 				orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN;
 
 			if (unlocked) {
-				if (lanscaped) {
+				if (landscaped) {
 					toggleFullscreen(true);
-				} else if (portraited) {
+				} else if (portrait) {
 					toggleFullscreen(false);
 				}
 			}

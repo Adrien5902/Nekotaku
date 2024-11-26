@@ -1,9 +1,11 @@
 import type { AnimeSamaUrl, EpisodeId, EpisodeName, Lang, Lecteur } from "@/types/AnimeSama";
-import DiskCache from "./useDiskCache";
+import { useCachedPromise } from "./usePromise";
+import { CacheReadType } from "./useCache";
 
 export function useAnimeSamaGetLecteurs(url: AnimeSamaUrl | undefined, currentLang: keyof typeof Lang | null, customEpisodes?: { id: EpisodeId, name: EpisodeName }[]) {
-    return DiskCache.useWithMemory(
-        "useAnimeSamaGetLecteurs",
+    return useCachedPromise(
+        CacheReadType.MemoryAndIfNotDisk,
+        "animeSamaLecteurs",
         async () => {
             if (url && currentLang) {
                 url.lang = currentLang;
@@ -11,7 +13,7 @@ export function useAnimeSamaGetLecteurs(url: AnimeSamaUrl | undefined, currentLa
             }
             return undefined
         },
-        [currentLang, url]
+        [currentLang, url?.animeName, url?.season, url?.horsSerie, url?.type]
     )
 }
 

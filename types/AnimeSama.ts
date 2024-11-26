@@ -1,13 +1,15 @@
+export type AnimeSamaMediaType = "saison" | "oav" | "film"
+
 export class AnimeSamaUrl {
     animeName: string;
-    type: "saison" | "oav" | "film";
+    type: AnimeSamaMediaType;
     season?: number;
     horsSerie?: boolean;
     lang?: keyof typeof Lang;
 
     constructor(
         animeName: string,
-        type: "saison" | "oav" | "film",
+        type: AnimeSamaMediaType,
         lang?: keyof typeof Lang,
         season?: number,
         horsSerie?: boolean,
@@ -31,7 +33,7 @@ export class AnimeSamaUrl {
         if (!match) return null;
 
         const animeName = match[1];
-        const type = match[2].replace(/\d+/, "") as "saison" | "oav" | "film";
+        const type = match[2].replace(/\d+/, "") as AnimeSamaMediaType;
         const seasonN = Number.parseInt(match[3], 10);
         const horsSerie = Boolean(match[4]);
         const lang = match[5]?.toUpperCase() as keyof typeof Lang;
@@ -39,7 +41,7 @@ export class AnimeSamaUrl {
         return new AnimeSamaUrl(animeName, type, lang, seasonN, horsSerie);
     }
 
-    async getAvailableLangsAndEpisodes(): Promise<{ langs: (keyof typeof Lang)[], customEpisodes: { name: EpisodeName, id: EpisodeId }[] | undefined } | undefined> {
+    async getAvailableLangsAndEpisodes(): Promise<LangsAndEpisodes> {
         const urls = Object.keys(Lang).map((lang) => {
             const url = new AnimeSamaUrl(this.animeName, this.type, lang as keyof typeof Lang, this.season, this.horsSerie);
             url.lang = lang as keyof typeof Lang;
@@ -107,6 +109,10 @@ export class AnimeSamaUrl {
         return { langs, customEpisodes: customEpisodes ?? undefined }
     }
 }
+
+export type Langs = (keyof typeof Lang)[]
+export type CustomEpisodes = { name: EpisodeName, id: EpisodeId }[]
+export interface LangsAndEpisodes { langs: Langs, customEpisodes?: CustomEpisodes };
 
 export enum Lang {
     VOSTFR = "vostfr",

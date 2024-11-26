@@ -19,7 +19,9 @@ import {
 	type AnimeSamaSearchMediaType,
 	useAnimeSamaSearch,
 } from "@/hooks/useAnimeSamaSearch";
-import DiskCache from "@/hooks/useDiskCache";
+import type { MediaList } from "@/types/Anilist/graphql";
+import Cache, { CacheReadType } from "@/hooks/useCache";
+import { useCachedPromise } from "@/hooks/usePromise";
 
 export default function EpisodesCollection({
 	media,
@@ -44,10 +46,10 @@ export default function EpisodesCollection({
 	const {
 		data,
 		loading: loadingLangs,
-		error: errorLangs,
 		refresh: refreshLangsAndEpisodes,
-	} = DiskCache.useWithMemory(
-		"getAvailableLangsAndEpisodes",
+	} = useCachedPromise(
+		CacheReadType.MemoryAndIfNotDisk,
+		"langsAndEpisodes",
 		async () => await url?.getAvailableLangsAndEpisodes(),
 		[animeSamaData],
 	);
@@ -77,8 +79,8 @@ export default function EpisodesCollection({
 
 	const loading = loadingAnimeSama || loadingLangs || !lang;
 
-	if (errorLangs || error) {
-		return <ThemedText>{(errorLangs || error)?.message}</ThemedText>;
+	if (error) {
+		return <ThemedText>{error?.message}</ThemedText>;
 	}
 
 	return (
