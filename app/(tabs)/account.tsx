@@ -21,7 +21,7 @@ export default function Account() {
 }
 
 function AccountInfo() {
-	const user = useAnilistUserInfo();
+	const { data: user } = useAnilistUserInfo() ?? {};
 	const colors = useThemeColors();
 	return (
 		<ThemedView style={{ marginBottom: Spacing.l }}>
