@@ -2,7 +2,7 @@ import EpisodesCollection from "@/components/Media/Episodes";
 import MediaListStatusDisplay from "@/components/Media/Status";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
+import { AspectRatios, Spacing } from "@/constants/Sizes";
 import {
 	type MediaQuery,
 	MediaType,
@@ -29,6 +29,7 @@ import EditMediaListStatus from "@/components/EditMediaListStatus";
 import { gql } from "@/types/Anilist";
 import MediaRelations from "@/components/Media/MediaRelations";
 import Cache, { CacheReadType } from "@/hooks/useCache";
+import CustomTabView from "@/components/CustomTabView";
 
 const QUERY = gql(`
 	query Media($format: ScoreFormat, $mediaId: Int) {
@@ -207,88 +208,57 @@ function MediaPageTabBar({
 }: {
 	media: NonNullable<MediaQuery["Media"]>;
 }) {
-	const [index, setIndex] = useState(0);
-	const colors = useThemeColors();
-
-	const renderScene = SceneMap({
-		episodes: () => (
-			<EpisodesCollection
-				media={media}
-				progress={media.mediaListEntry?.progress}
-			/>
-		),
-		details: () => <MediaDetails media={media} />,
-		relations: () => (
-			<MediaRelations
-				nodes={media?.relations?.edges?.map((edge, index) => ({
-					media: media.relations?.nodes?.[index],
-					mediaList: media.relations?.nodes?.[index]?.mediaListEntry,
-					relationType: edge?.relationType,
-				}))}
-			/>
-		),
-		following: () => <ThemedText>following</ThemedText>,
-		characters: () => <ThemedText>Characters</ThemedText>,
-		staff: () => <ThemedText>staff</ThemedText>,
-	});
-
-	const [routes] = useState<Route[]>([
+	const scenes = [
 		...(media.type === MediaType.Anime
-			? [{ key: "episodes", icon: "film" }]
+			? [
+					{
+						key: "episodes",
+						icon: "film",
+
+						component: () => (
+							<EpisodesCollection
+								media={media}
+								progress={media.mediaListEntry?.progress}
+							/>
+						),
+					},
+				]
 			: []),
-		{ key: "details", icon: "align-left" },
-		{ key: "relations", icon: "link" },
-		{ key: "following", icon: "user-plus" },
-		{ key: "characters", icon: "user-group" },
-		{ key: "staff", icon: "user-tie" },
-	]);
 
-	const renderTabBar: (
-		props: SceneRendererProps & {
-			navigationState: NavigationState<Route>;
-			options: Record<string, TabDescriptor<Route>> | undefined;
+		{
+			component: () => <MediaDetails media={media} />,
+			key: "details",
+			icon: "align-left",
 		},
-	) => React.ReactNode = (props) => (
-		<TabBar
-			{...props}
-			indicatorStyle={{
-				backgroundColor: colors.accent,
-				height: Spacing.s,
-				paddingHorizontal: Spacing.l,
-				borderTopLeftRadius: Spacing.m,
-				borderTopRightRadius: Spacing.m,
-			}}
-			style={{
-				backgroundColor: "transparent",
-				borderBottomWidth: Spacing.xs,
-				borderColor: colors.primary,
-			}}
-			renderTabBarItem={({ route }) => {
-				const routeIndex = routes.findIndex((r) => r.key === route.key);
-				return (
-					<View
-						style={{
-							paddingVertical: Spacing.m,
-							width: Dimensions.get("window").width / routes.length,
-							alignItems: "center",
-						}}
-						onTouchStart={() => setIndex(routeIndex)}
-					>
-						<Icon name={route.icon as IconName} size={TextSizes.l} />
-					</View>
-				);
-			}}
-			activeColor={colors.accent}
-			inactiveColor={colors.text}
-		/>
-	);
+		{
+			key: "relations",
+			icon: "link",
+			component: () => (
+				<MediaRelations
+					nodes={media?.relations?.edges?.map((edge, index) => ({
+						media: media.relations?.nodes?.[index],
+						mediaList: media.relations?.nodes?.[index]?.mediaListEntry,
+						relationType: edge?.relationType,
+					}))}
+				/>
+			),
+		},
+		{
+			key: "following",
+			icon: "user-plus",
+			component: () => <ThemedText>following</ThemedText>,
+		},
+		{
+			key: "characters",
+			icon: "user-group",
+			component: () => <ThemedText>Characters</ThemedText>,
+		},
+		{
+			component: () => <ThemedText>staff</ThemedText>,
+			key: "staff",
+			icon: "user-tie",
+		},
+	];
 
-	return (
-		<TabView
-			renderTabBar={renderTabBar}
-			onIndexChange={setIndex}
-			renderScene={renderScene}
-			navigationState={{ index, routes }}
-		/>
-	);
+	return <CustomTabView scenes={scenes} />;
 }
