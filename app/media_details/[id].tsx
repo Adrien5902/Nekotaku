@@ -38,6 +38,7 @@ export const QUERY = gql(`
 			trailer {
 				id
 				site
+				thumbnail
 			}
 			coverImage {
 				large
