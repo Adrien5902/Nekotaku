@@ -13,6 +13,19 @@ import Icon from "../Icon";
 import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
 import type { Media, MediaList, MediaRelation } from "@/types/Anilist/graphql";
 import useStyles from "@/hooks/useStyles";
+import { useApolloClient } from "@apollo/client";
+import { gql } from "@/types/Anilist";
+import { useEffect, useState } from "react";
+import { QUERY as MEDIA_LISTS_QUERY } from "../ToggleContext";
+
+const ADD_ONE_PROGRESS_MUTATION = gql(`
+mutation AddOneProgress($progress: Int, $status: MediaListStatus, $mediaId: Int) {
+	SaveMediaListEntry(progress: $progress, status: $status, mediaId: $mediaId) {
+		progress
+		status
+	}
+}
+`);
 
 export interface Props {
 	media?:
@@ -29,8 +42,19 @@ export interface Props {
 	relationType?: MediaRelation | null | undefined;
 }
 
-function EntryButton({ media, mediaList, relationType }: Props) {
+function EntryButton({
+	media,
+	mediaList: defaultMediaList,
+	relationType,
+}: Props) {
 	const styles = useStyles();
+	const api = useApolloClient();
+
+	const [mediaList, setMediaList] = useState(defaultMediaList);
+	useEffect(() => {
+		setMediaList(defaultMediaList);
+	}, [defaultMediaList]);
+
 	return (
 		<TouchableOpacity
 			onPress={() => {
@@ -112,8 +136,31 @@ function EntryButton({ media, mediaList, relationType }: Props) {
 						) : null}
 						{media?.episodes && mediaList?.progress ? (
 							<TouchableHighlight
-								onPress={() => {
-									Vibration.vibrate([70, 40]);
+								onPress={async () => {
+									if (
+										media.episodes &&
+										(mediaList.progress ?? 0) < media.episodes
+									) {
+										Vibration.vibrate([70, 40]);
+										try {
+											const res = await api.mutate({
+												mutation: ADD_ONE_PROGRESS_MUTATION,
+												variables: {
+													...mediaList,
+													mediaId: media.id,
+													progress: (mediaList.progress ?? 0) + 1,
+												},
+												refetchQueries: [MEDIA_LISTS_QUERY],
+											});
+
+											setMediaList((curr) => ({
+												...curr,
+												...res.data?.SaveMediaListEntry,
+											}));
+										} catch (error) {
+											// TODO: handle error
+										}
+									}
 								}}
 								style={{
 									borderRadius: Spacing.s,
@@ -129,7 +176,7 @@ function EntryButton({ media, mediaList, relationType }: Props) {
 									<ThemedText>
 										{mediaList.progress}/{media.episodes}
 									</ThemedText>
-									{mediaList.progress !== media.episodes ? (
+									{mediaList.progress < media.episodes ? (
 										<ThemedText>
 											{" "}
 											<Icon size={TextSizes.m} name="plus" />

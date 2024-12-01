@@ -8,7 +8,7 @@ import { createContext, useContext, useState } from "react";
 import { useAnilistUserInfo } from "./AnilistUserInfoProvider";
 import { gql } from "@/types/Anilist";
 
-const QUERY = gql(`
+export const QUERY = gql(`
 	query MediaListCollection($userId: Int, $type: MediaType, $version: Int) {
 		MediaListCollection(userId: $userId, type: $type) {
 			lists {

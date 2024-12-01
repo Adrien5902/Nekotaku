@@ -19,7 +19,7 @@ import MediaRelations from "@/components/Media/MediaRelations";
 import Cache, { CacheReadType } from "@/hooks/useCache";
 import CustomTabView from "@/components/CustomTabView";
 
-const QUERY = gql(`
+export const QUERY = gql(`
 	query Media($format: ScoreFormat, $mediaId: Int) {
 		Media(id: $mediaId) {
 			id
