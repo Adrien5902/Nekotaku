@@ -138,7 +138,7 @@ function EntryButton({
 								<Icon size={TextSizes.m} name="repeat" />
 							</ThemedText>
 						) : null}
-						{media?.episodes && mediaList?.progress ? (
+						{media?.episodes && typeof mediaList?.progress === "number" ? (
 							<TouchableHighlight
 								onPress={async () => {
 									if (
@@ -154,8 +154,6 @@ function EntryButton({
 													progress: (mediaList.progress ?? 0) + 1,
 												},
 											);
-
-											console.log(newMediaList);
 
 											const res = await api.mutate({
 												mutation: ADD_ONE_PROGRESS_MUTATION,
