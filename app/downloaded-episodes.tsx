@@ -21,22 +21,12 @@ export default function DownloadedEpisodes() {
 		CacheReadType.MemoryAndIfNotDisk,
 		"media",
 	);
-	const { data: lists, error, loading: listsLoading, refetch } = listsData;
+	const { data: lists, loading: listsLoading, refetch } = listsData;
 
 	const networkState = useNetworkState();
 
 	const loading =
 		cacheLoading || (networkState.isConnected ? listsLoading : false);
-
-	if (error) {
-		return (
-			<ThemedView
-				style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-			>
-				<ThemedText>{error.message}</ThemedText>
-			</ThemedView>
-		);
-	}
 
 	const cachedMedias = cacheData ? Object.values(cacheData) : [];
 	const entries = lists?.flatMap((m) => m?.entries ?? []);
