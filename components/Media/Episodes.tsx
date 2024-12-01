@@ -143,7 +143,9 @@ export function EpisodesList({
 			{lecteur?.episodes.map((episode) => (
 				<EpisodeButton
 					watched={
-						lastWatchedEpisodeId ? lastWatchedEpisodeId >= episode.id : false
+						lastWatchedEpisodeId !== undefined
+							? lastWatchedEpisodeId >= episode.id
+							: false
 					}
 					episode={episode}
 					{...{ media, lecteur }}

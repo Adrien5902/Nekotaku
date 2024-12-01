@@ -11,20 +11,8 @@ import {
 import { useQuery } from "@apollo/client";
 import { useLocalSearchParams } from "expo-router";
 import BannerTitleDisplay from "@/components/BannerTitleDisplay";
-import {
-	TabView,
-	SceneMap,
-	TabBar,
-	type Route,
-	type SceneRendererProps,
-	type NavigationState,
-	type TabDescriptor,
-} from "react-native-tab-view";
-import { useEffect, useState } from "react";
-import { useThemeColors } from "@/hooks/useThemeColor";
+import { useEffect } from "react";
 import MediaDetails from "@/components/Media/MediaDetails";
-import { Dimensions, View } from "react-native";
-import Icon, { type IconName } from "@/components/Icon";
 import EditMediaListStatus from "@/components/EditMediaListStatus";
 import { gql } from "@/types/Anilist";
 import MediaRelations from "@/components/Media/MediaRelations";
