@@ -9,14 +9,14 @@ import {
 import { ThemedText } from "./ThemedText";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { Spacing, TextSizes } from "@/constants/Sizes";
-import Icon from "./Icon";
+import Icon, { type IconName } from "./Icon";
 
 interface Props<T extends string> {
 	buttonStyle?: ViewStyle;
 	activeStyle?: ViewStyle;
 	textStyle?: TextStyle;
 	activeTextStyle?: TextStyle;
-	buttons: T[];
+	buttons: (T | { key: T; title: string; icon?: IconName })[];
 	defaultValue?: T;
 	onValueChange: (newVal: T) => void;
 	checkMark?: boolean;
@@ -38,7 +38,11 @@ export function SelectButtons<T extends string>({
 	return (
 		<ScrollView horizontal={true}>
 			{buttons.map((buttonName) => {
-				const active = value === buttonName;
+				const button =
+					typeof buttonName === "string"
+						? { key: buttonName, title: buttonName }
+						: buttonName;
+				const active = value === button.key;
 
 				const buttonStyle2 = [
 					buttonStyle ?? {
@@ -72,10 +76,10 @@ export function SelectButtons<T extends string>({
 				return (
 					<TouchableHighlight
 						onPress={() => {
-							onValueChange(buttonName);
-							setValue(buttonName);
+							onValueChange(button.key);
+							setValue(button.key);
 						}}
-						key={buttonName}
+						key={button.key}
 						style={buttonStyle2}
 						underlayColor={colors.primary}
 					>
@@ -87,7 +91,15 @@ export function SelectButtons<T extends string>({
 									size={TextSizes.s}
 								/>
 							) : null}
-							<ThemedText style={textStyle2}>{buttonName}</ThemedText>
+							{button.icon ? (
+								<Icon
+									name={button.icon}
+									color={active ? colors.accent : colors.text}
+									style={[textStyle2, { paddingRight: Spacing.s }]}
+									size={TextSizes.s}
+								/>
+							) : null}
+							<ThemedText style={textStyle2}>{button.title}</ThemedText>
 						</View>
 					</TouchableHighlight>
 				);

@@ -2,7 +2,7 @@ import type { Color } from "@/constants/Colors";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { Animated, View, type ViewProps } from "react-native";
 
-interface Props extends ViewProps {
+export interface Props extends ViewProps {
 	color?: Color;
 }
 

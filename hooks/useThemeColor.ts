@@ -5,6 +5,7 @@ import { useSettings } from '@/components/Settings/Context';
 
 export function useThemeColors() {
     const { colorTheme } = useSettings()
-    const theme = (colorTheme === "system" ? useColorScheme() : colorTheme) ?? 'light';
+    const deviceColorScheme = useColorScheme();
+    const theme = (colorTheme === "system" ? deviceColorScheme : colorTheme) ?? 'light';
     return Colors[theme];
 }

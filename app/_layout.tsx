@@ -1,4 +1,4 @@
-import { router, Stack } from "expo-router";
+import { type Href, router, Stack } from "expo-router";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import DownloadingProvider, {
@@ -6,13 +6,13 @@ import DownloadingProvider, {
 } from "@/components/DownloadingContext";
 import notifee from "@notifee/react-native";
 import { ToggleProvider } from "@/components/ToggleContext";
-import SettingsProvider from "@/components/Settings/Context";
+import SettingsProvider, { useSettings } from "@/components/Settings/Context";
 import AnilistLoginProvider, {
 	useAnilistToken,
 } from "@/components/AnilistAccountProvider";
 import AnilistUserInfoProvider from "@/components/AnilistUserInfoProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useNetworkState } from "expo-network";
+import { useEffect } from "react";
 
 const downloader = new Downloader();
 
@@ -72,13 +72,24 @@ function Providers({ children }: { children: React.ReactNode }) {
 
 function StackScreens() {
 	const colors = useThemeColors();
-	const networkState = useNetworkState();
+	const settings = useSettings();
+
+	const defaultRoute: Href<string> = "/(tabs)";
+	const offlineRoute: Href<string> = "/downloaded-episodes";
+
+	const route = settings.offlineMode ? offlineRoute : defaultRoute;
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	useEffect(() => {
+		if (router.canDismiss()) {
+			router.dismissAll();
+		}
+		router.replace(route);
+	}, [settings.offlineMode]);
 
 	return (
 		<Stack
-			initialRouteName={
-				networkState.isConnected ? "(tabs)" : "downloaded-episodes"
-			}
+			initialRouteName={route}
 			screenOptions={{
 				contentStyle: { backgroundColor: colors.background },
 			}}

@@ -4,14 +4,18 @@ import { ThemedView } from "@/components/ThemedView";
 import { useContext } from "react";
 import { useToggle } from "../components/ToggleContext";
 import BigTitle from "@/components/BigTitle";
-import type { MediaQuery } from "@/types/Anilist/graphql";
 import MediaListCollection from "@/components/Media/MediaCollection";
 import { Spacing } from "@/constants/Sizes";
 import { useNetworkState } from "expo-network";
 import Cache, { CacheReadType } from "@/hooks/useCache";
+import Icon from "@/components/Icon";
+import { router } from "expo-router";
+import { useSettings } from "@/components/Settings/Context";
+import NavButton from "@/components/NavButton";
 
 export default function DownloadedEpisodes() {
 	const downloader = useContext(DownloadingContext);
+	const settings = useSettings();
 	const { listsData } = useToggle();
 	const { loading: cacheLoading, data: cacheData } = Cache.useAll(
 		CacheReadType.MemoryAndIfNotDisk,
@@ -55,6 +59,13 @@ export default function DownloadedEpisodes() {
 
 	return (
 		<ThemedView style={{ paddingTop: Spacing.xl, flex: 1 }}>
+			{settings.offlineMode ? (
+				<NavButton
+					style={{ position: "absolute", right: Spacing.l, top: Spacing.m }}
+					icon="gears"
+					route="/settings"
+				/>
+			) : null}
 			<BigTitle
 				icon={networkState.isConnected ? "folder-open" : "plane"}
 				title={

@@ -20,11 +20,9 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import { ThemedView } from "./ThemedView";
 import { SelectButtons } from "./SelectButtons";
 import useStyles from "@/hooks/useStyles";
-import { FontAwesome } from "@expo/vector-icons";
-import { useApolloClient, useMutation } from "@apollo/client";
+import { useApolloClient } from "@apollo/client";
 import { gql } from "@/types/Anilist";
-import type IconName from "@expo/vector-icons/build/FontAwesome";
-import { useAnilistUserInfo } from "./AnilistUserInfoProvider";
+import { BooleanInput } from "./BooleanInput";
 
 export default function EditMediaListStatus({
 	media,
@@ -465,47 +463,5 @@ function PlusMinusNumberInput({
 				}}
 			/>
 		</ThemedView>
-	);
-}
-
-interface BooleanInputProps {
-	defaultValue: boolean;
-	onChange: (newVal: boolean) => unknown;
-	activeIcon?: keyof (typeof IconName)["glyphMap"];
-	inactiveIcon?: keyof (typeof IconName)["glyphMap"];
-	title: string;
-}
-
-function BooleanInput({
-	defaultValue,
-	onChange,
-	activeIcon,
-	inactiveIcon,
-	title,
-}: BooleanInputProps) {
-	const styles = useStyles();
-	const colors = useThemeColors();
-	const [isTrue, setIsTrue] = useState(defaultValue);
-
-	return (
-		<View
-			style={[
-				styles.PrimaryElement,
-				{ flexDirection: "row", borderColor: colors.text, flex: 1 },
-			]}
-			onTouchEnd={() => {
-				onChange(!isTrue);
-				setIsTrue((t) => !t);
-			}}
-		>
-			<ThemedText style={{ flex: 1 }}>{title}</ThemedText>
-			<FontAwesome
-				size={TextSizes.l}
-				name={
-					isTrue ? (activeIcon ?? "check-square") : (inactiveIcon ?? "square-o")
-				}
-				color={isTrue ? colors.accent : colors.text}
-			/>
-		</View>
 	);
 }

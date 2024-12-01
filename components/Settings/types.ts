@@ -1,11 +1,13 @@
 export interface Settings {
     colorTheme: keyof typeof ColorTheme
     lang: keyof typeof Lang
+    offlineMode: boolean
 }
 
 export const DefaultSettings: Settings = {
     colorTheme: "system",
-    lang: "fr"
+    lang: "fr",
+    offlineMode: false,
 }
 
 export enum ColorTheme {
