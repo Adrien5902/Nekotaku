@@ -6,11 +6,10 @@ import CustomButton from "@/components/Button";
 import CustomTabView from "@/components/CustomTabView";
 import { SelectButtons } from "@/components/SelectButtons";
 import { useSetSettings, useSettings } from "@/components/Settings/Context";
+import { ColorTheme, Lang } from "@/components/Settings/types";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Spacing } from "@/constants/Sizes";
-import useStyles from "@/hooks/useStyles";
-import { useThemeColors } from "@/hooks/useThemeColor";
 import { MediaType } from "@/types/Anilist/graphql";
 import { ScrollView, View } from "react-native";
 
@@ -49,19 +48,22 @@ function AppWorkSettings() {
 
 	return (
 		<ScrollView>
-			<ThemedText style={{ padding: Spacing.m }}>
-				Default app mode :{" "}
-			</ThemedText>
-			<SelectButtons
-				buttons={[
-					{ key: MediaType.Manga, title: "Manga", icon: "book-open" },
-					{ key: MediaType.Anime, title: "Anime", icon: "film" },
-				]}
-				onValueChange={(value) => {
-					setSettings((s) => ({ ...s, defaultMode: value }));
-				}}
-				defaultValue={settings.defaultMode}
-			/>
+			<View>
+				<ThemedText style={{ padding: Spacing.m }}>
+					Default app mode :{" "}
+				</ThemedText>
+				<SelectButtons
+					buttons={[
+						{ key: MediaType.Anime, title: "Anime", icon: "film" },
+						{ key: MediaType.Manga, title: "Manga", icon: "book-open" },
+					]}
+					onValueChange={(value) => {
+						setSettings((s) => ({ ...s, defaultMode: value }));
+					}}
+					defaultValue={settings.defaultMode}
+				/>
+			</View>
+
 			<BooleanInput
 				defaultValue={settings.offlineMode}
 				onChange={(value) => setSettings((s) => ({ ...s, offlineMode: value }))}
@@ -79,22 +81,35 @@ function AppearanceSettings() {
 	return (
 		<ScrollView>
 			<View>
-				<ThemedText>{settings.lang}</ThemedText>
+				<ThemedText style={{ padding: Spacing.m }}>App lang :</ThemedText>
+				<SelectButtons
+					buttons={Object.values(Lang).map((lang, i) => ({
+						key: lang,
+						title: Object.keys(Lang)[i],
+					}))}
+					onValueChange={(value) => {
+						setSettings((s) => ({ ...s, lang: value }));
+					}}
+					defaultValue={settings.lang}
+				/>
 			</View>
 
-			<ThemedView>
-				<SelectButtons
-					buttons={[
-						{ key: "light", title: "Light", icon: "sun" },
-						{ key: "dark", title: "Dark", icon: "moon" },
-						{ key: "system", title: "System", icon: "wrench" },
-					]}
-					onValueChange={(value) => {
-						setSettings((s) => ({ ...s, colorTheme: value }));
-					}}
-					defaultValue={settings.colorTheme}
-				/>
-			</ThemedView>
+			<View>
+				<ThemedText style={{ padding: Spacing.m }}>Theme :</ThemedText>
+				<ThemedView>
+					<SelectButtons
+						buttons={[
+							{ key: ColorTheme.Light, title: "Light", icon: "sun" },
+							{ key: ColorTheme.Dark, title: "Dark", icon: "moon" },
+							{ key: ColorTheme.System, title: "System", icon: "wrench" },
+						]}
+						onValueChange={(value) => {
+							setSettings((s) => ({ ...s, colorTheme: value }));
+						}}
+						defaultValue={settings.colorTheme}
+					/>
+				</ThemedView>
+			</View>
 		</ScrollView>
 	);
 }

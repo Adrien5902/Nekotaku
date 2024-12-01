@@ -1,26 +1,26 @@
 import { MediaType } from "@/types/Anilist/graphql"
 
 export interface Settings {
-    colorTheme: keyof typeof ColorTheme
-    lang: keyof typeof Lang
+    colorTheme: ColorTheme
+    lang: Lang
     offlineMode: boolean
     defaultMode: MediaType
 }
 
-export const DefaultSettings: Settings = {
-    colorTheme: "system",
-    lang: "fr",
-    offlineMode: false,
-    defaultMode: MediaType.Anime
-}
-
 export enum ColorTheme {
-    system = "system",
-    light = "light",
-    dark = "dark"
+    System = "system",
+    Light = "light",
+    Dark = "dark"
 }
 
 export enum Lang {
-    fr = "Français",
-    en = "English"
+    Français = "fr",
+    English = "en"
+}
+
+export const DefaultSettings: Settings = {
+    colorTheme: ColorTheme.System,
+    lang: Lang.Français,
+    offlineMode: false,
+    defaultMode: MediaType.Anime
 }
