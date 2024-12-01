@@ -4,6 +4,7 @@ import {
 	Animated,
 	Dimensions,
 	Easing,
+	type GestureResponderEvent,
 	TouchableWithoutFeedback,
 	useAnimatedValue,
 	View,
@@ -22,6 +23,7 @@ import useStyles from "@/hooks/useStyles";
 import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
 import useAniskip from "@/hooks/useAniskip";
 import CustomButton from "../Button";
+import { useDoublePress } from "@/hooks/useDoublePress";
 
 export interface Props {
 	playerRef: React.RefObject<PlayerFunctions | undefined>;
@@ -82,20 +84,40 @@ export default function Controls({
 		return `${display(hours)}${paddingZero(minutes)}:${paddingZero(seconds)}`;
 	};
 
-	const timer = useRef<NodeJS.Timeout | null>();
-	const TIMEOUT = 500;
-	const debounce = (onSingle: () => void, onDouble: () => void) => {
-		if (timer.current) {
-			clearTimeout(timer.current);
-			timer.current = null;
-			onDouble();
-		} else {
-			timer.current = setTimeout(() => {
-				timer.current = null;
-			}, TIMEOUT);
-		}
-		onSingle();
-	};
+	const onPress = useDoublePress<GestureResponderEvent>(
+		() => {
+			if (viewControls) {
+				setTimeout(() => setViewControls(false), 6000);
+			}
+			setViewControls((c) => !c);
+		},
+		(e) => {
+			const { locationX } = e.nativeEvent;
+			const { width } = Dimensions.get("screen");
+			const rightOrLeft = locationX / width > 0.5;
+			setRightOrLeft(rightOrLeft);
+
+			Animated.timing(forwardGradientOpacityAnim, {
+				toValue: 1,
+				duration: 150,
+				easing: Easing.ease,
+				useNativeDriver: true,
+			}).start();
+			setTimeout(() => {
+				Animated.timing(forwardGradientOpacityAnim, {
+					toValue: 0,
+					duration: 500,
+					easing: Easing.quad,
+					useNativeDriver: true,
+				}).start();
+			}, 150);
+
+			playerRef.current?.setPositionAsync(
+				(statusRef.current?.positionMillis ?? 0) +
+					timeChangeInterval * (rightOrLeft ? 1 : -1),
+			);
+		},
+	);
 
 	const timeChangeInterval = 10_000;
 	const SessionManager = GoogleCast.getSessionManager();
@@ -112,44 +134,7 @@ export default function Controls({
 
 	return (
 		<>
-			<TouchableWithoutFeedback
-				onPress={(e) => {
-					debounce(
-						() => {
-							if (viewControls) {
-								setTimeout(() => setViewControls(false), 6000);
-							}
-							setViewControls((c) => !c);
-						},
-						() => {
-							const { locationX } = e.nativeEvent;
-							const { width } = Dimensions.get("screen");
-							const rightOrLeft = locationX / width > 0.5;
-							setRightOrLeft(rightOrLeft);
-
-							Animated.timing(forwardGradientOpacityAnim, {
-								toValue: 1,
-								duration: 150,
-								easing: Easing.ease,
-								useNativeDriver: true,
-							}).start();
-							setTimeout(() => {
-								Animated.timing(forwardGradientOpacityAnim, {
-									toValue: 0,
-									duration: 500,
-									easing: Easing.quad,
-									useNativeDriver: true,
-								}).start();
-							}, 150);
-
-							playerRef.current?.setPositionAsync(
-								(statusRef.current?.positionMillis ?? 0) +
-									timeChangeInterval * (rightOrLeft ? 1 : -1),
-							);
-						},
-					);
-				}}
-			>
+			<TouchableWithoutFeedback onPress={onPress}>
 				<View
 					style={{
 						...(isFullscreen ? styles.fullscreenVideo : styles.video),

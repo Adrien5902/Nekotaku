@@ -11,6 +11,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useToggle } from "@/components/ToggleContext";
 import * as NavigationBar from "expo-navigation-bar";
 import { useThemeColors } from "@/hooks/useThemeColor";
+import { useDoublePress } from "@/hooks/useDoublePress";
 
 type BottomTabBarProps = {
 	state: TabNavigationState<ParamListBase>;
@@ -27,7 +28,7 @@ export default function CustomTabBar({
 	navigation,
 }: BottomTabBarProps) {
 	const colors = useThemeColors();
-	const { isManga, setIsManga } = useToggle();
+	const { setIsManga } = useToggle();
 	NavigationBar.setBackgroundColorAsync(colors.primary);
 
 	return (
@@ -40,11 +41,18 @@ export default function CustomTabBar({
 					const { options } = descriptors[route.key];
 					const isFocused = state.index === index;
 
-					const onPress = () => {
-						if (!isFocused) {
-							navigation.navigate(route.name);
-						}
-					};
+					const onPress = useDoublePress(
+						() => {
+							if (!isFocused) {
+								navigation.navigate(route.name);
+							}
+						},
+						route.name === "index"
+							? () => {
+									if (setIsManga) setIsManga((i) => !i);
+								}
+							: undefined,
+					);
 
 					return (
 						<TouchableOpacity
@@ -66,18 +74,6 @@ export default function CustomTabBar({
 						</TouchableOpacity>
 					);
 				})}
-			</View>
-
-			<View style={styles.switchContainer}>
-				<ThemedText>{`${isManga ? "Manga" : "Anime"} `}</ThemedText>
-				<Switch
-					value={isManga}
-					onValueChange={() => {
-						if (setIsManga) {
-							setIsManga((prev) => !prev);
-						}
-					}}
-				/>
 			</View>
 		</ThemedView>
 	);

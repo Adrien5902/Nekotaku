@@ -1,8 +1,10 @@
 import { Tabs } from "expo-router";
 import CustomTabBar from "@/components/CustomTabBar";
 import Icon from "@/components/Icon";
+import { useToggle } from "@/components/ToggleContext";
 
 export default function TabLayout() {
+	const { isManga } = useToggle();
 	return (
 		<Tabs
 			tabBar={(props) => <CustomTabBar {...props} />}
@@ -14,7 +16,9 @@ export default function TabLayout() {
 				name="index"
 				options={{
 					title: "List",
-					tabBarIcon: ({ color }) => <Icon name="film" color={color} />,
+					tabBarIcon: ({ color }) => (
+						<Icon name={isManga ? "book-open" : "film"} color={color} />
+					),
 				}}
 			/>
 			<Tabs.Screen
