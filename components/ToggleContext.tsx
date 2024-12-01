@@ -36,6 +36,16 @@ export const QUERY = gql(`
 					progress
 					repeat
 					score
+					startedAt {
+						year
+						month
+						day
+					}
+					completedAt {
+						year
+						month
+						day
+					}
 				}
 				name
 				status

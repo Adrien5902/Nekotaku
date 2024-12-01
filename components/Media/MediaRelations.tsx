@@ -1,5 +1,4 @@
 import type { MediaRelation } from "@/types/Anilist/graphql";
-import { ThemedView } from "../ThemedView";
 import EntryButton, { type Props as EntryButtonProps } from "./EntryButton";
 import { ScrollView } from "react-native";
 

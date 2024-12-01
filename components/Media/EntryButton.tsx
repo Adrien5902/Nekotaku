@@ -17,6 +17,7 @@ import { useApolloClient } from "@apollo/client";
 import { gql } from "@/types/Anilist";
 import { useEffect, useState } from "react";
 import { QUERY as MEDIA_LISTS_QUERY } from "../ToggleContext";
+import { autoUpdateMediaListByProgress } from "@/types/MediaList";
 
 const ADD_ONE_PROGRESS_MUTATION = gql(`
 mutation AddOneProgress($progress: Int, $status: MediaListStatus, $mediaId: Int) {
@@ -36,7 +37,10 @@ export interface Props {
 		| null
 		| undefined;
 	mediaList?:
-		| Pick<MediaList, "progress" | "score" | "repeat" | "status">
+		| Pick<
+				MediaList,
+				"progress" | "score" | "repeat" | "startedAt" | "completedAt" | "status"
+		  >
 		| null
 		| undefined;
 	relationType?: MediaRelation | null | undefined;
@@ -143,12 +147,21 @@ function EntryButton({
 									) {
 										Vibration.vibrate([70, 40]);
 										try {
+											const newMediaList = autoUpdateMediaListByProgress(
+												media,
+												{
+													...mediaList,
+													progress: (mediaList.progress ?? 0) + 1,
+												},
+											);
+
+											console.log(newMediaList);
+
 											const res = await api.mutate({
 												mutation: ADD_ONE_PROGRESS_MUTATION,
 												variables: {
-													...mediaList,
 													mediaId: media.id,
-													progress: (mediaList.progress ?? 0) + 1,
+													...newMediaList,
 												},
 												refetchQueries: [MEDIA_LISTS_QUERY],
 											});
@@ -158,6 +171,7 @@ function EntryButton({
 												...res.data?.SaveMediaListEntry,
 											}));
 										} catch (error) {
+											console.error(error);
 											// TODO: handle error
 										}
 									}
