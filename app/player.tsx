@@ -138,5 +138,3 @@ const VideoPlayer = () => {
 };
 
 export default VideoPlayer;
-
-const { width, height } = Dimensions.get("window");

@@ -47,6 +47,7 @@ export default function Player({
 				{
 					...statusRef.current,
 				},
+				true,
 			);
 		}
 	}

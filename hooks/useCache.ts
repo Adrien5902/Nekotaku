@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 
 export class CCache {
     private map = new Map<CacheKey, CacheValues<CacheKey>>();
+    private listeners: ({ key: CacheKey, fn: () => void })[] = []
 
     async readAllDisk<T extends CacheKey>(key: T) {
         if (!FileSystem.cacheDirectory) { throw new Error("No cache dir") }
@@ -52,6 +53,12 @@ export class CCache {
 
         useEffect(() => {
             refresh()
+            const length = this.listeners.push({ key, fn: refresh });
+            const index = length - 1;
+
+            return () => {
+                delete this.listeners[index];
+            }
         }, [])
 
         return { loading, data: dataRef.current, refresh };
@@ -68,13 +75,25 @@ export class CCache {
         }
 
         useEffect(() => {
-            refresh()
+            refresh();
+            const length = this.listeners.push({ key, fn: refresh });
+            const index = length - 1;
+
+            return () => {
+                delete this.listeners[index];
+            }
         }, [])
 
         return { loading, data: dataRef.current, refresh };
     }
 
-    async writeAll<T extends CacheKey>(readType: CacheReadType, key: T, data: CacheValues<T>) {
+    sendEvent<T extends CacheKey>(key: T) {
+        for (const listener of this.listeners) {
+            if (listener && listener.key === key) listener.fn()
+        }
+    }
+
+    async writeAll<T extends CacheKey>(readType: CacheReadType, key: T, data: CacheValues<T>, sendEvent?: boolean) {
         if (readType & CacheReadType.Disk) {
             if (!FileSystem.cacheDirectory) { throw new Error("No cache dir") }
             FileSystem.writeAsStringAsync(FileSystem.cacheDirectory + key, JSON.stringify(data))
@@ -83,9 +102,11 @@ export class CCache {
         if (readType & CacheReadType.Memory) {
             this.map.set(key, data)
         }
+
+        if (sendEvent) this.sendEvent(key)
     }
 
-    async write<T extends CacheKey>(readType: CacheReadType, key: T, deps: CacheDeps<T>, data: CacheValue<T>) {
+    async write<T extends CacheKey>(readType: CacheReadType, key: T, deps: CacheDeps<T>, data: CacheValue<T>, sendEvent?: boolean) {
         const valKey = JSON.stringify(deps);
         if (readType & CacheReadType.Disk) {
             if (!FileSystem.cacheDirectory) { throw new Error("No cache dir") }
@@ -97,7 +118,7 @@ export class CCache {
         if (readType & CacheReadType.Memory) {
             const record = await this.readAll(CacheReadType.Memory, key) ?? {}
             record[valKey] = data
-            this.writeAll(CacheReadType.Memory, key, record)
+            this.writeAll(CacheReadType.Memory, key, record, sendEvent)
         }
     }
 }
