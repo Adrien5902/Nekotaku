@@ -5,6 +5,7 @@ import {
 	Dimensions,
 	Easing,
 	type GestureResponderEvent,
+	Modal,
 	TouchableWithoutFeedback,
 	useAnimatedValue,
 	View,
@@ -24,6 +25,7 @@ import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
 import useAniskip from "@/hooks/useAniskip";
 import CustomButton from "../Button";
 import { useDoublePress } from "@/hooks/useDoublePress";
+import { ThemedView } from "../ThemedView";
 
 export interface Props {
 	playerRef: React.RefObject<PlayerFunctions | undefined>;
@@ -132,6 +134,8 @@ export default function Controls({
 	const positionSecs = (currentStatus?.positionMillis ?? 0) / 1000;
 	const shouldDisplayControls = loading || viewControls || forceView;
 
+	const [settingsVisible, setSettingsVisible] = useState(false);
+
 	return (
 		<>
 			<TouchableWithoutFeedback onPress={onPress}>
@@ -179,6 +183,15 @@ export default function Controls({
 										if (devices[0]) {
 											SessionManager.startSession(devices[0].deviceId);
 										}
+									}}
+								/>
+								<Icon
+									name="gear"
+									size={TextSizes.m}
+									color={Colors.dark.text}
+									style={{ marginRight: Spacing.m, padding: Spacing.m }}
+									onPress={() => {
+										setSettingsVisible((s) => !s);
 									}}
 								/>
 							</LinearGradient>
@@ -276,7 +289,7 @@ export default function Controls({
 											maximumValue={currentStatus.durationMillis}
 											thumbTintColor={colors.accent}
 											minimumTrackTintColor={colors.accent}
-											maximumTrackTintColor={Colors.light.text}
+											maximumTrackTintColor={Colors.dark.text}
 										/>
 									</>
 								) : (
@@ -338,6 +351,65 @@ export default function Controls({
 					<View style={{ flex: 1 }} />
 				</LinearGradient>
 			</Animated.View>
+
+			<ControlsSettings
+				visible={settingsVisible}
+				setVisible={setSettingsVisible}
+				setValue={(value) => playerRef.current?.setPlaybackSpeedAsync(value)}
+				defaultValue={1}
+			/>
 		</>
+	);
+}
+
+function ControlsSettings({
+	visible,
+	setVisible,
+	defaultValue,
+	setValue: setValuePlayer,
+}: {
+	visible: boolean;
+	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	defaultValue: number;
+	setValue: (value: number) => void;
+}) {
+	const colors = useThemeColors();
+	const [value, setValueState] = useState(defaultValue ?? 1);
+
+	function setValue(value: number) {
+		setValuePlayer(value);
+		setValueState(value);
+	}
+
+	return (
+		<Modal
+			onRequestClose={() => setVisible(false)}
+			animationType="slide"
+			visible={visible}
+			transparent
+		>
+			<View
+				style={{
+					flex: 1,
+					justifyContent: "flex-end",
+				}}
+			>
+				<ThemedView color="primary" style={{ padding: Spacing.m }}>
+					<ThemedText size="m">Playback speed : x{value.toFixed(2)}</ThemedText>
+					<Slider
+						minimumValue={0.05}
+						maximumValue={2}
+						step={0.05}
+						value={value}
+						onValueChange={(value) => {
+							setValue(value);
+						}}
+						thumbTintColor={colors.accent}
+						minimumTrackTintColor={colors.accent}
+						maximumTrackTintColor={colors.text}
+					/>
+				</ThemedView>
+			</View>
+		</Modal>
 	);
 }

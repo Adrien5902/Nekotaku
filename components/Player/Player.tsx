@@ -104,6 +104,9 @@ export default function Player({
 					async setPositionAsync(positionMillis) {
 						await videoPlayerRef.current?.setPositionAsync(positionMillis);
 					},
+					async setPlaybackSpeedAsync(value) {
+						await videoPlayerRef.current?.setRateAsync(value, true);
+					},
 				}
 			: undefined;
 	}, [googleCastMedia]);

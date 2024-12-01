@@ -93,6 +93,9 @@ export default function CastControls({
 						position: positionMillis / 1000,
 					});
 				},
+				async setPlaybackSpeedAsync(value) {
+					media.setPlaybackRate(value);
+				},
 			};
 
 			return () => {
