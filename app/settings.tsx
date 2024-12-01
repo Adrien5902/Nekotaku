@@ -11,6 +11,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { Spacing } from "@/constants/Sizes";
 import useStyles from "@/hooks/useStyles";
 import { useThemeColors } from "@/hooks/useThemeColor";
+import { MediaType } from "@/types/Anilist/graphql";
 import { ScrollView, View } from "react-native";
 
 export default function Settings() {
@@ -19,6 +20,11 @@ export default function Settings() {
 			<BigTitle icon={"gears"} title="Settings" />
 			<CustomTabView
 				scenes={[
+					{
+						component: () => <AppWorkSettings />,
+						icon: "wrench",
+						key: "work",
+					},
 					{
 						component: () => <AppearanceSettings />,
 						icon: "palette",
@@ -36,10 +42,36 @@ export default function Settings() {
 	);
 }
 
-function AppearanceSettings() {
-	const styles = useStyles();
-	const colors = useThemeColors();
+function AppWorkSettings() {
+	const settings = useSettings();
+	const setSettings = useSetSettings();
+	if (!setSettings) return null;
 
+	return (
+		<ScrollView>
+			<ThemedText style={{ padding: Spacing.m }}>
+				Default app mode :{" "}
+			</ThemedText>
+			<SelectButtons
+				buttons={[
+					{ key: MediaType.Manga, title: "Manga", icon: "book-open" },
+					{ key: MediaType.Anime, title: "Anime", icon: "film" },
+				]}
+				onValueChange={(value) => {
+					setSettings((s) => ({ ...s, defaultMode: value }));
+				}}
+				defaultValue={settings.defaultMode}
+			/>
+			<BooleanInput
+				defaultValue={settings.offlineMode}
+				onChange={(value) => setSettings((s) => ({ ...s, offlineMode: value }))}
+				title="Offline Mode"
+			/>
+		</ScrollView>
+	);
+}
+
+function AppearanceSettings() {
 	const settings = useSettings();
 	const setSettings = useSetSettings();
 	if (!setSettings) return null;
@@ -50,11 +82,6 @@ function AppearanceSettings() {
 				<ThemedText>{settings.lang}</ThemedText>
 			</View>
 
-			<BooleanInput
-				defaultValue={settings.offlineMode}
-				onChange={(value) => setSettings((s) => ({ ...s, offlineMode: value }))}
-				title="Offline Mode"
-			/>
 			<ThemedView>
 				<SelectButtons
 					buttons={[

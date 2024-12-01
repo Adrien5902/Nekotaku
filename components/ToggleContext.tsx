@@ -7,6 +7,7 @@ import type React from "react";
 import { createContext, useContext, useState } from "react";
 import { useAnilistUserInfo } from "./AnilistUserInfoProvider";
 import { gql } from "@/types/Anilist";
+import { useSettings } from "./Settings/Context";
 
 export const QUERY = gql(`
 	query MediaListCollection($userId: Int, $type: MediaType, $version: Int) {
@@ -61,8 +62,8 @@ export type MediaCollectionData = NonNullable<
 >;
 
 const ToggleContext = createContext<{
-	isManga: boolean;
-	setIsManga: React.Dispatch<React.SetStateAction<boolean>> | null;
+	appMode: MediaType;
+	setAppMode: React.Dispatch<React.SetStateAction<MediaType>> | null;
 	listsData: {
 		error?: ApolloError;
 		data?: MediaCollectionData;
@@ -70,8 +71,8 @@ const ToggleContext = createContext<{
 		refetch: () => void;
 	};
 }>({
-	isManga: false,
-	setIsManga: null,
+	appMode: MediaType.Anime,
+	setAppMode: null,
 	listsData: {
 		error: undefined,
 		data: undefined,
@@ -81,13 +82,14 @@ const ToggleContext = createContext<{
 });
 
 export const ToggleProvider = ({ children }: { children: React.ReactNode }) => {
-	const [isManga, setIsManga] = useState(false);
+	const { defaultMode } = useSettings();
+	const [appMode, setAppMode] = useState(defaultMode);
 	const { data: UserInfo } = useAnilistUserInfo() ?? {};
 
 	const { error, data, loading, refetch } = useQuery(QUERY, {
 		variables: {
 			userId: UserInfo?.id,
-			type: isManga ? MediaType.Manga : MediaType.Anime,
+			type: appMode,
 		},
 	});
 
@@ -119,8 +121,8 @@ export const ToggleProvider = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<ToggleContext.Provider
 			value={{
-				isManga,
-				setIsManga,
+				appMode,
+				setAppMode,
 				listsData: { error, data: lists, loading, refetch },
 			}}
 		>

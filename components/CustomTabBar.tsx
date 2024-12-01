@@ -12,6 +12,7 @@ import { useToggle } from "@/components/ToggleContext";
 import * as NavigationBar from "expo-navigation-bar";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { useDoublePress } from "@/hooks/useDoublePress";
+import { MediaType } from "@/types/Anilist/graphql";
 
 type BottomTabBarProps = {
 	state: TabNavigationState<ParamListBase>;
@@ -28,7 +29,7 @@ export default function CustomTabBar({
 	navigation,
 }: BottomTabBarProps) {
 	const colors = useThemeColors();
-	const { setIsManga } = useToggle();
+	const { setAppMode } = useToggle();
 	NavigationBar.setBackgroundColorAsync(colors.primary);
 
 	return (
@@ -49,7 +50,12 @@ export default function CustomTabBar({
 						},
 						route.name === "index"
 							? () => {
-									if (setIsManga) setIsManga((i) => !i);
+									if (setAppMode)
+										setAppMode((mode) =>
+											mode === MediaType.Anime
+												? MediaType.Manga
+												: MediaType.Anime,
+										);
 								}
 							: undefined,
 					);

@@ -2,13 +2,16 @@ import { StyleSheet } from "react-native";
 import { useToggle } from "../../components/ToggleContext";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
+import { MediaType } from "@/types/Anilist/graphql";
 
 export default function ExploreScreen() {
-	const { isManga } = useToggle();
+	const { appMode } = useToggle();
 
 	return (
 		<ThemedView style={styles.container}>
-			<ThemedText>{isManga ? "Explore Manga" : "Explore Anime"}</ThemedText>
+			<ThemedText>
+				{appMode === MediaType.Manga ? "Explore Manga" : "Explore Anime"}
+			</ThemedText>
 		</ThemedView>
 	);
 }

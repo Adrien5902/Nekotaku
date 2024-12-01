@@ -2,9 +2,10 @@ import { Tabs } from "expo-router";
 import CustomTabBar from "@/components/CustomTabBar";
 import Icon from "@/components/Icon";
 import { useToggle } from "@/components/ToggleContext";
+import { MediaType } from "@/types/Anilist/graphql";
 
 export default function TabLayout() {
-	const { isManga } = useToggle();
+	const { appMode } = useToggle();
 	return (
 		<Tabs
 			tabBar={(props) => <CustomTabBar {...props} />}
@@ -17,7 +18,10 @@ export default function TabLayout() {
 				options={{
 					title: "List",
 					tabBarIcon: ({ color }) => (
-						<Icon name={isManga ? "book-open" : "film"} color={color} />
+						<Icon
+							name={appMode === MediaType.Manga ? "book-open" : "film"}
+							color={color}
+						/>
 					),
 				}}
 			/>
