@@ -38,8 +38,8 @@ export default function Player({
 	const styles = useStyles();
 
 	async function savePos() {
-		// Do not save if position is 0
-		if (statusRef.current.positionMillis) {
+		// Do not save if position or duration is 0
+		if (statusRef.current.positionMillis && statusRef.current.durationMillis) {
 			await Cache.write(
 				CacheReadType.MemoryAndIfNotDisk,
 				"episodeProgress",
