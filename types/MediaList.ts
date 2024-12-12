@@ -1,3 +1,4 @@
+import { gql } from "./Anilist";
 import { type FuzzyDate, MediaListStatus, type Media, type MediaList } from "./Anilist/graphql";
 
 export function autoUpdateMediaListByProgress(media: Pick<Media, "episodes">, mediaList: Pick<MediaList, "progress" | "startedAt" | "completedAt" | "status">): Partial<MediaList> {
@@ -26,3 +27,98 @@ export function currentFuzzyDate(): FuzzyDate {
     const date = new Date(Date.now())
     return { day: date.getDate(), month: date.getMonth() + 1, year: date.getFullYear() }
 }
+
+
+export const GET_MEDIA_QUERY = gql(`
+	query Media($format: ScoreFormat, $mediaId: Int) {
+		Media(id: $mediaId) {
+			id
+			idMal
+			type
+			format
+			status
+			description
+			popularity
+			favourites
+			meanScore
+			averageScore
+			episodes
+			isFavourite
+			synonyms
+			trailer {
+				id
+				site
+				thumbnail
+			}
+			coverImage {
+				large
+				color
+			}
+			bannerImage
+			title {
+				romaji
+				english
+			}
+			relations {
+				edges {
+					relationType
+				}
+				nodes {
+					id
+					episodes
+					coverImage {
+						large
+					}
+					title {
+						english
+						romaji
+					}
+					status
+					format
+			
+					mediaListEntry {
+						id
+						progress
+						score
+						repeat
+						startedAt {
+							year
+							month
+							day
+						}
+						completedAt {
+							year
+							month
+							day
+						}
+					}
+				}
+			}
+		
+			mediaListEntry {
+				id
+				status
+				score(format: $format)
+				progress
+				progressVolumes
+				repeat
+				private
+				notes
+				hiddenFromStatusLists
+				customLists
+				startedAt {
+					year
+					month
+					day
+				}
+				completedAt {
+					year
+					month
+					day
+				}
+				updatedAt
+				createdAt
+			}
+		}
+		}
+`);

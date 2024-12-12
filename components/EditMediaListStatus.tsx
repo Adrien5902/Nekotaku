@@ -23,15 +23,19 @@ import useStyles from "@/hooks/useStyles";
 import { useApolloClient } from "@apollo/client";
 import { gql } from "@/types/Anilist";
 import { BooleanInput } from "./BooleanInput";
+import useModal from "@/hooks/useModal";
+import { GET_MEDIA_QUERY } from "@/types/MediaList";
 
 export default function EditMediaListStatus({
 	media,
 	currentStatus,
 	refetch,
+	mediaListId,
 }: {
 	media: ModalProps["media"];
 	currentStatus?: MutationSaveMediaListEntryArgs | null | undefined;
 	refetch: () => void;
+	mediaListId: ModalProps["mediaListId"];
 }) {
 	const colors = useThemeColors();
 	const styles = useStyles();
@@ -41,6 +45,7 @@ export default function EditMediaListStatus({
 	return modalVisible ? (
 		<EditMediaListStatusModal
 			{...{
+				mediaListId,
 				refetch,
 				media,
 				currentStatus,
@@ -68,6 +73,14 @@ export default function EditMediaListStatus({
 		/>
 	);
 }
+
+const DELETE_ENTRY_QUERY = gql(`
+	mutation DeleteMediaListEntry($deleteMediaListEntryId: Int) {
+		DeleteMediaListEntry(id: $deleteMediaListEntryId) {
+			deleted
+		}
+	}
+`);
 
 const QUERY = gql(`
 	mutation Mutation(
@@ -107,6 +120,7 @@ interface ModalProps {
 	modalVisible: boolean;
 	setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 	refetch: () => void;
+	mediaListId: number | undefined;
 }
 
 function EditMediaListStatusModal({
@@ -115,6 +129,7 @@ function EditMediaListStatusModal({
 	modalVisible,
 	setModalVisible,
 	refetch,
+	mediaListId,
 }: ModalProps) {
 	const colors = useThemeColors();
 	const styles = useStyles();
@@ -162,6 +177,9 @@ function EditMediaListStatusModal({
 		refetch();
 	}
 
+	const { modal: DeleteModal, setModalVisible: setDeleteModalVisible } =
+		useModal("Cancel");
+
 	return (
 		<Modal
 			visible={modalVisible}
@@ -171,6 +189,26 @@ function EditMediaListStatusModal({
 				setModalVisible(false);
 			}}
 		>
+			<DeleteModal
+				title="Delete anime/manga status ?"
+				buttons={[
+					{
+						title: "Delete",
+						color: "alert",
+						async onPress() {
+							await api.mutate({
+								mutation: DELETE_ENTRY_QUERY,
+								variables: {
+									deleteMediaListEntryId: mediaListId,
+								},
+								refetchQueries: [GET_MEDIA_QUERY],
+							});
+							setDeleteModalVisible(false);
+							setModalVisible(false);
+						},
+					},
+				]}
+			/>
 			<ScrollView
 				onScrollEndDrag={(e) => {
 					if (
@@ -335,7 +373,12 @@ function EditMediaListStatusModal({
 					width: "100%",
 				}}
 			>
-				<TouchableOpacity activeOpacity={0.7}>
+				<TouchableOpacity
+					activeOpacity={0.7}
+					onPress={() => {
+						setDeleteModalVisible(true);
+					}}
+				>
 					<View style={[styles.PrimaryElement]}>
 						<Icon
 							name="trash"

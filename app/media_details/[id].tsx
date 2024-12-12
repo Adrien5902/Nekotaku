@@ -14,104 +14,10 @@ import BannerTitleDisplay from "@/components/BannerTitleDisplay";
 import { useEffect } from "react";
 import MediaDetails from "@/components/Media/MediaDetails";
 import EditMediaListStatus from "@/components/EditMediaListStatus";
-import { gql } from "@/types/Anilist";
 import MediaRelations from "@/components/Media/MediaRelations";
 import Cache, { CacheReadType } from "@/hooks/useCache";
 import CustomTabView from "@/components/CustomTabView";
-
-export const QUERY = gql(`
-	query Media($format: ScoreFormat, $mediaId: Int) {
-		Media(id: $mediaId) {
-			id
-			idMal
-			type
-			format
-			status
-			description
-			popularity
-			favourites
-			meanScore
-			averageScore
-			episodes
-			isFavourite
-			synonyms
-			trailer {
-				id
-				site
-				thumbnail
-			}
-			coverImage {
-				large
-				color
-			}
-			bannerImage
-			title {
-				romaji
-				english
-			}
-			relations {
-				edges {
-					relationType
-				}
-				nodes {
-					id
-					episodes
-					coverImage {
-						large
-					}
-					title {
-						english
-						romaji
-					}
-					status
-					format
-			
-					mediaListEntry {
-						id
-						progress
-						score
-						repeat
-						startedAt {
-							year
-							month
-							day
-						}
-						completedAt {
-							year
-							month
-							day
-						}
-					}
-				}
-			}
-		
-			mediaListEntry {
-				id
-				status
-				score(format: $format)
-				progress
-				progressVolumes
-				repeat
-				private
-				notes
-				hiddenFromStatusLists
-				customLists
-				startedAt {
-					year
-					month
-					day
-				}
-				completedAt {
-					year
-					month
-					day
-				}
-				updatedAt
-				createdAt
-			}
-		}
-		}
-`);
+import { GET_MEDIA_QUERY } from "@/types/MediaList";
 
 export default function MediaPage() {
 	const { id } = useLocalSearchParams();
@@ -122,7 +28,7 @@ export default function MediaPage() {
 		data: mediaData,
 		error: apiError,
 		refetch,
-	} = useQuery(QUERY, {
+	} = useQuery(GET_MEDIA_QUERY, {
 		variables: {
 			mediaId,
 			format: ScoreFormat.Point_10Decimal,
@@ -195,6 +101,7 @@ export default function MediaPage() {
 						currentStatus={media.mediaListEntry}
 						media={media}
 						refetch={refetch}
+						mediaListId={media.mediaListEntry?.id ?? undefined}
 					/>
 				</>
 			) : null}
