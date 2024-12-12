@@ -116,11 +116,11 @@ export default function PlayDownloadButton({
 		child = (
 			<>
 				<Modal
-					text={"Delete downloaded episode ?"}
+					title={"Delete downloaded episode ?"}
 					buttons={[
 						{
 							title: "Delete",
-							color: "accent",
+							color: "alert",
 							async onPress() {
 								await downloadingContext.deleteDownloadedEpisode(
 									mediaId,

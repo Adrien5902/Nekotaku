@@ -8,6 +8,7 @@ import type { Color } from "@/constants/Colors";
 
 export interface Props {
 	text?: string | JSX.Element;
+	title?: string | JSX.Element;
 	buttons?: { title: string; color?: Color; onPress?: () => void }[];
 }
 
@@ -15,14 +16,14 @@ export default function useModal(closeButton?: string) {
 	const [modalVisible, setModalVisible] = useState(false);
 	const colors = useThemeColors();
 
-	const modal = ({ text, buttons }: Props) => {
+	const modal = ({ text, buttons, title }: Props) => {
 		const b: Props["buttons"] = [
 			...(buttons ?? []),
 			...(closeButton
 				? [
 						{
 							title: closeButton,
-							color: "alert" as Color,
+							color: "text" as Color,
 							onPress: () => setModalVisible(false),
 						},
 					]
@@ -48,6 +49,11 @@ export default function useModal(closeButton?: string) {
 						color="primary"
 						style={{ padding: Spacing.l, borderRadius: Spacing.m }}
 					>
+						{title ? (
+							<ThemedText size="m" weight="bold">
+								{title}
+							</ThemedText>
+						) : null}
 						{text ? <ThemedText>{text}</ThemedText> : null}
 
 						<View
