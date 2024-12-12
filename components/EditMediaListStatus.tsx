@@ -373,23 +373,26 @@ function EditMediaListStatusModal({
 					width: "100%",
 				}}
 			>
-				<TouchableOpacity
-					activeOpacity={0.7}
-					onPress={() => {
-						setDeleteModalVisible(true);
-					}}
-				>
-					<View style={[styles.PrimaryElement]}>
-						<Icon
-							name="trash"
-							style={{ marginRight: Spacing.m }}
-							color={colors.alert}
-						/>
-						<ThemedText size="m" color="alert">
-							Delete
-						</ThemedText>
-					</View>
-				</TouchableOpacity>
+				{/* Do no display delete button if the user never saved the media list */}
+				{mediaListId ? (
+					<TouchableOpacity
+						activeOpacity={0.7}
+						onPress={() => {
+							setDeleteModalVisible(true);
+						}}
+					>
+						<View style={[styles.PrimaryElement]}>
+							<Icon
+								name="trash"
+								style={{ marginRight: Spacing.m }}
+								color={colors.alert}
+							/>
+							<ThemedText size="m" color="alert">
+								Delete
+							</ThemedText>
+						</View>
+					</TouchableOpacity>
+				) : null}
 				<TouchableOpacity
 					activeOpacity={0.7}
 					onPress={() => {
