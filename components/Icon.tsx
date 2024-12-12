@@ -41,12 +41,15 @@ export default function Icon({
 		return (
 			<TouchableWithoutFeedback onPress={onPress}>
 				<CustomIcon
-					style={{
-						width: size ?? TextSizes.xl,
-						height: size ?? TextSizes.xl,
-						justifyContent: "center",
-						alignItems: "center",
-					}}
+					style={[
+						props.style,
+						{
+							width: size ?? TextSizes.xl,
+							height: size ?? TextSizes.xl,
+							justifyContent: "center",
+							alignItems: "center",
+						},
+					]}
 					fill={color ?? colors.text}
 				/>
 			</TouchableWithoutFeedback>

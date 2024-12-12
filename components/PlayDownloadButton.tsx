@@ -12,6 +12,7 @@ import {
 } from "./DownloadingContext";
 import type { Color } from "@/constants/Colors";
 import type { VideoPlayerMedia } from "@/app/player";
+import useModal from "@/hooks/useModal";
 
 export interface Props {
 	media: VideoPlayerMedia;
@@ -108,16 +109,34 @@ export default function PlayDownloadButton({
 		},
 	};
 
+	const { modal: Modal, setModalVisible } = useModal("Cancel");
+
 	let child: React.ReactNode;
 	if (state === DownloadState.Downloaded) {
 		child = (
 			<>
+				<Modal
+					text={"Delete downloaded episode ?"}
+					buttons={[
+						{
+							title: "Delete",
+							color: "accent",
+							async onPress() {
+								await downloadingContext.deleteDownloadedEpisode(
+									mediaId,
+									episode.id,
+								);
+								updateDownloadState();
+								setModalVisible(false);
+							},
+						},
+					]}
+				/>
 				<Icon
 					name={"trash"}
 					style={styles.icon}
 					onPress={() => {
-						downloadingContext.deleteDownloadedEpisode(mediaId, episode.id);
-						updateDownloadState();
+						setModalVisible(true);
 					}}
 					color={iconColor}
 				/>
@@ -128,7 +147,7 @@ export default function PlayDownloadButton({
 						router.navigate(playerPath);
 					}}
 					color={iconColor}
-					style={styles.icon}
+					style={{ marginHorizontal: Spacing.m }}
 				/>
 			</>
 		);
@@ -160,8 +179,9 @@ export default function PlayDownloadButton({
 	} else {
 		child = (
 			<>
-				<View style={styles.icon}>
+				<View>
 					<Icon
+						style={styles.icon}
 						name={"download"}
 						color={`${iconColor}60`}
 						size={TextSizes.xl}
@@ -171,17 +191,20 @@ export default function PlayDownloadButton({
 						name={"download"}
 						color={colors.accent}
 						size={TextSizes.xl}
-						style={{
-							position: "absolute",
-							height: fillAnim,
-						}}
+						style={[
+							styles.icon,
+							{
+								position: "absolute",
+								height: fillAnim,
+							},
+						]}
 					/>
 				</View>
 
 				<Icon
 					name={state === DownloadState.PausedDownloading ? "play" : "pause"}
 					size={TextSizes.xl}
-					style={[{ marginRight: Spacing.xl }, styles.icon]}
+					style={styles.icon}
 					onPress={() => {
 						if (state === DownloadState.PausedDownloading) {
 							downloadingContext.resumeDownload(mediaId, episode.id);
