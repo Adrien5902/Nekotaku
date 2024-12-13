@@ -1,5 +1,4 @@
 import { DownloadingContext } from "@/components/DownloadingContext";
-import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useContext } from "react";
 import { useToggle } from "../components/ToggleContext";
@@ -8,8 +7,6 @@ import MediaListCollection from "@/components/Media/MediaCollection";
 import { Spacing } from "@/constants/Sizes";
 import { useNetworkState } from "expo-network";
 import Cache, { CacheReadType } from "@/hooks/useCache";
-import Icon from "@/components/Icon";
-import { router } from "expo-router";
 import { useSettings } from "@/components/Settings/Context";
 import NavButton from "@/components/NavButton";
 

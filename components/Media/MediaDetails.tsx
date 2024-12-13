@@ -1,20 +1,43 @@
-import type { Media, MediaTitle, MediaTrailer } from "@/types/Anilist/graphql";
+import type {
+	FuzzyDate,
+	Media,
+	MediaTitle,
+	MediaTrailer,
+} from "@/types/Anilist/graphql";
 import useStyles from "@/hooks/useStyles";
 import MediaStats, { type Props as MediaStatsProps } from "./MediaStats";
-import { Dimensions, Image, Linking, ScrollView, View } from "react-native";
+import {
+	Dimensions,
+	Image,
+	Linking,
+	ScrollView,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import WebView from "react-native-webview";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { Spacing, TextSizes } from "@/constants/Sizes";
 import { ThemedText } from "../ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "../Icon";
-import { Link } from "expo-router";
 
 export default function MediaDetails({
 	media,
 }: {
 	media?:
-		| (Pick<Media, "description"> &
+		| (Pick<
+				Media,
+				| "description"
+				| "startDate"
+				| "endDate"
+				| "status"
+				| "episodes"
+				| "duration"
+				| "season"
+				| "source"
+				| "countryOfOrigin"
+				| "seasonYear"
+		  > &
 				MediaStatsProps["media"] & {
 					trailer?:
 						| Pick<MediaTrailer, "site" | "id" | "thumbnail">
@@ -28,6 +51,8 @@ export default function MediaDetails({
 	const colors = useThemeColors();
 	const styles = useStyles();
 	const style = `<style>body{background: ${colors.background}; color: ${colors.text}; font-size: 40;}</style>`;
+	const duration = media?.duration ?? 0;
+	const hours = Math.floor(duration / 60);
 
 	return (
 		<ScrollView style={{ flex: 1 }}>
@@ -45,44 +70,126 @@ export default function MediaDetails({
 
 			<MediaStats media={media} />
 
+			<DetailsTable
+				lines={[
+					{
+						label: "Media Status",
+						text: media?.status ?? "",
+					},
+					{
+						label: "Release Date",
+						text: `${dateStrFromFuzzyDate(media?.startDate)} - ${dateStrFromFuzzyDate(media?.endDate)}`,
+					},
+					{
+						label: "Number of episodes",
+						text: (media?.episodes ?? 0).toString(),
+					},
+					{
+						label: "Episode duration",
+						text: `${hours ? `${hours}h` : ""} ${duration % 60} min`,
+					},
+					{
+						label: "Season",
+						text: `${media?.season} ${media?.seasonYear}`,
+					},
+					{ label: "Source", text: media?.source ?? "" },
+					{ label: "Origin", text: media?.countryOfOrigin ?? "" },
+				]}
+			/>
+
 			{media?.trailer?.thumbnail && media.trailer.site === "youtube" ? (
-				<View
-					style={[
-						styles.PrimaryElement,
-						{ padding: 0, justifyContent: "center" },
-					]}
-					onTouchEnd={() => {
+				<TouchableOpacity
+					onPress={() => {
 						Linking.openURL(`https://youtube.com/watch?v=${media.trailer?.id}`);
 					}}
 				>
-					<Image
-						source={{ uri: media.trailer.thumbnail }}
-						style={{ width: "100%", aspectRatio: 16 / 9 }}
-					/>
-
-					<LinearGradient
-						colors={["#000000ff", "#00000000"]}
-						style={{
-							position: "absolute",
-							width: "100%",
-							height: Spacing.xl * 2,
-							top: 0,
-						}}
-					/>
-
-					<Icon
-						name="arrow-up-right-from-square"
-						style={{ position: "absolute" }}
-						size={TextSizes.xxl}
-					/>
-
-					<ThemedText
-						style={{ position: "absolute", top: Spacing.m, left: Spacing.m }}
+					<View
+						style={[
+							styles.PrimaryElement,
+							{ padding: 0, justifyContent: "center" },
+						]}
 					>
-						{media.title?.english} - Trailer
-					</ThemedText>
-				</View>
+						<Image
+							source={{ uri: media.trailer.thumbnail }}
+							style={{ width: "100%", aspectRatio: 16 / 9 }}
+						/>
+
+						<LinearGradient
+							colors={["#000000ff", "#00000000"]}
+							style={{
+								position: "absolute",
+								width: "100%",
+								height: Spacing.xl * 2,
+								top: 0,
+							}}
+						/>
+
+						<Icon
+							name="arrow-up-right-from-square"
+							style={{ position: "absolute" }}
+							size={TextSizes.xxl}
+						/>
+
+						<ThemedText
+							style={{ position: "absolute", top: Spacing.m, left: Spacing.m }}
+						>
+							{media.title?.english} - Trailer
+						</ThemedText>
+					</View>
+				</TouchableOpacity>
 			) : null}
 		</ScrollView>
+	);
+}
+
+function dateStrFromFuzzyDate(date?: FuzzyDate | null) {
+	const datetime = new Date(
+		date?.year ?? 0,
+		(date?.month ?? 1) - 1,
+		date?.day ?? 1,
+	);
+
+	return datetime.toLocaleDateString("fr-Fr", {
+		month: "long",
+		day: "numeric",
+		year: "numeric",
+	});
+}
+
+function DetailsTable({
+	lines,
+}: { lines: { label: string; text: JSX.Element | string }[] }) {
+	const styles = useStyles();
+	const colors = useThemeColors();
+
+	return (
+		<View
+			style={[
+				styles.PrimaryElement,
+				{ flexDirection: "column", alignItems: "stretch", padding: 0 },
+			]}
+		>
+			{lines.map(({ label, text }, i) => (
+				<View
+					key={label}
+					style={{
+						flexDirection: "row",
+						justifyContent: "space-between",
+						flex: 1,
+						borderColor: colors.primary,
+						// Do not show border on the first item
+						borderTopWidth: i && Spacing.xs,
+						padding: Spacing.m,
+					}}
+				>
+					<ThemedText weight="bold">{label}</ThemedText>
+					{typeof text === "string" ? (
+						<ThemedText weight="bold">{text}</ThemedText>
+					) : (
+						text
+					)}
+				</View>
+			))}
+		</View>
 	);
 }

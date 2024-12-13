@@ -21,7 +21,11 @@ import type { Episode } from "@/types/AnimeSama";
 import Icon from "../Icon";
 import GoogleCast, { useDevices } from "react-native-google-cast";
 import useStyles from "@/hooks/useStyles";
-import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
+import {
+	millisToTimeStamp,
+	type PlayerFunctions,
+	type VideoPlayStatus,
+} from "@/types/Player";
 import useAniskip from "@/hooks/useAniskip";
 import CustomButton from "../Button";
 import { useDoublePress } from "@/hooks/useDoublePress";
@@ -74,17 +78,6 @@ export default function Controls({
 
 		return () => clearInterval(interval);
 	}, [statusRef]);
-
-	const millisToTimeStamp = (millis: number) => {
-		const s = Math.floor(millis / 1000);
-		const hours = Math.floor(s / (60 * 60));
-		const minutes = Math.floor(s / 60) % 60;
-		const seconds = s % 60;
-		const paddingZero = (n: number) => (n < 10 ? `0${n}` : n.toString());
-		const display = (n: number) => (n !== 0 ? `${paddingZero(n)}:` : "");
-
-		return `${display(hours)}${paddingZero(minutes)}:${paddingZero(seconds)}`;
-	};
 
 	const onPress = useDoublePress<GestureResponderEvent>(
 		() => {
