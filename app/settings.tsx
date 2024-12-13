@@ -10,13 +10,15 @@ import { ColorTheme, Lang } from "@/components/Settings/types";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Spacing } from "@/constants/Sizes";
+import useLang from "@/hooks/useLang";
 import { MediaType } from "@/types/Anilist/graphql";
 import { ScrollView, View } from "react-native";
 
 export default function Settings() {
+	const lang = useLang();
 	return (
 		<View style={{ paddingTop: Spacing.xl, flex: 1 }}>
-			<BigTitle icon={"gears"} title="Settings" />
+			<BigTitle icon={"gears"} title={lang.pages.settings.tilte} />
 			<CustomTabView
 				scenes={[
 					{
@@ -45,18 +47,20 @@ function AppWorkSettings() {
 	const settings = useSettings();
 	const setSettings = useSetSettings();
 	if (!setSettings) return null;
+	const lang = useLang();
 
 	return (
 		<ScrollView>
 			<View>
 				<ThemedText style={{ padding: Spacing.m }}>
-					Default app mode :{" "}
+					{lang.settings.defaultMode} :
 				</ThemedText>
 				<SelectButtons
-					buttons={[
-						{ key: MediaType.Anime, title: "Anime", icon: "film" },
-						{ key: MediaType.Manga, title: "Manga", icon: "book-open" },
-					]}
+					buttons={Object.values(MediaType).map((type) => ({
+						key: type,
+						title: lang.Anilist.MediaType[type],
+						icon: type === MediaType.Anime ? "film" : "book-open",
+					}))}
 					onValueChange={(value) => {
 						setSettings((s) => ({ ...s, defaultMode: value }));
 					}}
@@ -67,7 +71,7 @@ function AppWorkSettings() {
 			<BooleanInput
 				defaultValue={settings.offlineMode}
 				onChange={(value) => setSettings((s) => ({ ...s, offlineMode: value }))}
-				title="Offline Mode"
+				title={lang.settings.offlineMode}
 			/>
 		</ScrollView>
 	);
@@ -76,6 +80,7 @@ function AppWorkSettings() {
 function AppearanceSettings() {
 	const settings = useSettings();
 	const setSettings = useSetSettings();
+	const lang = useLang();
 	if (!setSettings) return null;
 
 	return (
@@ -83,9 +88,9 @@ function AppearanceSettings() {
 			<View>
 				<ThemedText style={{ padding: Spacing.m }}>App lang :</ThemedText>
 				<SelectButtons
-					buttons={Object.values(Lang).map((lang, i) => ({
-						key: lang,
-						title: Object.keys(Lang)[i],
+					buttons={Object.values(Lang).map((l, i) => ({
+						key: l,
+						title: lang.settings.langs[l],
 					}))}
 					onValueChange={(value) => {
 						setSettings((s) => ({ ...s, lang: value }));
@@ -98,11 +103,16 @@ function AppearanceSettings() {
 				<ThemedText style={{ padding: Spacing.m }}>Theme :</ThemedText>
 				<ThemedView>
 					<SelectButtons
-						buttons={[
-							{ key: ColorTheme.Light, title: "Light", icon: "sun" },
-							{ key: ColorTheme.Dark, title: "Dark", icon: "moon" },
-							{ key: ColorTheme.System, title: "System", icon: "wrench" },
-						]}
+						buttons={Object.values(ColorTheme).map((theme) => ({
+							key: theme,
+							title: lang.settings.themes[theme],
+							icon:
+								theme === ColorTheme.Light
+									? "sun"
+									: theme === ColorTheme.Dark
+										? "moon"
+										: "wrench",
+						}))}
 						onValueChange={(value) => {
 							setSettings((s) => ({ ...s, colorTheme: value }));
 						}}
@@ -117,10 +127,11 @@ function AppearanceSettings() {
 function AccountSettings() {
 	const { logout } = useAnilistToken() ?? {};
 	const { data } = useAnilistUserInfo() ?? {};
+	const lang = useLang();
 	return (
 		<ScrollView>
 			<ThemedText style={{ margin: Spacing.l }} size="m">
-				Logged in as : {data?.name}
+				{lang.pages.settings.account.loggedInAs} : {data?.name}
 			</ThemedText>
 			<CustomButton
 				onPress={() => {
@@ -130,7 +141,7 @@ function AccountSettings() {
 				}}
 				backgroundColor="alert"
 			>
-				Logout
+				{lang.pages.settings.account.logout}
 			</CustomButton>
 		</ScrollView>
 	);

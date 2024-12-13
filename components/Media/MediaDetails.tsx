@@ -20,6 +20,7 @@ import { Spacing, TextSizes } from "@/constants/Sizes";
 import { ThemedText } from "../ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "../Icon";
+import useLang from "@/hooks/useLang";
 
 export default function MediaDetails({
 	media,
@@ -53,6 +54,7 @@ export default function MediaDetails({
 	const style = `<style>body{background: ${colors.background}; color: ${colors.text}; font-size: 40;}</style>`;
 	const duration = media?.duration ?? 0;
 	const hours = Math.floor(duration / 60);
+	const lang = useLang();
 
 	return (
 		<ScrollView style={{ flex: 1 }}>
@@ -73,27 +75,30 @@ export default function MediaDetails({
 			<DetailsTable
 				lines={[
 					{
-						label: "Media Status",
+						label: lang.pages.media.details.status,
 						text: media?.status ?? "",
 					},
 					{
-						label: "Release Date",
+						label: lang.pages.media.details.releaseDate,
 						text: `${dateStrFromFuzzyDate(media?.startDate)} - ${dateStrFromFuzzyDate(media?.endDate)}`,
 					},
 					{
-						label: "Number of episodes",
+						label: lang.pages.media.details.numberOfEpisodes,
 						text: (media?.episodes ?? 0).toString(),
 					},
 					{
-						label: "Episode duration",
+						label: lang.pages.media.details.duration,
 						text: `${hours ? `${hours}h` : ""} ${duration % 60} min`,
 					},
 					{
-						label: "Season",
+						label: lang.pages.media.details.season,
 						text: `${media?.season} ${media?.seasonYear}`,
 					},
-					{ label: "Source", text: media?.source ?? "" },
-					{ label: "Origin", text: media?.countryOfOrigin ?? "" },
+					{ label: lang.pages.media.details.source, text: media?.source ?? "" },
+					{
+						label: lang.pages.media.details.origin,
+						text: media?.countryOfOrigin ?? "",
+					},
 				]}
 			/>
 
@@ -133,7 +138,7 @@ export default function MediaDetails({
 						<ThemedText
 							style={{ position: "absolute", top: Spacing.m, left: Spacing.m }}
 						>
-							{media.title?.english} - Trailer
+							{media.title?.english} - {lang.pages.media.details.trailer}
 						</ThemedText>
 					</View>
 				</TouchableOpacity>

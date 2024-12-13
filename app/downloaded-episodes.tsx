@@ -9,6 +9,7 @@ import { useNetworkState } from "expo-network";
 import Cache, { CacheReadType } from "@/hooks/useCache";
 import { useSettings } from "@/components/Settings/Context";
 import NavButton from "@/components/NavButton";
+import useLang from "@/hooks/useLang";
 
 export default function DownloadedEpisodes() {
 	const downloader = useContext(DownloadingContext);
@@ -44,6 +45,8 @@ export default function DownloadedEpisodes() {
 		},
 	);
 
+	const lang = useLang();
+
 	return (
 		<ThemedView style={{ paddingTop: Spacing.xl, flex: 1 }}>
 			{settings.offlineMode ? (
@@ -56,13 +59,18 @@ export default function DownloadedEpisodes() {
 			<BigTitle
 				icon={networkState.isConnected ? "folder-open" : "plane"}
 				title={
-					networkState.isConnected ? "Downloaded Episodes" : "Offline mode"
+					networkState.isConnected
+						? lang.pages.downloadedEpisodes.title
+						: "Offline mode"
 				}
 			/>
 			<MediaListCollection
 				header={
 					downloadedMediaEntries.length !== 0 ? null : (
-						<BigTitle icon={"face-frown"} title="No downloaded episodes" />
+						<BigTitle
+							icon={"face-frown"}
+							title={lang.pages.downloadedEpisodes.noDownloadedEpisodes}
+						/>
 					)
 				}
 				refreshing={loading ?? false}

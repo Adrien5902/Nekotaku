@@ -4,18 +4,24 @@ import MenuItemLink from "@/components/MenuItemLink";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Spacing } from "@/constants/Sizes";
+import useLang from "@/hooks/useLang";
 import { useThemeColors } from "@/hooks/useThemeColor";
 
 export default function Account() {
+	const lang = useLang();
 	return (
 		<ThemedView style={{ paddingTop: Spacing.xl, flex: 1 }}>
 			<AccountInfo />
 			<MenuItemLink
 				iconLeft={"folder-open"}
-				name="Downloaded Episodes"
+				name={lang.pages.downloadedEpisodes.title}
 				route={"/downloaded-episodes"}
 			/>
-			<MenuItemLink iconLeft={"gear"} name="Settings" route={"/settings"} />
+			<MenuItemLink
+				iconLeft={"gear"}
+				name={lang.pages.settings.tilte}
+				route={"/settings"}
+			/>
 		</ThemedView>
 	);
 }

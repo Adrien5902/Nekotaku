@@ -14,8 +14,8 @@ export enum ColorTheme {
 }
 
 export enum Lang {
-    Français = "fr",
-    English = "en"
+    Français = "fr-FR",
+    English = "en-US"
 }
 
 export const DefaultSettings: Settings = {
