@@ -1,5 +1,6 @@
 export const TextSizes = {
     xs: 10,
+
     s: 14,
     m: 18,
     l: 28,
@@ -13,7 +14,13 @@ export const Spacing = {
     s: 4,
     m: 10,
     l: 18,
-    xl: 32
+    xl: 32,
+    xxl: 64,
 }
 
-export const AspectRatios = { banner: 14 / 3, cover: 3 / 4 }
+export const AspectRatios = {
+    banner: 14 / 3,
+    cover: 3 / 4,
+    screenHorizontal: 16 / 9,
+    screenVertical: 9 / 16,
+}

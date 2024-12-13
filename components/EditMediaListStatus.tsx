@@ -359,7 +359,7 @@ function EditMediaListStatusModal({
 							placeholder="Notes..."
 						/>
 					</View>
-					<View style={{ height: Spacing.xl * 3 }} />
+					<View style={{ height: Spacing.xxl }} />
 				</ThemedView>
 			</ScrollView>
 			<ThemedView

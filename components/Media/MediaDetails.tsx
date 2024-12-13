@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import WebView from "react-native-webview";
 import { useThemeColors } from "@/hooks/useThemeColor";
-import { Spacing, TextSizes } from "@/constants/Sizes";
+import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
 import { ThemedText } from "../ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "../Icon";
@@ -116,7 +116,10 @@ export default function MediaDetails({
 					>
 						<Image
 							source={{ uri: media.trailer.thumbnail }}
-							style={{ width: "100%", aspectRatio: 16 / 9 }}
+							style={{
+								width: "100%",
+								aspectRatio: AspectRatios.screenHorizontal,
+							}}
 						/>
 
 						<LinearGradient
@@ -124,7 +127,7 @@ export default function MediaDetails({
 							style={{
 								position: "absolute",
 								width: "100%",
-								height: Spacing.xl * 2,
+								height: Spacing.xxl,
 								top: 0,
 							}}
 						/>

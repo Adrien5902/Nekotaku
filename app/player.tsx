@@ -12,7 +12,7 @@ import { EpisodesList } from "@/components/Media/Episodes";
 import type { Lecteur } from "@/types/AnimeSama";
 import { DownloadingContext } from "@/components/DownloadingContext";
 import type { Media, MediaList, MediaTitle } from "@/types/Anilist/graphql";
-import { Spacing } from "@/constants/Sizes";
+import { AspectRatios, Spacing } from "@/constants/Sizes";
 
 export type VideoPlayerMedia =
 	| (Pick<Media, "bannerImage" | "id" | "idMal"> & {
@@ -117,7 +117,7 @@ const VideoPlayer = () => {
 						source={{ uri: media?.bannerImage ?? undefined }}
 						style={{
 							width: "100%",
-							aspectRatio: 14 / 3,
+							aspectRatio: AspectRatios.banner,
 							resizeMode: "contain",
 						}}
 					/>

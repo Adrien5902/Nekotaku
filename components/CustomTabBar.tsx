@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, StyleSheet, Switch, View } from "react-native";
+import { TouchableOpacity, StyleSheet, View } from "react-native";
 import type {
 	NavigationHelpers,
 	ParamListBase,
@@ -13,6 +13,7 @@ import * as NavigationBar from "expo-navigation-bar";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { useDoublePress } from "@/hooks/useDoublePress";
 import { MediaType } from "@/types/Anilist/graphql";
+import { Spacing } from "@/constants/Sizes";
 
 type BottomTabBarProps = {
 	state: TabNavigationState<ParamListBase>;
@@ -68,7 +69,7 @@ export default function CustomTabBar({
 						>
 							{options.tabBarIcon?.({
 								color: isFocused ? colors.accent : colors.text,
-								size: 24,
+								size: Spacing.xl,
 							})}
 							<ThemedText
 								style={{
@@ -89,9 +90,9 @@ const styles = StyleSheet.create({
 	container: {
 		flexDirection: "row",
 		alignItems: "center",
-		paddingHorizontal: 10,
-		paddingVertical: 5,
-		borderTopWidth: 1,
+		paddingHorizontal: Spacing.m,
+		paddingVertical: Spacing.s,
+		borderTopWidth: Spacing.xs,
 	},
 	tabsContainer: {
 		flexDirection: "row",
@@ -100,11 +101,11 @@ const styles = StyleSheet.create({
 	},
 	tabButton: {
 		alignItems: "center",
-		padding: 10,
+		padding: Spacing.m,
 	},
 	switchContainer: {
 		flexDirection: "row",
 		alignItems: "center",
-		paddingHorizontal: 10,
+		paddingHorizontal: Spacing.m,
 	},
 });

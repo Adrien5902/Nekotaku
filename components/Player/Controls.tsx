@@ -328,7 +328,7 @@ export default function Controls({
 					<View
 						style={{
 							position: "absolute",
-							padding: Spacing.xl * 2,
+							padding: Spacing.xxl,
 							alignItems: "center",
 						}}
 					>

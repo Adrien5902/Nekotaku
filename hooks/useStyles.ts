@@ -1,5 +1,5 @@
 import { Dimensions, StyleSheet } from "react-native"
-import { Spacing } from "../constants/Sizes"
+import { AspectRatios, Spacing } from "../constants/Sizes"
 import { useThemeColors } from "./useThemeColor"
 
 export function useStyles() {
@@ -30,7 +30,7 @@ export function useStyles() {
         },
         video: {
             width: "100%",
-            aspectRatio: 16 / 9,
+            aspectRatio: AspectRatios.screenHorizontal,
         },
         fullscreenVideo: {
             width: "100%",

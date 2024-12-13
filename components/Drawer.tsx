@@ -115,14 +115,14 @@ export default function Drawer({
 								style={{
 									backgroundColor: isFocused ? colors.accent : undefined,
 									borderRadius: Spacing.m,
-									margin: 2,
+									margin: Spacing.xs,
 								}}
 							>
 								<ThemedText
 									numberOfLines={1}
 									style={{
-										paddingHorizontal: 20,
-										paddingVertical: 8,
+										paddingHorizontal: Spacing.l,
+										paddingVertical: Spacing.m,
 									}}
 									weight={isFocused ? "bold" : undefined}
 									color={isFocused ? "background" : "text"}
@@ -184,7 +184,6 @@ function SearchBar({ setFilterEntries }: Pick<Props, "setFilterEntries">) {
 						position: "absolute",
 						borderRadius: Spacing.xl,
 						aspectRatio: 1,
-						width: Spacing.l * 1.5,
 						justifyContent: "center",
 						alignItems: "center",
 						right: Spacing.m,
