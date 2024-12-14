@@ -74,6 +74,10 @@ export const GET_MEDIA_QUERY = gql(`
 				romaji
 				english
 			}
+			nextAiringEpisode {
+				episode
+				timeUntilAiring
+			}
 			relations {
 				edges {
 					relationType

@@ -51,4 +51,11 @@ export interface LangScheme {
         defaultMode: string,
         colorTheme: string
     }
+
+    misc: {
+        statusDisplay: {
+            nextEpIn: (shouldShowDays: boolean, days: number, hours: number, mins: number) => string
+            late: (episodes: number) => string
+        }
+    }
 }

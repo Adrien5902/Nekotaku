@@ -73,5 +73,14 @@ export const enUS: LangScheme = {
             "en-US": "English US 🇺🇸",
             "fr-FR": "French France 🇫🇷"
         }
+    },
+    misc: {
+        statusDisplay: {
+            nextEpIn: (shouldShowDays, days, hours, mins) => `Next episode in ${shouldShowDays
+                ? `${days} days`
+                : `${hours}h ${mins}min`
+                }`,
+            late: (episodes) => `${episodes} episode${episodes > 1 ? "s" : ""} behind`,
+        }
     }
 }

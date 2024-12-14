@@ -26,13 +26,13 @@ export const QUERY = gql(`
 							large
 						}
 						status(version: $version)
-						nextAiringEpisode {
-							airingAt
-							timeUntilAiring
-							episode
-						}
 						format
 						episodes
+						nextAiringEpisode {
+							episode
+							timeUntilAiring
+							airingAt
+						}
 					}
 					progress
 					repeat

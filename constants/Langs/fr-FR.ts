@@ -74,5 +74,14 @@ export const frFR: LangScheme = {
             light: "Clair",
             system: "Système"
         }
+    },
+    misc: {
+        statusDisplay: {
+            late: (episodes) => `${episodes} épisode${episodes > 1 ? "s" : ""} de retard`,
+            nextEpIn: (shouldShowDays, days, hours, mins) => `Prochain épisode dans ${shouldShowDays
+                ? `${days} jours`
+                : `${hours}h ${mins}min`
+                }`
+        }
     }
 }

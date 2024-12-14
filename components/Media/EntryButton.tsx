@@ -8,10 +8,17 @@ import {
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
 import { type Href, router } from "expo-router";
-import MediaListStatusDisplay from "./Status";
+import MediaListStatusDisplay, {
+	type Props as StatusDisplayProps,
+} from "./Status";
 import Icon from "../Icon";
 import { AspectRatios, Spacing, TextSizes } from "@/constants/Sizes";
-import type { Media, MediaList, MediaRelation } from "@/types/Anilist/graphql";
+import type {
+	Media,
+	MediaList,
+	MediaRelation,
+	MediaTitle,
+} from "@/types/Anilist/graphql";
 import useStyles from "@/hooks/useStyles";
 import { useApolloClient } from "@apollo/client";
 import { gql } from "@/types/Anilist";
@@ -30,17 +37,14 @@ mutation AddOneProgress($progress: Int, $status: MediaListStatus, $mediaId: Int)
 
 export interface Props {
 	media?:
-		| Pick<
-				Media,
-				"id" | "episodes" | "coverImage" | "title" | "status" | "format"
-		  >
+		| (StatusDisplayProps["media"] &
+				Pick<Media, "coverImage" | "id" | "episodes"> & {
+					title?: Pick<MediaTitle, "english" | "romaji"> | undefined | null;
+				})
 		| null
 		| undefined;
 	mediaList?:
-		| Pick<
-				MediaList,
-				"progress" | "score" | "repeat" | "startedAt" | "completedAt" | "status"
-		  >
+		| (StatusDisplayProps["mediaList"] & Pick<MediaList, "score" | "repeat">)
 		| null
 		| undefined;
 	relationType?: MediaRelation | null | undefined;
