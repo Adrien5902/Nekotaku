@@ -14,6 +14,8 @@ import useStyles from "@/hooks/useStyles";
 import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
 import CastControls from "./CastControls";
 import Cache, { CacheReadType } from "@/hooks/useCache";
+import { ThemedView } from "../ThemedView";
+import { ThemedText } from "../ThemedText";
 
 interface Props {
 	isFullscreen: boolean;
@@ -23,6 +25,7 @@ interface Props {
 	toggleFullscreen: (force?: boolean) => void;
 	setIsLoadingVid: React.Dispatch<React.SetStateAction<boolean>>;
 	videoUri?: string;
+	error?: Error;
 }
 
 export default function Player({
@@ -33,6 +36,7 @@ export default function Player({
 	toggleFullscreen,
 	setIsLoadingVid,
 	videoUri,
+	error,
 }: Props) {
 	const videoPlayerRef = useRef<Video>(null);
 	const styles = useStyles();
@@ -138,47 +142,58 @@ export default function Player({
 					}}
 					forceView={!!googleCastMedia}
 				/>
-				{!googleCastMedia ? (
-					<Video
-						style={{
-							...(isFullscreen ? styles.fullscreenVideo : styles.video),
-							zIndex: -1,
-							backgroundColor: "#000",
-						}}
-						source={videoUri ? { uri: videoUri } : undefined}
-						ref={videoPlayerRef}
-						shouldPlay
-						resizeMode={ResizeMode.CONTAIN}
-						positionMillis={startPos?.positionMillis ?? 0}
-						onPlaybackStatusUpdate={(s) => {
-							const status = s as AVPlaybackStatusSuccess;
-							statusRef.current = status;
+				{!error ? (
+					!googleCastMedia ? (
+						<Video
+							style={{
+								...(isFullscreen ? styles.fullscreenVideo : styles.video),
+								zIndex: -1,
+								backgroundColor: "#000",
+							}}
+							source={videoUri ? { uri: videoUri } : undefined}
+							ref={videoPlayerRef}
+							shouldPlay
+							resizeMode={ResizeMode.CONTAIN}
+							positionMillis={startPos?.positionMillis ?? 0}
+							onPlaybackStatusUpdate={(s) => {
+								const status = s as AVPlaybackStatusSuccess;
+								statusRef.current = status;
 
-							if (!isAwake.current && status.isPlaying) {
-								activateKeepAwakeAsync();
-								isAwake.current = true;
-							} else if (isAwake.current && !status.isPlaying) {
-								deactivateKeepAwake();
-								isAwake.current = false;
-							}
-						}}
-						onLoad={() => {
-							videoPlayerRef.current?.setPositionAsync(
-								startPos?.positionMillis ?? 0,
-							);
-							setIsLoadingVid(false);
-						}}
-					/>
+								if (!isAwake.current && status.isPlaying) {
+									activateKeepAwakeAsync();
+									isAwake.current = true;
+								} else if (isAwake.current && !status.isPlaying) {
+									deactivateKeepAwake();
+									isAwake.current = false;
+								}
+							}}
+							onLoad={() => {
+								videoPlayerRef.current?.setPositionAsync(
+									startPos?.positionMillis ?? 0,
+								);
+								setIsLoadingVid(false);
+							}}
+						/>
+					) : (
+						<CastControls
+							setIsLoadingVid={setIsLoadingVid}
+							episode={episode}
+							isFullscreen={isFullscreen}
+							media={googleCastMedia}
+							loadingVid={loading}
+							statusRef={statusRef}
+							playerRef={playerRef}
+						/>
+					)
 				) : (
-					<CastControls
-						setIsLoadingVid={setIsLoadingVid}
-						episode={episode}
-						isFullscreen={isFullscreen}
-						media={googleCastMedia}
-						loadingVid={loading}
-						statusRef={statusRef}
-						playerRef={playerRef}
-					/>
+					<ThemedView
+						style={[
+							styles.video,
+							{ zIndex: 10, justifyContent: "center", alignItems: "center" },
+						]}
+					>
+						<ThemedText>Error : {error.message}</ThemedText>
+					</ThemedView>
 				)}
 			</View>
 		</GestureDetector>

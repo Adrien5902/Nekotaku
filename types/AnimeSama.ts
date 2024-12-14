@@ -129,13 +129,13 @@ export enum Lang {
 export interface Lecteur {
     id: number,
     hostname: string,
-    episodes: Episode[]
+    url: string
 }
 
 export interface Episode {
     name: EpisodeName,
     id: EpisodeId
-    url: string
+    lecteurs: Lecteur[]
 }
 
 export type EpisodeId = number;

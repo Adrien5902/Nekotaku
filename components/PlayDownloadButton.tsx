@@ -17,15 +17,15 @@ import useModal from "@/hooks/useModal";
 export interface Props {
 	media: VideoPlayerMedia;
 	episode: Episode;
-	lecteur: Lecteur;
+	episodes: Episode[];
 	color?: Color;
 }
 
 export default function PlayDownloadButton({
 	media,
 	episode,
-	lecteur,
 	color,
+	episodes,
 }: Props) {
 	const mediaId = media?.id;
 	if (!mediaId) {
@@ -103,8 +103,8 @@ export default function PlayDownloadButton({
 	const playerPath: Href = {
 		pathname: "/player",
 		params: {
-			episodeId: episode.id,
-			lecteur: JSON.stringify(lecteur),
+			episodeId: JSON.stringify(episode.id),
+			episodes: JSON.stringify(episodes),
 			media: JSON.stringify(media),
 		},
 	};

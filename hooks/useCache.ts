@@ -133,10 +133,10 @@ export interface CacheKeys {
     episodeProgress: { data: { positionMillis: number, durationMillis?: number }, deps: [Media["id"], EpisodeId] }
     langsAndEpisodes: { data: LangsAndEpisodes, deps: [AnimeSamaSearch<unknown> | undefined] }
     animeSamaSearch: { data: AnimeSamaSearch<unknown>, deps: [AnimeSamaSearchMediaType] }
-    animeSamaLecteurs: { data: Lecteur[], deps: [keyof typeof Lang | null, string | undefined, number | undefined, boolean | undefined, AnimeSamaMediaType | undefined] }
+    animeSamaEpisodes: { data: Episode[], deps: [keyof typeof Lang | null, string | undefined, number | undefined, boolean | undefined, AnimeSamaMediaType | undefined] }
     media: { data: MediaQuery["Media"], deps: [Media["id"]] }
     aniskip: { data: AniskipData["results"] | null, deps: [Media["id"], EpisodeId, number | undefined] }
-    videoUri: { data: string, deps: [Media["id"], Episode["url"]] }
+    videoUri: { data: string, deps: [Media["id"], Episode["id"]] }
 }
 
 export enum CacheReadType {

@@ -3,16 +3,17 @@ import { useLocalSearchParams } from "expo-router";
 import * as ScreenOrientation from "expo-screen-orientation";
 import type React from "react";
 import { useContext, useEffect, useState } from "react";
-import { Text, Dimensions, Image, ScrollView } from "react-native";
+import { Image, ScrollView } from "react-native";
 import * as NavigationBar from "expo-navigation-bar";
 import * as StatusBar from "expo-status-bar";
 import Player from "@/components/Player/Player";
 import { ThemedView } from "@/components/ThemedView";
 import { EpisodesList } from "@/components/Media/Episodes";
-import type { Lecteur } from "@/types/AnimeSama";
+import type { Episode } from "@/types/AnimeSama";
 import { DownloadingContext } from "@/components/DownloadingContext";
 import type { Media, MediaList, MediaTitle } from "@/types/Anilist/graphql";
 import { AspectRatios, Spacing } from "@/constants/Sizes";
+import { ThemedText } from "@/components/ThemedText";
 
 export type VideoPlayerMedia =
 	| (Pick<Media, "bannerImage" | "id" | "idMal"> & {
@@ -26,15 +27,20 @@ const VideoPlayer = () => {
 	const {
 		episodeId: episodeIdParam,
 		media: mediaJSON,
-		lecteur: lecteurJSON,
+		episodes: episodesJSON,
 	} = useLocalSearchParams() as Record<string, string>;
 	const media: VideoPlayerMedia = JSON.parse(mediaJSON);
-	const lecteur: Lecteur = JSON.parse(lecteurJSON);
-	const episode = lecteur.episodes[Number.parseInt(episodeIdParam)];
+	const episodes: Episode[] = JSON.parse(episodesJSON);
+	const episode = episodes.find(
+		(e) => e.id === Number.parseInt(episodeIdParam),
+	);
 
 	const downloadingContext = useContext(DownloadingContext);
-	const { loading: isGetVideoSourceLoading, data: videoUri } =
-		useGetVideoSource(downloadingContext, media?.id ?? 0, episode);
+	const {
+		loading: isGetVideoSourceLoading,
+		data: videoUri,
+		error,
+	} = useGetVideoSource(downloadingContext, media?.id ?? 0, episode);
 	const [isFullscreen, setIsFullscreen] = useState(false);
 	const [isLoadingVid, setIsLoadingVid] = useState(true);
 
@@ -89,7 +95,7 @@ const VideoPlayer = () => {
 		setIsFullscreen(fullscreen);
 	};
 
-	return loading || videoUri ? (
+	return (loading || videoUri) && episode ? (
 		<ThemedView
 			style={{
 				flex: 1,
@@ -108,6 +114,7 @@ const VideoPlayer = () => {
 					videoUri,
 					setIsLoadingVid,
 					media,
+					error,
 				}}
 				key={episode.id}
 			/>
@@ -124,16 +131,16 @@ const VideoPlayer = () => {
 					<ScrollView style={{ flexDirection: "column", flex: 1 }}>
 						<EpisodesList
 							progress={media?.mediaListEntry?.progress}
-							lecteur={lecteur}
 							media={media}
 							selected={episode.id}
+							episodes={episodes}
 						/>
 					</ScrollView>
 				</>
 			) : null}
 		</ThemedView>
 	) : (
-		<Text>Error</Text>
+		<ThemedText>Error</ThemedText>
 	);
 };
 

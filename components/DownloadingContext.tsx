@@ -129,7 +129,7 @@ export class Downloader {
 			return null;
 		}
 
-		const [uriPromise, headers] = getVideoUri(episode.url);
+		const [uriPromise, headers] = getVideoUri(episode);
 		const uri = await uriPromise;
 
 		const formattedFileName = Downloader.formatFileName(media.id, episode.id);

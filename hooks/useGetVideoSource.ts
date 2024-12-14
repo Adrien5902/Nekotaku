@@ -1,17 +1,34 @@
 import type { Episode } from "@/types/AnimeSama";
 import type { Downloader } from "@/components/DownloadingContext";
-import { useCachedPromise, usePromise } from "./usePromise";
+import { useCachedPromise } from "./usePromise";
 import { CacheReadType } from "./useCache";
 
-export function useGetVideoSource(downloadingContext: Downloader, mediaId: number, episode: Episode) {
-    if (downloadingContext.downloadedEpisodes[mediaId]?.includes(episode.id)) {
-        return usePromise(() => downloadingContext.getDownloadedEpisodeFileUri(mediaId, episode.id), [mediaId, episode.url]);
-    }
+export function useGetVideoSource(downloadingContext: Downloader, mediaId: number, episode: Episode | undefined) {
+    return useCachedPromise(CacheReadType.Memory, "videoUri", () => {
+        if (!episode) {
+            throw new Error("Episode not found")
+        }
 
-    return useCachedPromise(CacheReadType.Memory, "videoUri", () => getVideoUri(episode.url)[0], [mediaId, episode.url]);
+        if (downloadingContext.downloadedEpisodes[mediaId]?.includes(episode.id ?? 0)) {
+            return downloadingContext.getDownloadedEpisodeFileUri(mediaId, episode.id ?? 0)
+        }
+
+        return getVideoUri(episode)[0]
+    },
+        [mediaId, episode?.id ?? 0]
+    );
 };
 
-export function getVideoUri(videoSource: string): [Promise<string>, Record<string, string>] {
+export function getVideoUri(episode: Episode): [Promise<string>, Record<string, string>] {
+    console.log(episode.lecteurs);
+    const sibnetLecteur = episode?.lecteurs.find(l => l.hostname.includes("sibnet.ru"));
+
+    if (!sibnetLecteur?.url) {
+        throw new Error("Can't use this lecteur")
+    }
+
+    const videoSource = sibnetLecteur.url;
+
     const headers: Record<string, string> = {
         "Referer": videoSource,
     }

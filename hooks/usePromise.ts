@@ -21,6 +21,7 @@ export function usePromise<R>(fn: () => Promise<R | undefined>, deps?: unknown[]
     // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
     useEffect(() => {
         setLoading(true)
+        errorRef.current = undefined
         fn().then((res) => {
             if (res !== undefined) {
                 dataRef.current = res
@@ -44,6 +45,7 @@ export function useCachedPromise<T extends CacheKey>(readType: CacheReadType, ke
 
     const refresh = async () => {
         setLoading(true)
+        errorRef.current = undefined
 
         const cacheHit = await Cache.read(readType, key, deps) ?? undefined
         if (cacheHit) {

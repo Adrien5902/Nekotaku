@@ -1,15 +1,10 @@
-import {
-	AnimeSamaUrl,
-	type Episode,
-	type Lang,
-	type Lecteur,
-} from "@/types/AnimeSama";
+import { AnimeSamaUrl, type Episode, type Lang } from "@/types/AnimeSama";
 import { ThemedView } from "../ThemedView";
 import { ThemedText } from "../ThemedText";
 import { useEffect, useState } from "react";
 import { SelectButtons } from "../SelectButtons";
 import { RefreshControl, ScrollView, View } from "react-native";
-import { useAnimeSamaGetLecteurs } from "@/hooks/useAnimeSamaGetEpisodes";
+import { useAnimeSamaGetLecteurs as useAnimeSamaGetEpisodes } from "@/hooks/useAnimeSamaGetEpisodes";
 import PlayDownloadButton, {
 	type Props as PlayDownloadButtonProps,
 } from "../PlayDownloadButton";
@@ -61,11 +56,11 @@ export default function EpisodesCollection({
 	const [lang, setLang] = useState<keyof typeof Lang | null>(null);
 
 	const {
-		data: lecteurs,
+		data: episodes,
 		loading: loadingEpisodes,
 		error: errorEpisodes,
 		refresh: refreshAnimeSamaGetLecteurs,
-	} = useAnimeSamaGetLecteurs(url ?? undefined, lang, customEpisodesData);
+	} = useAnimeSamaGetEpisodes(url ?? undefined, lang, customEpisodesData);
 
 	useEffect(() => {
 		if (langs) {
@@ -103,14 +98,8 @@ export default function EpisodesCollection({
 			) : null}
 			{errorEpisodes ? (
 				<ThemedText>{errorEpisodes.message}</ThemedText>
-			) : !loadingEpisodes && lecteurs ? (
-				<EpisodesList
-					{...{ media, url, lang, progress }}
-					lecteur={
-						lecteurs.find((l) => l.hostname.includes("sibnet.ru")) ??
-						lecteurs[0]
-					}
-				/>
+			) : !loadingEpisodes && episodes ? (
+				<EpisodesList {...{ media, url, lang, progress, episodes }} />
 			) : (
 				<ThemedText>Retrieving episodes...</ThemedText>
 			)}
@@ -121,16 +110,16 @@ export default function EpisodesCollection({
 
 export function EpisodesList({
 	media,
-	lecteur,
+	episodes,
 	selected,
 	progress,
 }: {
 	media: PlayDownloadButtonProps["media"];
 	progress: MediaList["progress"];
-	lecteur: Lecteur | undefined;
+	episodes: Episode[] | undefined;
 	selected?: number;
 }) {
-	const lastWatchedEpisodeId = lecteur?.episodes.find((ep) => {
+	const lastWatchedEpisodeId = episodes?.find((ep) => {
 		const num =
 			typeof ep.name === "number" ? ep.name : Number.parseInt(ep.name);
 		if (!Number.isNaN(num)) {
@@ -140,7 +129,7 @@ export function EpisodesList({
 
 	return (
 		<>
-			{lecteur?.episodes.map((episode) => (
+			{episodes?.map((episode) => (
 				<EpisodeButton
 					watched={
 						lastWatchedEpisodeId !== undefined
@@ -148,7 +137,7 @@ export function EpisodesList({
 							: false
 					}
 					episode={episode}
-					{...{ media, lecteur }}
+					{...{ media, episodes }}
 					key={episode.id}
 					selected={selected === episode.id}
 				/>
@@ -162,13 +151,13 @@ function EpisodeButton({
 	media,
 	episode,
 	selected,
-	lecteur,
 	watched,
+	episodes,
 }: {
 	media: PlayDownloadButtonProps["media"];
 	selected?: boolean;
 	episode: Episode;
-	lecteur: Lecteur;
+	episodes: Episode[];
 	watched: boolean;
 }) {
 	const styles = useStyles();
@@ -206,8 +195,8 @@ function EpisodeButton({
 				{media ? (
 					<PlayDownloadButton
 						media={media}
-						lecteur={lecteur}
 						episode={episode}
+						episodes={episodes}
 					/>
 				) : null}
 			</View>
