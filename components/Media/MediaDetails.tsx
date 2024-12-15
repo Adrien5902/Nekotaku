@@ -62,17 +62,19 @@ export default function MediaDetails({
 
 	return (
 		<ScrollView style={{ flex: 1 }}>
-			<View
-				style={[
-					styles.PrimaryElement,
-					{ height: Dimensions.get("window").height / 4 },
-				]}
-			>
-				<WebView
-					source={{ html: style + (media?.description ?? "") }}
-					style={{ backgroundColor: colors.background }}
-				/>
-			</View>
+			{media?.description ? (
+				<View
+					style={[
+						styles.PrimaryElement,
+						{ height: Dimensions.get("window").height / 4 },
+					]}
+				>
+					<WebView
+						source={{ html: style + media.description }}
+						style={{ backgroundColor: colors.background }}
+					/>
+				</View>
+			) : null}
 
 			<MediaStats media={media} />
 
