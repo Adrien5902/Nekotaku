@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	ScrollView,
 	type TextStyle,
@@ -34,9 +34,15 @@ export function SelectButtons<T extends string>({
 }: Props<T>) {
 	const colors = useThemeColors();
 	const [value, setValue] = useState(defaultValue ?? buttons[0]);
+	useEffect(() => {
+		if (defaultValue) setValue(defaultValue);
+	}, [defaultValue]);
 
 	return (
-		<ScrollView horizontal={true}>
+		<ScrollView
+			horizontal={true}
+			style={{ maxHeight: TextSizes.m + Spacing.l * 2 }}
+		>
 			{buttons.map((buttonName) => {
 				const button =
 					typeof buttonName === "string"
@@ -52,6 +58,7 @@ export function SelectButtons<T extends string>({
 						borderRadius: Spacing.s,
 						borderColor: colors.text,
 						borderWidth: Spacing.xs,
+						alignSelf: "flex-start",
 					},
 				];
 

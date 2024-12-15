@@ -1,7 +1,7 @@
 import { AppState, View } from "react-native";
 import Controls, { type Props as ControlsProps } from "./Controls";
 import { type AVPlaybackStatusSuccess, ResizeMode, Video } from "expo-av";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Episode } from "@/types/AnimeSama";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import {
@@ -16,6 +16,10 @@ import CastControls from "./CastControls";
 import Cache, { CacheReadType } from "@/hooks/useCache";
 import { ThemedView } from "../ThemedView";
 import { ThemedText } from "../ThemedText";
+import useModal from "@/hooks/useModal";
+import Slider from "@react-native-community/slider";
+import { useThemeColors } from "@/hooks/useThemeColor";
+import { SelectButtons } from "../SelectButtons";
 
 interface Props {
 	isFullscreen: boolean;
@@ -127,11 +131,15 @@ export default function Player({
 		toggleFullscreen();
 	});
 
+	const { modal: Modal, setModalVisible } = useModal("Close");
+	const playbackSpeedRef = useRef(1);
+
 	return (
 		<GestureDetector gesture={gesture}>
 			<View>
 				<Controls
 					{...{
+						setModalVisible,
 						isFullscreen,
 						playerRef,
 						statusRef,
@@ -142,6 +150,13 @@ export default function Player({
 					}}
 					forceView={!!googleCastMedia}
 				/>
+
+				<Modal>
+					<PlayerSettings
+						playerRef={playerRef}
+						playbackSpeedRef={playbackSpeedRef}
+					/>
+				</Modal>
 				{!error ? (
 					!googleCastMedia ? (
 						<Video
@@ -197,5 +212,56 @@ export default function Player({
 				)}
 			</View>
 		</GestureDetector>
+	);
+}
+
+function PlayerSettings({
+	playerRef,
+	playbackSpeedRef,
+}: {
+	playerRef: React.MutableRefObject<PlayerFunctions | undefined>;
+	playbackSpeedRef: React.MutableRefObject<number>;
+}) {
+	const colors = useThemeColors();
+	const [playBackSpeed, setPlaybackSpeed] = useState(playbackSpeedRef.current);
+	return (
+		<View
+			style={{
+				alignSelf: "flex-start",
+			}}
+		>
+			<ThemedText size="m">
+				Playback speed : x{playBackSpeed.toFixed(2)}
+			</ThemedText>
+
+			<Slider
+				minimumValue={0.05}
+				maximumValue={2}
+				step={0.05}
+				value={playBackSpeed}
+				onValueChange={(value) => {
+					playerRef.current?.setPlaybackSpeedAsync(value);
+					playbackSpeedRef.current = value;
+					setPlaybackSpeed(value);
+				}}
+				thumbTintColor={colors.accent}
+				minimumTrackTintColor={colors.accent}
+				maximumTrackTintColor={colors.text}
+			/>
+
+			<SelectButtons
+				buttons={[0.5, 1, 1.5, 2].map((n) => ({
+					key: n.toString(),
+					title: `x${n}`,
+				}))}
+				defaultValue={playBackSpeed.toString()}
+				onValueChange={(value) => {
+					const n = Number.parseFloat(value);
+					playerRef.current?.setPlaybackSpeedAsync(n);
+					playbackSpeedRef.current = n;
+					setPlaybackSpeed(n);
+				}}
+			/>
+		</View>
 	);
 }
