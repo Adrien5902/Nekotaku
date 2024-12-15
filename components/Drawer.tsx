@@ -1,5 +1,6 @@
 import {
 	Animated,
+	BackHandler,
 	ScrollView,
 	TextInput,
 	TouchableHighlight,
@@ -51,6 +52,15 @@ export default function Drawer({
 			useNativeDriver: false,
 		}).start();
 	};
+
+	BackHandler.addEventListener("hardwareBackPress", () => {
+		if (drawerOpened) {
+			toggleDrawer();
+			return true;
+		}
+
+		return false;
+	});
 
 	return (
 		<ThemedView
