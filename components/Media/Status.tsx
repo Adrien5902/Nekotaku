@@ -47,7 +47,7 @@ export default function MediaListStatusDisplay({
 			const upToDate = (mediaList.progress ?? 0) === numberOfReleasedEpisodes;
 
 			const numberOfEpisodesBehind =
-				numberOfReleasedEpisodes - mediaList.progress - 1;
+				numberOfReleasedEpisodes - mediaList.progress;
 
 			const daysBeforeNextEp =
 				media.nextAiringEpisode.timeUntilAiring / 3600 / 24;
