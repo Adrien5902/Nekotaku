@@ -1,8 +1,25 @@
 import type { ColorTheme, Lang } from "@/components/Settings/types"
-import type { MediaFormat, MediaListStatus, MediaStatus, MediaType } from "@/types/Anilist/graphql"
+import type { MediaFormat, MediaListStatus, MediaSeason, MediaSource, MediaStatus, MediaType } from "@/types/Anilist/graphql"
+
+export enum CountryOfOrigin {
+    Japan = "JP",
+    SouthKorea = "KR",
+    China = "CN",
+    Taiwan = "TW",
+}
 
 export interface LangScheme {
     Anilist: {
+        MediaDuration: (hours: number, minutes: number) => string
+        MediaSeason: {
+            [key in MediaSeason]: string
+        }
+        MediaSource: {
+            [key in MediaSource]: string
+        }
+        countryOfOrigin: {
+            [key in CountryOfOrigin]: string
+        }
         MediaStatus: {
             [key in MediaStatus]: string
         }

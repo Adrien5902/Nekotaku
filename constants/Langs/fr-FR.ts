@@ -2,6 +2,36 @@ import type { LangScheme } from "./scheme";
 
 export const frFR: LangScheme = {
     Anilist: {
+        MediaDuration: (hours, minutes) => `${hours ? `${hours}h` : ""} ${minutes} min`,
+        MediaSeason: {
+            FALL: "Automne",
+            SPRING: "Printemps",
+            SUMMER: "Été",
+            WINTER: "Hiver"
+        },
+        MediaSource: {
+            ANIME: "Animé",
+            COMIC: "Comic",
+            DOUJINSHI: "Doujinshi",
+            GAME: "Jeu",
+            LIGHT_NOVEL: "Nouvelle",
+            LIVE_ACTION: "Live Action",
+            MANGA: "Manga",
+            MULTIMEDIA_PROJECT: "Projet Multimédia",
+            NOVEL: "Roman",
+            ORIGINAL: "Original",
+            OTHER: "Autre",
+            PICTURE_BOOK: "Livre imagé",
+            VIDEO_GAME: "Jeu vidéo",
+            VISUAL_NOVEL: "Visual Novel",
+            WEB_NOVEL: "Web Novel"
+        },
+        countryOfOrigin: {
+            CN: "Chine",
+            JP: "Japon",
+            KR: "Corée du sud",
+            TW: "Taïwan"
+        },
         MediaStatus: {
             CANCELLED: "Annulé",
             FINISHED: "Terminé",

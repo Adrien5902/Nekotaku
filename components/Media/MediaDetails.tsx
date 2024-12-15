@@ -21,6 +21,9 @@ import { ThemedText } from "../ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "../Icon";
 import useLang from "@/hooks/useLang";
+import type { CountryOfOrigin } from "@/constants/Langs/scheme";
+import type { Lang } from "../Settings/types";
+import { useSettings } from "../Settings/Context";
 
 export default function MediaDetails({
 	media,
@@ -55,6 +58,7 @@ export default function MediaDetails({
 	const duration = media?.duration ?? 0;
 	const hours = Math.floor(duration / 60);
 	const lang = useLang();
+	const settings = useSettings();
 
 	return (
 		<ScrollView style={{ flex: 1 }}>
@@ -76,11 +80,11 @@ export default function MediaDetails({
 				lines={[
 					{
 						label: lang.pages.media.details.status,
-						text: media?.status ?? "",
+						text: media?.status ? lang.Anilist.MediaStatus[media?.status] : "",
 					},
 					{
 						label: lang.pages.media.details.releaseDate,
-						text: `${dateStrFromFuzzyDate(media?.startDate)} - ${dateStrFromFuzzyDate(media?.endDate)}`,
+						text: `${dateStrFromFuzzyDate(media?.startDate, settings.lang)} - ${dateStrFromFuzzyDate(media?.endDate, settings.lang)}`,
 					},
 					{
 						label: lang.pages.media.details.numberOfEpisodes,
@@ -88,16 +92,23 @@ export default function MediaDetails({
 					},
 					{
 						label: lang.pages.media.details.duration,
-						text: `${hours ? `${hours}h` : ""} ${duration % 60} min`,
+						text: lang.Anilist.MediaDuration(hours, duration % 60),
 					},
 					{
 						label: lang.pages.media.details.season,
-						text: `${media?.season} ${media?.seasonYear}`,
+						text: media?.season
+							? `${lang.Anilist.MediaSeason[media?.season]} ${media?.seasonYear}`
+							: "",
 					},
-					{ label: lang.pages.media.details.source, text: media?.source ?? "" },
+					{
+						label: lang.pages.media.details.source,
+						text: media?.source ? lang.Anilist.MediaSource[media?.source] : "",
+					},
 					{
 						label: lang.pages.media.details.origin,
-						text: media?.countryOfOrigin ?? "",
+						text: lang.Anilist.countryOfOrigin[
+							(media?.countryOfOrigin ?? "JP") as CountryOfOrigin
+						],
 					},
 				]}
 			/>
@@ -150,14 +161,17 @@ export default function MediaDetails({
 	);
 }
 
-function dateStrFromFuzzyDate(date?: FuzzyDate | null) {
+function dateStrFromFuzzyDate(
+	date: FuzzyDate | null | undefined,
+	langId: Lang,
+) {
 	const datetime = new Date(
 		date?.year ?? 0,
 		(date?.month ?? 1) - 1,
 		date?.day ?? 1,
 	);
 
-	return datetime.toLocaleDateString("fr-Fr", {
+	return datetime.toLocaleDateString(langId, {
 		month: "long",
 		day: "numeric",
 		year: "numeric",
