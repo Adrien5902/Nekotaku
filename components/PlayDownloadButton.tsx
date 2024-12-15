@@ -196,13 +196,11 @@ export default function PlayDownloadButton({
 						name={"download"}
 						color={colors.accent}
 						size={TextSizes.xl}
-						style={[
-							styles.icon,
-							{
-								position: "absolute",
-								height: fillAnim,
-							},
-						]}
+						style={{
+							margin: Spacing.m,
+							position: "absolute",
+							height: fillAnim,
+						}}
 					/>
 				</View>
 
