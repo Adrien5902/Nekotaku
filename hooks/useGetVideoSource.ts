@@ -20,46 +20,67 @@ export function useGetVideoSource(downloadingContext: Downloader, mediaId: numbe
 };
 
 export function getVideoUri(episode: Episode): [Promise<string>, Record<string, string>] {
-    console.log(episode.lecteurs);
-    const sibnetLecteur = episode?.lecteurs.find(l => l.hostname.includes("sibnet.ru"));
+    const supportedLecteursName = Object.keys(supportedLecteurs)
+    let foundSupportedLecteur: undefined | string = undefined;
+    const foundEpisodeLecteur = episode.lecteurs.find(l => {
+        const lName = supportedLecteursName.find(lName => l.hostname.includes(lName))
+        if (lName) {
+            foundSupportedLecteur = lName
+        }
+        return lName
+    })
 
-    if (!sibnetLecteur?.url) {
-        throw new Error("Can't use this lecteur")
+    if (foundSupportedLecteur && foundEpisodeLecteur) {
+        const getVideoFn = supportedLecteurs[foundSupportedLecteur]
+        return getVideoFn(foundEpisodeLecteur.url)
     }
 
-    const videoSource = sibnetLecteur.url;
+    throw new Error("Lecteur not supported")
+}
 
-    const headers: Record<string, string> = {
-        "Referer": videoSource,
-    }
+export const supportedLecteurs: Record<string, (url: string) => [Promise<string>, Record<string, string>]> = {
+    "sibnet.ru": (url: string) => {
+        const headers: Record<string, string> = {
+            "Referer": url,
+        }
 
-    return [new Promise((resolve) => {
-        (async () => {
-            const response = await fetch(videoSource);
-            const html = await response.text();
+        return [new Promise((resolve) => {
+            (async () => {
+                const response = await fetch(url);
+                const html = await response.text();
 
-            const videoSrcMatch = html.match(/player\.src\(\[\{src: "(.*?)",/);
-            if (!videoSrcMatch)
-                throw new Error("Video source not found in JavaScript.");
+                const videoSrcMatch = html.match(/player\.src\(\[\{src: "(.*?)",/);
+                if (!videoSrcMatch)
+                    throw new Error("Video source not found in JavaScript.");
 
-            const videoPath = videoSrcMatch[1];
-            const fullVideoUrl = `https://video.sibnet.ru${videoPath}`;
+                const videoPath = videoSrcMatch[1];
+                const fullVideoUrl = `https://video.sibnet.ru${videoPath}`;
 
-            const request = new XMLHttpRequest();
-            const listener = () => {
-                if (request.responseURL) {
-                    request.removeEventListener("readystatechange", listener);
-                    resolve(request.responseURL);
+                const request = new XMLHttpRequest();
+                const listener = () => {
+                    if (request.responseURL) {
+                        request.removeEventListener("readystatechange", listener);
+                        resolve(request.responseURL);
+                    }
+                };
+
+                request.addEventListener("readystatechange", listener);
+                request.open("GET", fullVideoUrl);
+                const headersKeys = Object.keys(headers)
+                for (const i in headersKeys) {
+                    request.setRequestHeader(headersKeys[i], headers[headersKeys[i]])
                 }
-            };
+                request.send();
+            })()
+        }), headers]
+    },
+    "sendvid.com": (url: string) => {
+        return [(async () => {
+            const res = await fetch(url)
+            const html = await res.text()
+            const regex = /<meta property="og:video" content="([\S]*)"\/>/g
 
-            request.addEventListener("readystatechange", listener);
-            request.open("GET", fullVideoUrl);
-            const headersKeys = Object.keys(headers)
-            for (const i in headersKeys) {
-                request.setRequestHeader(headersKeys[i], headers[headersKeys[i]])
-            }
-            request.send();
-        })()
-    }), headers]
+            return Array.from(html.matchAll(regex))[0][1]
+        })(), {}]
+    }
 }
