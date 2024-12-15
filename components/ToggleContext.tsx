@@ -31,7 +31,6 @@ export const QUERY = gql(`
 						nextAiringEpisode {
 							episode
 							timeUntilAiring
-							airingAt
 						}
 					}
 					progress

@@ -55,7 +55,7 @@ export default function MediaListStatusDisplay({
 			const min = (media.nextAiringEpisode.timeUntilAiring / 60) % 60;
 
 			texts.push(
-				<ThemedText style={{ flex: 1 }} {...props} color="accent">
+				<ThemedText key={"tail"} style={{ flex: 1 }} {...props} color="accent">
 					{upToDate
 						? lang.misc.statusDisplay.nextEpIn(
 								daysBeforeNextEp > 1,
