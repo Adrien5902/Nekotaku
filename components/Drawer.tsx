@@ -197,6 +197,8 @@ function SearchBar({ setFilterEntries }: Pick<Props, "setFilterEntries">) {
 						justifyContent: "center",
 						alignItems: "center",
 						right: Spacing.m,
+						width: TextSizes.m,
+						height: TextSizes.m,
 					}}
 					onTouchEnd={() => {
 						setFilterEntries(undefined);
