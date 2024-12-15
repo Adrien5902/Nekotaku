@@ -125,7 +125,7 @@ const VideoPlayer = () => {
 						style={{
 							width: "100%",
 							aspectRatio: AspectRatios.banner,
-							resizeMode: "contain",
+							resizeMode: "cover",
 						}}
 					/>
 					<ScrollView style={{ flexDirection: "column", flex: 1 }}>
