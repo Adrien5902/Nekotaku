@@ -142,8 +142,8 @@ export class Downloader {
 		const notificationData: Notification = {
 			id: Downloader.notificationId(formattedFileName),
 			title: "Downloading",
-			subtitle: `${media.title?.english} ep. ${episode.name}`,
-			body: `${media.title?.english} ep. ${episode.name}`,
+			subtitle: `${media.title?.english ?? media.title?.romaji} ep. ${episode.name}`,
+			body: `${media.title?.english ?? media.title?.romaji} ep. ${episode.name}`,
 			android: {
 				ongoing: true,
 				onlyAlertOnce: true,

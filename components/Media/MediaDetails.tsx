@@ -47,7 +47,7 @@ export default function MediaDetails({
 						| Pick<MediaTrailer, "site" | "id" | "thumbnail">
 						| null
 						| undefined;
-					title?: Pick<MediaTitle, "english"> | null | undefined;
+					title?: Pick<MediaTitle, "english" | "romaji"> | null | undefined;
 				})
 		| null
 		| undefined;
@@ -152,7 +152,8 @@ export default function MediaDetails({
 						<ThemedText
 							style={{ position: "absolute", top: Spacing.m, left: Spacing.m }}
 						>
-							{media.title?.english} - {lang.pages.media.details.trailer}
+							{media.title?.english ?? media.title?.romaji} -{" "}
+							{lang.pages.media.details.trailer}
 						</ThemedText>
 					</View>
 				</TouchableOpacity>

@@ -83,11 +83,17 @@ export default function MediaPage() {
 						text={
 							<>
 								<ThemedText numberOfLines={2} size="m">
-									{media.title?.english}
+									{media.title?.english ?? media.title?.romaji}
 								</ThemedText>
-								<ThemedText numberOfLines={1} size="s" style={{ opacity: 0.6 }}>
-									{media.title?.romaji}
-								</ThemedText>
+								{media.title?.english ? (
+									<ThemedText
+										numberOfLines={1}
+										size="s"
+										style={{ opacity: 0.6 }}
+									>
+										{media.title?.romaji}
+									</ThemedText>
+								) : null}
 								<MediaListStatusDisplay
 									mediaList={media.mediaListEntry}
 									media={media}
