@@ -10,7 +10,7 @@ import {
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
 import { useThemeColors } from "@/hooks/useThemeColor";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MediaListGroup } from "@/types/Anilist/graphql";
 import Icon from "./Icon";
 import { Spacing, TextSizes } from "@/constants/Sizes";
@@ -53,13 +53,19 @@ export default function Drawer({
 		}).start();
 	};
 
-	BackHandler.addEventListener("hardwareBackPress", () => {
-		if (drawerOpened) {
-			toggleDrawer();
-			return true;
-		}
+	useEffect(() => {
+		const listener = BackHandler.addEventListener("hardwareBackPress", () => {
+			if (drawerOpened) {
+				toggleDrawer();
+				return true;
+			}
 
-		return false;
+			return false;
+		});
+
+		return () => {
+			listener.remove();
+		};
 	});
 
 	return (
