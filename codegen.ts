@@ -9,8 +9,9 @@ const config: CodegenConfig = {
         "./types/Anilist/": {
             preset: "client",
             presetConfig: {
-                gqlTagName: "gql"
-            }
+                gqlTagName: "gql",
+                fragmentMasking: false,
+            },
         }
     }
 };

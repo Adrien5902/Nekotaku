@@ -2,7 +2,6 @@ import {
 	Animated,
 	BackHandler,
 	ScrollView,
-	TextInput,
 	TouchableHighlight,
 	TouchableWithoutFeedback,
 	View,
@@ -13,13 +12,13 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import { useEffect, useRef, useState } from "react";
 import type { MediaListGroup } from "@/types/Anilist/graphql";
 import Icon from "./Icon";
-import { Spacing, TextSizes } from "@/constants/Sizes";
+import { Spacing } from "@/constants/Sizes";
 import type { Entry } from "@/app/(tabs)";
 import {
 	searchFriendly,
 	searchFriendlyMediaNames,
 } from "@/hooks/useAnimeSamaSearch";
-import useLang from "@/hooks/useLang";
+import SearchBar from "./SearchBar";
 
 type ListsType =
 	| (Pick<MediaListGroup, "name" | "status"> | undefined | null)[]
@@ -87,9 +86,25 @@ export default function Drawer({
 					flexDirection: "row",
 					justifyContent: "space-between",
 					padding: Spacing.m,
+					gap: Spacing.m,
 				}}
 			>
-				<SearchBar setFilterEntries={setFilterEntries} />
+				<SearchBar
+					onValueChange={(value) => {
+						const searchStr = searchFriendly(value);
+						if (searchStr) {
+							setFilterEntries(
+								() => (entry: Entry) =>
+									searchFriendlyMediaNames(entry?.media)
+										.map((s) => s.includes(searchStr))
+										.reduce((prev, curr) => prev || curr),
+							);
+						} else {
+							setFilterEntries(undefined);
+							setFilterEntries(undefined);
+						}
+					}}
+				/>
 				<TouchableWithoutFeedback onPress={toggleDrawer}>
 					<ThemedView
 						color="background"
@@ -151,75 +166,6 @@ export default function Drawer({
 					})}
 				</ScrollView>
 			</Animated.View>
-		</ThemedView>
-	);
-}
-
-function SearchBar({ setFilterEntries }: Pick<Props, "setFilterEntries">) {
-	const [searchValue, setSearchValue] = useState<string>();
-	const [clearTextVisible, setClearTextVisible] = useState(false);
-	const colors = useThemeColors();
-	const lang = useLang();
-
-	return (
-		<ThemedView
-			style={{
-				flex: 1,
-				marginRight: Spacing.m,
-				padding: Spacing.m,
-				borderRadius: Spacing.m,
-				justifyContent: "center",
-			}}
-		>
-			<TextInput
-				style={{
-					color: colors.text,
-					fontSize: TextSizes.m,
-				}}
-				placeholderTextColor={colors.text}
-				placeholder={lang.misc.searchPlaceholder}
-				value={searchValue}
-				onChange={(event) => {
-					const searchStr = searchFriendly(event.nativeEvent.text);
-					if (searchStr) {
-						setClearTextVisible(true);
-						setFilterEntries(
-							() => (entry: Entry) =>
-								searchFriendlyMediaNames(entry?.media)
-									.map((s) => s.includes(searchStr))
-									.reduce((prev, curr) => prev || curr),
-						);
-					} else {
-						setClearTextVisible(false);
-						setFilterEntries(undefined);
-					}
-				}}
-			/>
-			{clearTextVisible ? (
-				<ThemedView
-					color="text"
-					style={{
-						position: "absolute",
-						borderRadius: Spacing.xl,
-						aspectRatio: 1,
-						justifyContent: "center",
-						alignItems: "center",
-						right: Spacing.m,
-						width: TextSizes.m,
-						height: TextSizes.m,
-					}}
-					onTouchEnd={() => {
-						setFilterEntries(undefined);
-						setSearchValue("");
-						setClearTextVisible(false);
-						setTimeout(() => {
-							setSearchValue(undefined);
-						});
-					}}
-				>
-					<Icon name="xmark" color={colors.background} size={TextSizes.m} />
-				</ThemedView>
-			) : null}
 		</ThemedView>
 	);
 }
