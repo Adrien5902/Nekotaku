@@ -70,19 +70,17 @@ export default function MediaListStatusDisplay({
 	}
 
 	return (
-		<View>
-			<ThemedText style={{ flex: 1 }}>
-				{texts.flatMap((element, i) => {
-					const arr = [];
+		<ThemedText {...props} style={[props.style]}>
+			{texts.flatMap((element, i) => {
+				const arr = [];
 
-					if (i !== 0) {
-						arr.push(" • ");
-					}
-					arr.push(element);
+				if (i !== 0) {
+					arr.push(" • ");
+				}
+				arr.push(element);
 
-					return arr;
-				})}
-			</ThemedText>
-		</View>
+				return arr;
+			})}
+		</ThemedText>
 	);
 }
