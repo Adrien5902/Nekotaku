@@ -65,6 +65,18 @@ export const frFR: LangScheme = {
         }
     },
     pages: {
+        editMediaListStatus: {
+            delete: "Supprimer",
+            episodeProgress: "Progression des épisodes",
+            favorite: "Favori",
+            hidden: "Cachée sur ma liste",
+            notesPlaceHolder: "Notes...",
+            private: "Privé",
+            save: "Enregistrer",
+            score: "Score",
+            totalRewatches: "Nombre de re-visionnages",
+            deleteConfirm: "Supprimer de la liste ?"
+        },
         media: {
             details: {
                 trailer: "Trailer",
@@ -106,6 +118,7 @@ export const frFR: LangScheme = {
         }
     },
     misc: {
+        cancel: "Annuler",
         statusDisplay: {
             late: (episodes) => `${episodes} épisode${episodes > 1 ? "s" : ""} de retard`,
             nextEpIn: (shouldShowDays, days, hours, mins) => `Prochain épisode dans ${shouldShowDays

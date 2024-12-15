@@ -25,6 +25,7 @@ import { gql } from "@/types/Anilist";
 import { BooleanInput } from "./BooleanInput";
 import useModal from "@/hooks/useModal";
 import { GET_MEDIA_QUERY } from "@/types/MediaList";
+import useLang from "@/hooks/useLang";
 
 export default function EditMediaListStatus({
 	media,
@@ -133,6 +134,7 @@ function EditMediaListStatusModal({
 }: ModalProps) {
 	const colors = useThemeColors();
 	const styles = useStyles();
+	const lang = useLang();
 
 	const isFavourite = useRef(media.isFavourite);
 
@@ -178,7 +180,7 @@ function EditMediaListStatusModal({
 	}
 
 	const { modal: DeleteModal, setModalVisible: setDeleteModalVisible } =
-		useModal("Cancel");
+		useModal(lang.misc.cancel);
 
 	return (
 		<Modal
@@ -190,10 +192,10 @@ function EditMediaListStatusModal({
 			}}
 		>
 			<DeleteModal
-				title="Delete anime/manga status ?"
+				title={lang.pages.editMediaListStatus.deleteConfirm}
 				buttons={[
 					{
-						title: "Delete",
+						title: lang.pages.editMediaListStatus.delete,
 						color: "alert",
 						async onPress() {
 							await api.mutate({
@@ -235,11 +237,10 @@ function EditMediaListStatusModal({
 					</ThemedText>
 					<SelectButtons
 						checkMark={true}
-						buttons={
-							Object.values(
-								MediaListStatus,
-							) as (typeof MediaListStatus)[keyof typeof MediaListStatus][]
-						}
+						buttons={Object.values(MediaListStatus).map((status) => ({
+							key: status,
+							title: lang.Anilist.MediaListStatus[status],
+						}))}
 						defaultValue={newStatus.current.status ?? undefined}
 						onValueChange={(value) => {
 							newStatus.current.status = value;
@@ -247,7 +248,7 @@ function EditMediaListStatusModal({
 					/>
 
 					<PlusMinusNumberInput
-						tilte="Episode Progress"
+						tilte={lang.pages.editMediaListStatus.episodeProgress}
 						defaultValue={currentStatus?.progress ?? 0}
 						max={media.episodes ?? 1}
 						min={0}
@@ -257,7 +258,7 @@ function EditMediaListStatusModal({
 					/>
 
 					<PlusMinusNumberInput
-						tilte="Score"
+						tilte={lang.pages.editMediaListStatus.score}
 						defaultValue={currentStatus?.score ?? 0}
 						max={10}
 						min={0}
@@ -267,7 +268,7 @@ function EditMediaListStatusModal({
 					/>
 
 					<BooleanInput
-						title="Favourite"
+						title={lang.pages.editMediaListStatus.favorite}
 						activeIcon="heart"
 						inactiveIcon="heart-o"
 						defaultValue={media.isFavourite}
@@ -277,7 +278,7 @@ function EditMediaListStatusModal({
 					/>
 
 					<PlusMinusNumberInput
-						tilte="Total Rewatches"
+						tilte={lang.pages.editMediaListStatus.totalRewatches}
 						defaultValue={currentStatus?.repeat ?? 0}
 						max={Number.MAX_VALUE}
 						min={0}
@@ -287,7 +288,7 @@ function EditMediaListStatusModal({
 					/>
 
 					<BooleanInput
-						title="Hidden from status list"
+						title={lang.pages.editMediaListStatus.hidden}
 						defaultValue={currentStatus?.hiddenFromStatusLists ?? false}
 						onChange={(value) => {
 							newStatus.current.hiddenFromStatusLists = value;
@@ -295,7 +296,7 @@ function EditMediaListStatusModal({
 					/>
 
 					<BooleanInput
-						title="Private"
+						title={lang.pages.editMediaListStatus.private}
 						defaultValue={currentStatus?.private ?? false}
 						onChange={(value) => {
 							newStatus.current.private = value;
@@ -356,7 +357,7 @@ function EditMediaListStatusModal({
 							onChange={(e) => {
 								newStatus.current.notes = e.nativeEvent.text;
 							}}
-							placeholder="Notes..."
+							placeholder={lang.pages.editMediaListStatus.notesPlaceHolder}
 						/>
 					</View>
 					<View style={{ height: Spacing.xxl }} />
@@ -388,7 +389,7 @@ function EditMediaListStatusModal({
 								color={colors.alert}
 							/>
 							<ThemedText size="m" color="alert">
-								Delete
+								{lang.pages.editMediaListStatus.delete}
 							</ThemedText>
 						</View>
 					</TouchableOpacity>
@@ -406,7 +407,7 @@ function EditMediaListStatusModal({
 							color={colors.accent}
 						/>
 						<ThemedText size="m" color="accent">
-							Save
+							{lang.pages.editMediaListStatus.save}
 						</ThemedText>
 					</View>
 				</TouchableOpacity>

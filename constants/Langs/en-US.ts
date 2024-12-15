@@ -57,7 +57,7 @@ export const enUS: LangScheme = {
             DROPPED: "Dropped",
             PAUSED: "Paused",
             PLANNING: "Planning",
-            REPEATING: "Repeating"
+            REPEATING: "Re-watching"
         },
         MediaType: {
             ANIME: "Anime",
@@ -65,6 +65,18 @@ export const enUS: LangScheme = {
         }
     },
     pages: {
+        editMediaListStatus: {
+            delete: "Delete",
+            episodeProgress: "Episode progress",
+            favorite: "Favorite",
+            notesPlaceHolder: "Notes...",
+            private: "Private",
+            save: "Save",
+            score: "Score",
+            totalRewatches: "Total Rewatches",
+            hidden: "Hidden from status list",
+            deleteConfirm: "Delete anime/manga status ?"
+        },
         media: {
             details: {
                 trailer: "Trailer",
@@ -105,6 +117,7 @@ export const enUS: LangScheme = {
         }
     },
     misc: {
+        cancel: "Cancel",
         statusDisplay: {
             nextEpIn: (shouldShowDays, days, hours, mins) => `Next episode in ${shouldShowDays
                 ? `${days} days`

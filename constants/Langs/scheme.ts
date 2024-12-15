@@ -35,6 +35,18 @@ export interface LangScheme {
     }
 
     pages: {
+        editMediaListStatus: {
+            save: string
+            notesPlaceHolder: string
+            private: string
+            hidden: string
+            totalRewatches: string
+            favorite: string
+            score: string
+            episodeProgress: string
+            delete: string,
+            deleteConfirm: string
+        }
         downloadedEpisodes: {
             title: string,
             noDownloadedEpisodes: string
@@ -70,6 +82,7 @@ export interface LangScheme {
     }
 
     misc: {
+        cancel: string
         statusDisplay: {
             nextEpIn: (shouldShowDays: boolean, days: number, hours: number, mins: number) => string
             late: (episodes: number) => string
