@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { DefaultSettings, type Settings } from "./types";
 import * as FileSystem from "expo-file-system";
 import { usePromise } from "@/hooks/usePromise";
+import { useNetworkState } from "expo-network";
 
 const SETTINGS_FILE_NAME = "settings.json";
 const SETTINGS_LOCATION = FileSystem.documentDirectory + SETTINGS_FILE_NAME;
@@ -14,14 +15,16 @@ export const ChangeSettingsContext = createContext<
 export default function SettingsProvider({
 	children,
 }: { children: React.ReactNode }) {
+	const NetworkState = useNetworkState();
 	const { data, loading } = usePromise(async () => {
 		return JSON.parse(await FileSystem.readAsStringAsync(SETTINGS_LOCATION));
 	});
 
 	const [settings, setSettings] = useState(DefaultSettings);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		if (data) setSettings(data);
+		if (data) setSettings({ ...data, offlineMode: !NetworkState.isConnected });
 	}, [data]);
 
 	useEffect(() => {
