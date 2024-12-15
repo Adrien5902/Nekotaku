@@ -18,6 +18,7 @@ import type { MediaList } from "@/types/Anilist/graphql";
 import Cache, { CacheReadType } from "@/hooks/useCache";
 import { useCachedPromise } from "@/hooks/usePromise";
 import useLang from "@/hooks/useLang";
+import { useSettings } from "../Settings/Context";
 
 export default function EpisodesCollection({
 	media,
@@ -29,10 +30,11 @@ export default function EpisodesCollection({
 		| null;
 	progress: MediaList["progress"];
 }) {
+	const settings = useSettings();
 	const {
 		loading: loadingAnimeSama,
 		data: animeSamaData,
-		error,
+		error: errorSearch,
 		refresh: refreshAnimeSamaSearch,
 	} = useAnimeSamaSearch(media);
 
@@ -45,6 +47,7 @@ export default function EpisodesCollection({
 		data,
 		loading: loadingLangs,
 		refresh: refreshLangsAndEpisodes,
+		error: errorLangs,
 	} = useCachedPromise(
 		CacheReadType.MemoryAndIfNotDisk,
 		"langsAndEpisodes",
@@ -82,7 +85,8 @@ export default function EpisodesCollection({
 	const loading = loadingAnimeSama || loadingLangs || !selectedLang;
 	const lang = useLang();
 
-	if (error) {
+	const error = errorEpisodes || errorLangs || errorSearch;
+	if (!settings.offlineMode && error) {
 		return <ThemedText>{error?.message}</ThemedText>;
 	}
 
@@ -102,9 +106,7 @@ export default function EpisodesCollection({
 					}}
 				/>
 			) : null}
-			{errorEpisodes ? (
-				<ThemedText>{errorEpisodes.message}</ThemedText>
-			) : !loadingEpisodes && episodes ? (
+			{!loadingEpisodes && episodes ? (
 				<EpisodesList {...{ media, url, progress, episodes }} />
 			) : (
 				<ThemedText>{lang.pages.episodes.loading}</ThemedText>

@@ -18,9 +18,11 @@ import MediaRelations from "@/components/Media/MediaRelations";
 import Cache, { CacheReadType } from "@/hooks/useCache";
 import CustomTabView from "@/components/CustomTabView";
 import { GET_MEDIA_QUERY } from "@/types/MediaList";
+import { useSettings } from "@/components/Settings/Context";
 
 export default function MediaPage() {
 	const { id } = useLocalSearchParams();
+	const settings = useSettings();
 	const mediaId = Number.parseInt(id.toString());
 
 	const {
@@ -55,7 +57,7 @@ export default function MediaPage() {
 		}
 	}, [mediaData]);
 
-	if (apiError) {
+	if (!settings.offlineMode && apiError) {
 		return <ThemedText>{apiError.message}</ThemedText>;
 	}
 

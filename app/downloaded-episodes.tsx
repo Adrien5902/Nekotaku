@@ -10,6 +10,7 @@ import Cache, { CacheReadType } from "@/hooks/useCache";
 import { useSettings } from "@/components/Settings/Context";
 import NavButton from "@/components/NavButton";
 import useLang from "@/hooks/useLang";
+import { ThemedText } from "@/components/ThemedText";
 
 export default function DownloadedEpisodes() {
 	const downloader = useContext(DownloadingContext);
@@ -19,7 +20,7 @@ export default function DownloadedEpisodes() {
 		CacheReadType.MemoryAndIfNotDisk,
 		"media",
 	);
-	const { data: lists, loading: listsLoading, refetch } = listsData;
+	const { data: lists, loading: listsLoading, refetch, error } = listsData;
 
 	const networkState = useNetworkState();
 
@@ -46,6 +47,10 @@ export default function DownloadedEpisodes() {
 	);
 
 	const lang = useLang();
+
+	if (!settings.offlineMode && error) {
+		return <ThemedText>{error.message}</ThemedText>;
+	}
 
 	return (
 		<ThemedView style={{ paddingTop: Spacing.xl, flex: 1 }}>

@@ -13,6 +13,7 @@ import {
 import type { Color } from "@/constants/Colors";
 import type { VideoPlayerMedia } from "@/app/player";
 import useModal from "@/hooks/useModal";
+import { useSettings } from "./Settings/Context";
 
 export interface Props {
 	media: VideoPlayerMedia;
@@ -109,6 +110,8 @@ export default function PlayDownloadButton({
 		},
 	};
 
+	const settings = useSettings();
+
 	const { modal: Modal, setModalVisible } = useModal("Cancel");
 
 	let child: React.ReactNode;
@@ -152,7 +155,9 @@ export default function PlayDownloadButton({
 			</>
 		);
 	} else if (state === DownloadState.NotDownloaded) {
-		child = (
+		child = settings.offlineMode ? (
+			<Icon name="plane" style={styles.icon} />
+		) : (
 			<>
 				<Icon
 					onPress={async () => {

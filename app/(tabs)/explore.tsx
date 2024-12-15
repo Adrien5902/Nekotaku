@@ -6,7 +6,6 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import SearchBar from "@/components/SearchBar";
 import { useEffect, useState } from "react";
 import EntryButton from "@/components/Media/EntryButton";
-import { ThemedText } from "@/components/ThemedText";
 import type { SearchQuery } from "@/types/Anilist/graphql";
 import { gql } from "@/types/Anilist";
 import { useQuery } from "@apollo/client";

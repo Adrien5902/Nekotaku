@@ -10,6 +10,7 @@ import { useState } from "react";
 import Drawer from "@/components/Drawer";
 import { Spacing } from "@/constants/Sizes";
 import BigTitle from "@/components/BigTitle";
+import { useSettings } from "@/components/Settings/Context";
 
 export type Entry = NonNullable<
 	NonNullable<MediaCollectionData[number]>["entries"]
@@ -19,13 +20,15 @@ export default function ListScreen() {
 	const { listsData } = useToggle();
 	const { data: lists, error, loading, refetch } = listsData;
 
+	const settings = useSettings();
+
 	const [listStatus, setListStatus] = useState<number>(0);
 	const [filterEntries, setFilterEntries] =
 		useState<(entry: Entry) => boolean>();
 
 	const list =
 		lists && listStatus !== undefined ? lists[listStatus] : undefined;
-	if (error) {
+	if (!settings.offlineMode && error) {
 		return (
 			<ThemedView
 				style={{ flex: 1, justifyContent: "center", alignItems: "center" }}

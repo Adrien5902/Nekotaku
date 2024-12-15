@@ -57,6 +57,7 @@ export function useCachedPromise<T extends CacheKey>(readType: CacheReadType, ke
             const res = await fn()
             if (res !== undefined) {
                 dataRef.current = res
+                Cache.write(readType, key, deps, res, false)
                 setLoading(false)
             }
             return true
