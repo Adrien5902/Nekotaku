@@ -18,7 +18,6 @@ import MediaRelations from "@/components/Media/MediaRelations";
 import Cache, { CacheReadType } from "@/hooks/useCache";
 import CustomTabView from "@/components/CustomTabView";
 import { GET_MEDIA_QUERY } from "@/types/MediaList";
-import { View } from "react-native";
 
 export default function MediaPage() {
 	const { id } = useLocalSearchParams();

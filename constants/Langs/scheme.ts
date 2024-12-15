@@ -1,5 +1,5 @@
 import type { ColorTheme, Lang } from "@/components/Settings/types"
-import type { MediaFormat, MediaListStatus, MediaSeason, MediaSource, MediaStatus, MediaType } from "@/types/Anilist/graphql"
+import type { MediaFormat, MediaListStatus, MediaRelation, MediaSeason, MediaSource, MediaStatus, MediaType } from "@/types/Anilist/graphql"
 
 export enum CountryOfOrigin {
     Japan = "JP",
@@ -10,6 +10,9 @@ export enum CountryOfOrigin {
 
 export interface LangScheme {
     Anilist: {
+        MediaRelation: {
+            [key in MediaRelation]: string
+        }
         MediaDuration: (hours: number, minutes: number) => string
         MediaSeason: {
             [key in MediaSeason]: string
@@ -35,6 +38,10 @@ export interface LangScheme {
     }
 
     pages: {
+        episodes: {
+            episode: (n: number) => string,
+            loading: string
+        }
         editMediaListStatus: {
             save: string
             notesPlaceHolder: string
@@ -82,6 +89,7 @@ export interface LangScheme {
     }
 
     misc: {
+        searchPlaceholder: string
         cancel: string
         statusDisplay: {
             nextEpIn: (shouldShowDays: boolean, days: number, hours: number, mins: number) => string

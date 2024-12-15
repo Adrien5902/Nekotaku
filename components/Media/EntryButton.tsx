@@ -25,6 +25,7 @@ import { gql } from "@/types/Anilist";
 import { useEffect, useState } from "react";
 import { QUERY as MEDIA_LISTS_QUERY } from "../ToggleContext";
 import { autoUpdateMediaListByProgress } from "@/types/MediaList";
+import useLang from "@/hooks/useLang";
 
 const ADD_ONE_PROGRESS_MUTATION = gql(`
 mutation AddOneProgress($progress: Int, $status: MediaListStatus, $mediaId: Int) {
@@ -63,6 +64,8 @@ function EntryButton({
 		setMediaList(defaultMediaList);
 	}, [defaultMediaList]);
 
+	const lang = useLang();
+
 	return (
 		<TouchableOpacity
 			onPress={() => {
@@ -88,7 +91,7 @@ function EntryButton({
 						{relationType ? (
 							<>
 								<ThemedText color="accent" numberOfLines={1}>
-									{relationType}
+									{lang.Anilist.MediaRelation[relationType]}
 								</ThemedText>
 								<ThemedText numberOfLines={1}> • </ThemedText>
 							</>

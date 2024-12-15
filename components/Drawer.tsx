@@ -19,6 +19,7 @@ import {
 	searchFriendly,
 	searchFriendlyMediaNames,
 } from "@/hooks/useAnimeSamaSearch";
+import useLang from "@/hooks/useLang";
 
 type ListsType =
 	| (Pick<MediaListGroup, "name" | "status"> | undefined | null)[]
@@ -158,6 +159,7 @@ function SearchBar({ setFilterEntries }: Pick<Props, "setFilterEntries">) {
 	const [searchValue, setSearchValue] = useState<string>();
 	const [clearTextVisible, setClearTextVisible] = useState(false);
 	const colors = useThemeColors();
+	const lang = useLang();
 
 	return (
 		<ThemedView
@@ -175,7 +177,7 @@ function SearchBar({ setFilterEntries }: Pick<Props, "setFilterEntries">) {
 					fontSize: TextSizes.m,
 				}}
 				placeholderTextColor={colors.text}
-				placeholder="Search..."
+				placeholder={lang.misc.searchPlaceholder}
 				value={searchValue}
 				onChange={(event) => {
 					const searchStr = searchFriendly(event.nativeEvent.text);

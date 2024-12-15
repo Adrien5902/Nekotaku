@@ -17,6 +17,7 @@ import {
 import type { MediaList } from "@/types/Anilist/graphql";
 import Cache, { CacheReadType } from "@/hooks/useCache";
 import { useCachedPromise } from "@/hooks/usePromise";
+import useLang from "@/hooks/useLang";
 
 export default function EpisodesCollection({
 	media,
@@ -53,14 +54,18 @@ export default function EpisodesCollection({
 	const langs = data?.langs;
 	const customEpisodesData = data?.customEpisodes;
 
-	const [lang, setLang] = useState<keyof typeof Lang | null>(null);
+	const [selectedLang, setLang] = useState<keyof typeof Lang | null>(null);
 
 	const {
 		data: episodes,
 		loading: loadingEpisodes,
 		error: errorEpisodes,
 		refresh: refreshAnimeSamaGetLecteurs,
-	} = useAnimeSamaGetEpisodes(url ?? undefined, lang, customEpisodesData);
+	} = useAnimeSamaGetEpisodes(
+		url ?? undefined,
+		selectedLang,
+		customEpisodesData,
+	);
 
 	useEffect(() => {
 		if (langs) {
@@ -74,7 +79,8 @@ export default function EpisodesCollection({
 		refreshAnimeSamaGetLecteurs();
 	}
 
-	const loading = loadingAnimeSama || loadingLangs || !lang;
+	const loading = loadingAnimeSama || loadingLangs || !selectedLang;
+	const lang = useLang();
 
 	if (error) {
 		return <ThemedText>{error?.message}</ThemedText>;
@@ -90,7 +96,7 @@ export default function EpisodesCollection({
 			{!loading ? (
 				<SelectButtons
 					buttons={langs?.map((lang) => lang) ?? []}
-					defaultValue={lang}
+					defaultValue={selectedLang}
 					onValueChange={(value) => {
 						setLang(value as keyof typeof Lang);
 					}}
@@ -99,9 +105,9 @@ export default function EpisodesCollection({
 			{errorEpisodes ? (
 				<ThemedText>{errorEpisodes.message}</ThemedText>
 			) : !loadingEpisodes && episodes ? (
-				<EpisodesList {...{ media, url, lang, progress, episodes }} />
+				<EpisodesList {...{ media, url, progress, episodes }} />
 			) : (
-				<ThemedText>Retrieving episodes...</ThemedText>
+				<ThemedText>{lang.pages.episodes.loading}</ThemedText>
 			)}
 			<View style={{ height: Spacing.l * 3 }} />
 		</ScrollView>
@@ -165,6 +171,7 @@ function EpisodeButton({
 		media?.id ?? 0,
 		episode.id,
 	]);
+	const lang = useLang();
 
 	return (
 		<ThemedView
@@ -190,7 +197,7 @@ function EpisodeButton({
 				>
 					{typeof episode.name === "string"
 						? episode.name
-						: `Épisode ${episode.name}`}
+						: lang.pages.episodes.episode(episode.name)}
 				</ThemedText>
 				{media ? (
 					<PlayDownloadButton

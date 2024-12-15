@@ -2,6 +2,21 @@ import type { LangScheme } from "./scheme";
 
 export const enUS: LangScheme = {
     Anilist: {
+        MediaRelation: {
+            ADAPTATION: "Adaptation",
+            ALTERNATIVE: "Alternative",
+            CHARACTER: "Character",
+            COMPILATION: "Compilation",
+            CONTAINS: "Contains",
+            OTHER: "Other",
+            PARENT: "Parent",
+            PREQUEL: "Prequel",
+            SEQUEL: "Sequel",
+            SIDE_STORY: "Side Story",
+            SOURCE: "Source",
+            SPIN_OFF: "Spin Off",
+            SUMMARY: "Summary"
+        },
         MediaDuration: (hours, minutes) => `${hours ? `${hours}h` : ""} ${minutes} min`,
         MediaSeason: {
             FALL: "Fall",
@@ -65,6 +80,10 @@ export const enUS: LangScheme = {
         }
     },
     pages: {
+        episodes: {
+            episode: (n: number) => `Episode ${n}`,
+            loading: "Retrieving episodes..."
+        },
         editMediaListStatus: {
             delete: "Delete",
             episodeProgress: "Episode progress",
@@ -117,6 +136,7 @@ export const enUS: LangScheme = {
         }
     },
     misc: {
+        searchPlaceholder: "Search...",
         cancel: "Cancel",
         statusDisplay: {
             nextEpIn: (shouldShowDays, days, hours, mins) => `Next episode in ${shouldShowDays
