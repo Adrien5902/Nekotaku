@@ -10,7 +10,7 @@ export const frFR: LangScheme = {
             CONTAINS: "Contient",
             OTHER: "Autre",
             PARENT: "Issu de",
-            PREQUEL: "Précédant",
+            PREQUEL: "Précédent",
             SEQUEL: "Suivant",
             SIDE_STORY: "Histoire secondaire",
             SOURCE: "Source",
