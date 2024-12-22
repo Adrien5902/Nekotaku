@@ -1,7 +1,8 @@
 import { MediaStatus, type Media, type MediaTitle } from "@/types/Anilist/graphql";
 import { DOMParser } from 'react-native-html-parser';
-import Cache, { CacheReadType } from "./useCache";
+import { CacheReadType } from "./useCache";
 import { useCachedPromise } from "./usePromise";
+import { distance } from 'fastest-levenshtein';
 
 interface SeasonData {
     season: number;
@@ -79,9 +80,23 @@ export async function search(query: string) {
     return parseSearchResultFromHTML(await searchResultHTML(query))
 }
 
-export async function searchExactMatch(query: string) {
-    const results = await search(query);
-    return results.find(s => searchFriendly(s.title) === query || s.subtitles.map(st => searchFriendly(st).includes(query)))
+export async function searchBestMatch(query: string) {
+    const search_friendly_query = query;
+    const results = await search(search_friendly_query);
+    const result = results.reduce((prev, curr) => {
+        const title_dist = distance(searchFriendly(curr.title), search_friendly_query);
+        const subtitles_dist = curr.subtitles.map(subtitle => distance(searchFriendly(subtitle), search_friendly_query))
+
+        const smallest_dist = Math.min(title_dist, ...subtitles_dist);
+
+        if (prev?.[1] !== undefined && prev[1] < smallest_dist) {
+            return prev
+        }
+
+        return [curr, smallest_dist] as [SearchResult, number]
+
+    }, null as [SearchResult, number] | null)
+    return result?.[0]
 }
 
 function getSeasonFromString(s: string): ApplyTitleResult<SeasonData> | null {
@@ -152,24 +167,26 @@ interface ApplyTitleResult<T> { newString: string, data: T };
 type ApplyTitle<T> = (s: string) => ApplyTitleResult<T> | null;
 async function searchTitles<T>(media: AnimeSamaSearchMediaType, apply?: ApplyTitle<T>): Promise<AnimeSamaSearch<T> | undefined> {
     for (const synonym of searchFriendlyMediaNames(media)) {
-        const { newString, ...data } = apply ? apply(synonym) ?? { newString: null } : { newString: synonym };
-        if (!newString) {
-            continue
-        }
+        if (synonym) {
+            const { newString, data } = apply ? apply(synonym) ?? { newString: null } : { newString: synonym };
+            if (!newString) {
+                continue
+            }
 
-        const result = await searchExactMatch(searchFriendly(newString.split(":")[0]))
-        if (result) {
-            return { result, ...data }
+            const result = await searchBestMatch(newString.trim())
+            if (result) {
+                return { result, data }
+            }
         }
     }
 }
 
 export function mediaNames(media: AnimeSamaSearchMediaType) {
-    return [[media?.title?.romaji, media?.title?.english], media?.synonyms].flat()
+    return [[media?.title?.english ?? undefined, media?.title?.english?.split(":")[0] ?? undefined, media?.title?.romaji ?? undefined], media?.synonyms].flat()
 }
 
 export function searchFriendlyMediaNames(media: AnimeSamaSearchMediaType) {
-    return mediaNames(media).map(s => searchFriendly(s ?? ""))
+    return mediaNames(media).map(s => s ? searchFriendly(s) : undefined)
 }
 
 export async function searchMedia(media: AnimeSamaSearchMediaType) {
@@ -186,8 +203,8 @@ export async function searchMedia(media: AnimeSamaSearchMediaType) {
     return searchResult
 }
 
-export function searchFriendly(s: string) {
-    return s.trim().replaceAll("-", "").toLowerCase()
+export function searchFriendly(s?: string) {
+    return s?.trim().replaceAll("-", "").toLowerCase() ?? ""
 }
 
 export interface AnimeSamaSearch<T> {
