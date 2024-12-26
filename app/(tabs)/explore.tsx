@@ -1,4 +1,4 @@
-import { RefreshControl, View, VirtualizedList } from "react-native";
+import { RefreshControl, VirtualizedList } from "react-native";
 import { useToggle } from "../../components/ToggleContext";
 import { ThemedView } from "@/components/ThemedView";
 import { Spacing } from "@/constants/Sizes";
@@ -45,6 +45,12 @@ fragment EntryButton on Media {
 	nextAiringEpisode {
 		episode
 		timeUntilAiring
+	}
+	mediaListEntry{
+		status 
+		progress
+		repeat 
+		score
 	}
 }
 `);
@@ -94,7 +100,10 @@ export default function ExploreScreen() {
 				refreshControl={<RefreshControl refreshing={loading} />}
 				refreshing={loading}
 				renderItem={({ item }) => (
-					<EntryButton media={item as (typeof bucket)[number]} />
+					<EntryButton
+						media={item as (typeof bucket)[number]}
+						mediaList={(item as (typeof bucket)[number])?.mediaListEntry}
+					/>
 				)}
 				getItem={(_data, index) => bucket[index]}
 				getItemCount={() => bucket.length}
