@@ -44,19 +44,20 @@ export const supportedLecteurs: Record<string, (url: string) => [Promise<string>
             "Referer": url,
         }
 
-        return [new Promise((resolve) => {
-            (async () => {
-                const response = await fetch(url);
-                const html = await response.text();
+        return [(async () => {
+            const response = await fetch(url, { headers });
+            const html = await response.text();
 
-                const videoSrcMatch = html.match(/player\.src\(\[\{src: "(.*?)",/);
-                if (!videoSrcMatch)
-                    throw new Error("Video source not found in JavaScript.");
+            const videoSrcMatch = html.match(/player\.src\(\[\{src: "(.*?)",/);
+            if (!videoSrcMatch)
+                throw new Error("Video source not found in JavaScript.");
 
-                const videoPath = videoSrcMatch[1];
-                const fullVideoUrl = `https://video.sibnet.ru${videoPath}`;
+            const videoPath = videoSrcMatch[1];
+            const fullVideoUrl = `https://video.sibnet.ru${videoPath}`;
 
-                const request = new XMLHttpRequest();
+            const request = new XMLHttpRequest();
+
+            return await new Promise((resolve) => {
                 const listener = () => {
                     if (request.responseURL) {
                         request.removeEventListener("readystatechange", listener);
@@ -71,8 +72,8 @@ export const supportedLecteurs: Record<string, (url: string) => [Promise<string>
                     request.setRequestHeader(headersKeys[i], headers[headersKeys[i]])
                 }
                 request.send();
-            })()
-        }), headers]
+            })
+        })(), headers]
     },
     "sendvid.com": (url: string) => {
         return [(async () => {
