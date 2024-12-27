@@ -155,6 +155,11 @@ export default function Player({
 		}
 	}, [videoUri, remoteMediaClient]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	useEffect(() => {
+		savePos();
+	}, [videoUri]);
+
 	const playerRef = useRef<PlayerFunctions>();
 	const statusRef = useRef<VideoPlayStatus>({
 		isPlaying: false,
