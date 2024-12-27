@@ -6,7 +6,7 @@ import {
 	useCastDevice,
 	type RemoteMediaClient,
 } from "react-native-google-cast";
-import type { Episode } from "@/types/AnimeSama";
+import type { Episode, Lecteur } from "@/types/AnimeSama";
 import useStyles from "@/hooks/useStyles";
 import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
 import { usePromise } from "@/hooks/usePromise";
@@ -18,25 +18,26 @@ export default function CastControls({
 	isFullscreen,
 	media,
 	setIsLoadingVid,
-	loadingVid,
+	isLoadingVid,
 	statusRef,
 	playerRef,
+	selectedLecteur,
 }: {
 	media: RemoteMediaClient | null;
 	episode: Episode;
 	isFullscreen: boolean;
 	setIsLoadingVid: React.Dispatch<React.SetStateAction<boolean>>;
-	loadingVid: boolean;
+	isLoadingVid: boolean;
 	playerRef: React.MutableRefObject<PlayerFunctions | undefined>;
 	statusRef: React.MutableRefObject<VideoPlayStatus>;
+	selectedLecteur?: Lecteur;
 }) {
 	const styles = useStyles();
-	const videoSource = episode.url;
 	const {
 		data: videoUri,
 		loading,
 		error,
-	} = usePromise(() => getVideoUri(videoSource)[0], [episode.id]);
+	} = usePromise(() => getVideoUri(selectedLecteur)[0], [episode.id]);
 
 	const device = useCastDevice();
 
@@ -56,7 +57,7 @@ export default function CastControls({
 					if (currentStatus?.playerState) {
 						switch (currentStatus.playerState) {
 							case MediaPlayerState.PLAYING:
-								if (loadingVid) {
+								if (isLoadingVid) {
 									setIsLoadingVid(false);
 								}
 								statusRef.current.isPlaying = true;
@@ -65,7 +66,7 @@ export default function CastControls({
 								setIsLoadingVid(true);
 								break;
 							case MediaPlayerState.PAUSED:
-								if (loadingVid) {
+								if (isLoadingVid) {
 									setIsLoadingVid(false);
 								}
 								statusRef.current.isPlaying = false;

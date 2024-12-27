@@ -136,7 +136,7 @@ export interface CacheKeys {
     animeSamaEpisodes: { data: Episode[], deps: [keyof typeof Lang | null, string | undefined, number | undefined, boolean | undefined, AnimeSamaMediaType | undefined] }
     media: { data: MediaQuery["Media"], deps: [Media["id"]] }
     aniskip: { data: AniskipData["results"] | null, deps: [Media["id"], EpisodeId, number | undefined] }
-    videoUri: { data: string, deps: [Media["id"], Episode["id"]] }
+    videoUri: { data: string, deps: [Media["id"], Episode["id"], Lecteur["url"]] }
 }
 
 export enum CacheReadType {

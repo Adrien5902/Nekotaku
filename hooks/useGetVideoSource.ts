@@ -1,44 +1,50 @@
-import type { Episode } from "@/types/AnimeSama";
+import type { EpisodeId, Lecteur } from "@/types/AnimeSama";
 import type { Downloader } from "@/components/DownloadingContext";
 import { useCachedPromise } from "./usePromise";
 import { CacheReadType } from "./useCache";
 
-export function useGetVideoSource(downloadingContext: Downloader, mediaId: number, episode: Episode | undefined) {
+export function useGetVideoSource(downloadingContext: Downloader, mediaId: number, episodeId: EpisodeId | undefined, selectedLecteur?: Lecteur) {
+    if (!selectedLecteur) {
+        throw new Error("Lecteur not selected")
+    }
+
     return useCachedPromise(CacheReadType.Memory, "videoUri", () => {
-        if (!episode) {
+        if (episodeId === undefined) {
             throw new Error("Episode not found")
         }
 
-        if (downloadingContext.downloadedEpisodes[mediaId]?.includes(episode.id ?? 0)) {
-            return downloadingContext.getDownloadedEpisodeFileUri(mediaId, episode.id ?? 0)
+        if (downloadingContext.downloadedEpisodes[mediaId]?.includes(episodeId ?? 0)) {
+            return downloadingContext.getDownloadedEpisodeFileUri(mediaId, episodeId ?? 0)
         }
 
-        return getVideoUri(episode)[0]
+        return getVideoUri(selectedLecteur)[0]
     },
-        [mediaId, episode?.id ?? 0]
+        [mediaId, episodeId ?? 0, selectedLecteur.url]
     );
 };
 
-export function getVideoUri(episode: Episode): [Promise<string>, Record<string, string>] {
-    const supportedLecteursName = Object.keys(supportedLecteurs)
-    let foundSupportedLecteur: undefined | string = undefined;
-    const foundEpisodeLecteur = episode.lecteurs.find(l => {
-        const lName = supportedLecteursName.find(lName => l.hostname.includes(lName))
-        if (lName) {
-            foundSupportedLecteur = lName
-        }
-        return lName
-    })
+export function getVideoUri(selectedLecteur?: Lecteur): [Promise<string>, Record<string, string>] {
+    if (selectedLecteur) {
+        const supportedLecteursName = Object.keys(supportedLecteurs) as SupportedLecteurs[]
+        const supportedLecteur = supportedLecteursName.find((l) => selectedLecteur?.hostname.includes(l));
 
-    if (foundSupportedLecteur && foundEpisodeLecteur) {
-        const getVideoFn = supportedLecteurs[foundSupportedLecteur]
-        return getVideoFn(foundEpisodeLecteur.url)
+        if (supportedLecteur) {
+            const getVideoFn = supportedLecteurs[supportedLecteur]
+            return getVideoFn(selectedLecteur.url)
+        }
     }
 
     throw new Error("Lecteur not supported")
 }
 
-export const supportedLecteurs: Record<string, (url: string) => [Promise<string>, Record<string, string>]> = {
+/**
+ * @param url the url of the episode 
+ * @returns [a promise which resolves into the url of the video, the headers that should be used when fetching the video] 
+ */
+export type GetVideoSourceFromLecteurFunc = (url: string) => [Promise<string>, Record<string, string>]
+export type SupportedLecteurs = "sibnet.ru" | "sendvid.com"
+
+export const supportedLecteurs: Record<SupportedLecteurs, GetVideoSourceFromLecteurFunc> = {
     "sibnet.ru": (url: string) => {
         const headers: Record<string, string> = {
             "Referer": url,

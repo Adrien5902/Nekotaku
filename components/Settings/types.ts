@@ -1,3 +1,4 @@
+import type { SupportedLecteurs } from "@/hooks/useGetVideoSource"
 import { MediaType } from "@/types/Anilist/graphql"
 
 export interface Settings {
@@ -5,6 +6,7 @@ export interface Settings {
     lang: Lang
     offlineMode: boolean
     defaultMode: MediaType
+    preferredLecteur: SupportedLecteurs
 }
 
 export enum ColorTheme {
@@ -22,5 +24,6 @@ export const DefaultSettings: Settings = {
     colorTheme: ColorTheme.System,
     lang: Lang.Français,
     offlineMode: false,
-    defaultMode: MediaType.Anime
+    defaultMode: MediaType.Anime,
+    preferredLecteur: "sendvid.com"
 }

@@ -1,8 +1,7 @@
-import { useGetVideoSource } from "@/hooks/useGetVideoSource";
 import { useLocalSearchParams } from "expo-router";
 import * as ScreenOrientation from "expo-screen-orientation";
 import type React from "react";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, ScrollView } from "react-native";
 import * as NavigationBar from "expo-navigation-bar";
 import * as StatusBar from "expo-status-bar";
@@ -10,7 +9,6 @@ import Player from "@/components/Player/Player";
 import { ThemedView } from "@/components/ThemedView";
 import { EpisodesList } from "@/components/Media/Episodes";
 import type { Episode } from "@/types/AnimeSama";
-import { DownloadingContext } from "@/components/DownloadingContext";
 import type { Media, MediaList, MediaTitle } from "@/types/Anilist/graphql";
 import { AspectRatios, Spacing } from "@/constants/Sizes";
 import { ThemedText } from "@/components/ThemedText";
@@ -35,16 +33,7 @@ const VideoPlayer = () => {
 		(e) => e.id === Number.parseInt(episodeIdParam),
 	);
 
-	const downloadingContext = useContext(DownloadingContext);
-	const {
-		loading: isGetVideoSourceLoading,
-		data: videoUri,
-		error,
-	} = useGetVideoSource(downloadingContext, media?.id ?? 0, episode);
 	const [isFullscreen, setIsFullscreen] = useState(false);
-	const [isLoadingVid, setIsLoadingVid] = useState(true);
-
-	const loading = isLoadingVid || isGetVideoSourceLoading;
 
 	useEffect(() => {
 		ScreenOrientation.unlockAsync();
@@ -95,7 +84,7 @@ const VideoPlayer = () => {
 		setIsFullscreen(fullscreen);
 	};
 
-	return (loading || videoUri) && episode ? (
+	return episode ? (
 		<ThemedView
 			style={{
 				flex: 1,
@@ -108,13 +97,9 @@ const VideoPlayer = () => {
 				{...{
 					isFullscreen,
 					setIsFullscreen,
-					loading,
 					episode,
 					toggleFullscreen,
-					videoUri,
-					setIsLoadingVid,
 					media,
-					error,
 				}}
 				key={episode.id}
 			/>

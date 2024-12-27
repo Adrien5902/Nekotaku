@@ -1,8 +1,8 @@
 import { AppState, View } from "react-native";
 import Controls, { type Props as ControlsProps } from "./Controls";
 import { type AVPlaybackStatusSuccess, ResizeMode, Video } from "expo-av";
-import { useEffect, useRef, useState } from "react";
-import type { Episode } from "@/types/AnimeSama";
+import { useContext, useEffect, useRef, useState } from "react";
+import type { Episode, Lecteur } from "@/types/AnimeSama";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import {
 	Directions,
@@ -20,30 +20,58 @@ import useModal from "@/hooks/useModal";
 import Slider from "@react-native-community/slider";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { SelectButtons } from "../SelectButtons";
+import {
+	supportedLecteurs,
+	useGetVideoSource,
+} from "@/hooks/useGetVideoSource";
+import { useSettings } from "../Settings/Context";
+import { DownloadingContext } from "../DownloadingContext";
+import type React from "react";
 
 interface Props {
 	isFullscreen: boolean;
-	loading: boolean;
 	episode: Episode;
 	media: ControlsProps["media"];
 	toggleFullscreen: (force?: boolean) => void;
-	setIsLoadingVid: React.Dispatch<React.SetStateAction<boolean>>;
-	videoUri?: string;
-	error?: Error;
 }
 
 export default function Player({
 	isFullscreen,
-	loading,
 	episode,
 	media,
 	toggleFullscreen,
-	setIsLoadingVid,
-	videoUri,
-	error,
 }: Props) {
 	const videoPlayerRef = useRef<Video>(null);
 	const styles = useStyles();
+
+	const settings = useSettings();
+
+	const [selectedLecteur, setSelectedLecteur] = useState(
+		episode?.lecteurs.find(
+			(l) =>
+				l.hostname.includes(settings.preferredLecteur) &&
+				Object.keys(supportedLecteurs).find((l2) => l.hostname.includes(l2)),
+		) ??
+			episode?.lecteurs.find((l) =>
+				Object.keys(supportedLecteurs).find((l2) => l.hostname.includes(l2)),
+			),
+	);
+
+	const downloadingContext = useContext(DownloadingContext);
+	const {
+		loading: isGetVideoSourceLoading,
+		data: videoUri,
+		error: errorGetVideoSource,
+	} = useGetVideoSource(
+		downloadingContext,
+		media?.id ?? 0,
+		episode?.id,
+		selectedLecteur,
+	);
+
+	const [isLoadingVid, setIsLoadingVid] = useState(true);
+
+	const loading = isLoadingVid || isGetVideoSourceLoading;
 
 	async function savePos() {
 		// Do not save if position or duration is 0
@@ -134,91 +162,112 @@ export default function Player({
 	const { modal: Modal, setModalVisible } = useModal("Close");
 	const playbackSpeedRef = useRef(1);
 
+	const error = selectedLecteur
+		? errorGetVideoSource
+		: new Error("Lecteur not supported");
+
 	return (
-		<GestureDetector gesture={gesture}>
-			<View>
-				<Controls
+		<>
+			<Modal>
+				<PlayerSettings
 					{...{
-						setModalVisible,
-						isFullscreen,
-						playerRef,
-						statusRef,
-						loading,
 						episode,
-						toggleFullscreen,
-						media,
+						playbackSpeedRef,
+						playerRef,
+						selectedLecteur,
+						setSelectedLecteur,
 					}}
-					forceView={!!googleCastMedia}
 				/>
-
-				<Modal>
-					<PlayerSettings
-						playerRef={playerRef}
-						playbackSpeedRef={playbackSpeedRef}
+			</Modal>
+			<GestureDetector gesture={gesture}>
+				<View>
+					<Controls
+						{...{
+							setModalVisible,
+							isFullscreen,
+							playerRef,
+							statusRef,
+							loading,
+							episode,
+							toggleFullscreen,
+							media,
+						}}
+						forceView={!!googleCastMedia}
 					/>
-				</Modal>
-				{!error ? (
-					!googleCastMedia ? (
-						<Video
-							style={{
-								...(isFullscreen ? styles.fullscreenVideo : styles.video),
-								zIndex: -1,
-								backgroundColor: "#000",
-							}}
-							source={videoUri ? { uri: videoUri } : undefined}
-							ref={videoPlayerRef}
-							shouldPlay
-							resizeMode={ResizeMode.CONTAIN}
-							positionMillis={startPos?.positionMillis ?? 0}
-							onPlaybackStatusUpdate={(s) => {
-								const status = s as AVPlaybackStatusSuccess;
-								statusRef.current = status;
+					{!error ? (
+						!googleCastMedia ? (
+							<Video
+								style={{
+									...(isFullscreen ? styles.fullscreenVideo : styles.video),
+									zIndex: -1,
+									backgroundColor: "#000",
+								}}
+								source={videoUri ? { uri: videoUri } : undefined}
+								ref={videoPlayerRef}
+								shouldPlay
+								resizeMode={ResizeMode.CONTAIN}
+								positionMillis={startPos?.positionMillis ?? 0}
+								onPlaybackStatusUpdate={(s) => {
+									const status = s as AVPlaybackStatusSuccess;
+									statusRef.current = status;
 
-								if (!isAwake.current && status.isPlaying) {
-									activateKeepAwakeAsync();
-									isAwake.current = true;
-								} else if (isAwake.current && !status.isPlaying) {
-									deactivateKeepAwake();
-									isAwake.current = false;
-								}
-							}}
-							onLoad={() => {
-								videoPlayerRef.current?.setPositionAsync(
-									startPos?.positionMillis ?? 0,
-								);
-								setIsLoadingVid(false);
-							}}
-						/>
+									if (!isAwake.current && status.isPlaying) {
+										activateKeepAwakeAsync();
+										isAwake.current = true;
+									} else if (isAwake.current && !status.isPlaying) {
+										deactivateKeepAwake();
+										isAwake.current = false;
+									}
+								}}
+								onLoad={() => {
+									videoPlayerRef.current?.setPositionAsync(
+										startPos?.positionMillis ?? 0,
+									);
+									setIsLoadingVid(false);
+								}}
+							/>
+						) : (
+							<CastControls
+								{...{
+									episode,
+									isFullscreen,
+									isLoadingVid,
+									playerRef,
+									selectedLecteur,
+									setIsLoadingVid,
+									statusRef,
+								}}
+								media={googleCastMedia}
+							/>
+						)
 					) : (
-						<CastControls
-							setIsLoadingVid={setIsLoadingVid}
-							episode={episode}
-							isFullscreen={isFullscreen}
-							media={googleCastMedia}
-							loadingVid={loading}
-							statusRef={statusRef}
-							playerRef={playerRef}
-						/>
-					)
-				) : (
-					<ThemedView
-						style={[
-							styles.video,
-							{ zIndex: 10, justifyContent: "center", alignItems: "center" },
-						]}
-					>
-						<ThemedText>Error : {error.message}</ThemedText>
-					</ThemedView>
-				)}
-			</View>
-		</GestureDetector>
+						<ThemedView
+							style={[
+								styles.video,
+								{ zIndex: 10, justifyContent: "center", alignItems: "center" },
+							]}
+						>
+							<ThemedText>Error : {error.message}</ThemedText>
+						</ThemedView>
+					)}
+				</View>
+			</GestureDetector>
+		</>
 	);
 }
 
 function PlayerSettings({
+	episode,
 	playerRef,
 	playbackSpeedRef,
+	selectedLecteur,
+	setSelectedLecteur,
 }: {
+	selectedLecteur: Lecteur | undefined;
+	setSelectedLecteur:
+		| React.Dispatch<React.SetStateAction<Lecteur | undefined>>
+		| undefined;
+	episode: Episode;
 	playerRef: React.MutableRefObject<PlayerFunctions | undefined>;
 	playbackSpeedRef: React.MutableRefObject<number>;
 }) {
@@ -260,6 +309,28 @@ function PlayerSettings({
 					playerRef.current?.setPlaybackSpeedAsync(n);
 					playbackSpeedRef.current = n;
 					setPlaybackSpeed(n);
+				}}
+			/>
+
+			<ThemedText size="m">Selected Lecteur :</ThemedText>
+			<SelectButtons
+				buttons={episode.lecteurs
+					.filter(
+						(l, i) =>
+							episode.lecteurs.findIndex((l2) => l2.hostname === l.hostname) ===
+								i &&
+							Object.keys(supportedLecteurs).find((l2) =>
+								l.hostname.includes(l2),
+							),
+					)
+					.map((l) => ({
+						key: l.id.toString(),
+						title: l.hostname,
+					}))}
+				defaultValue={selectedLecteur?.id.toString()}
+				onValueChange={(value) => {
+					if (setSelectedLecteur)
+						setSelectedLecteur(episode.lecteurs[Number.parseInt(value) - 1]);
 				}}
 			/>
 		</View>
