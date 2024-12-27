@@ -52,7 +52,7 @@ export function SelectButtons<T extends string>({
 
 				const buttonStyle2 = [
 					buttonStyle ?? {
-						marginHorizontal: Spacing.m,
+						marginHorizontal: Spacing.s,
 						marginBottom: Spacing.m,
 						padding: Spacing.m,
 						borderRadius: Spacing.s,

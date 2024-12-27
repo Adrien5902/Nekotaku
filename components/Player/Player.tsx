@@ -304,7 +304,7 @@ function PlayerSettings({
 			/>
 
 			<SelectButtons
-				buttons={[0.5, 1, 1.5, 2].map((n) => ({
+				buttons={[0.5, 1, 1.25, 1.5, 1.75, 2].map((n) => ({
 					key: n.toString(),
 					title: `x${n}`,
 				}))}
