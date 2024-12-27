@@ -211,6 +211,11 @@ export default function Player({
 									const status = s as AVPlaybackStatusSuccess;
 									statusRef.current = status;
 
+									if (status.playableDurationMillis)
+										setIsLoadingVid(
+											status.playableDurationMillis <= status.positionMillis,
+										);
+
 									if (!isAwake.current && status.isPlaying) {
 										activateKeepAwakeAsync();
 										isAwake.current = true;
