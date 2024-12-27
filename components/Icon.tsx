@@ -4,6 +4,8 @@ import type { FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
 import {
 	Animated,
 	TouchableWithoutFeedback,
+	type TextStyle,
+	type ViewStyle,
 	type ColorValue,
 } from "react-native";
 import { TextSizes } from "@/constants/Sizes";
@@ -12,11 +14,12 @@ import { PlayDownloadedButton } from "@/assets/icons/PlayDownloaded";
 
 export type IconName = FontAwesomeIconProps["icon"];
 
-interface Props<T> extends SvgProps {
-	name: IconName | T;
+interface Props extends SvgProps {
+	name: IconName | keyof typeof customIcons;
 	source?: string;
 	size?: number;
 	color?: ColorValue;
+	style?: TextStyle | ViewStyle;
 }
 
 const customIcons = {
@@ -33,7 +36,7 @@ export default function Icon({
 	color,
 	onPress,
 	...props
-}: Props<keyof typeof customIcons>) {
+}: Props) {
 	const colors = useThemeColors();
 
 	const CustomIcon = customIcons[name as keyof typeof customIcons];
@@ -74,7 +77,7 @@ export function AnimatedIcon({
 	color,
 	onPress,
 	...props
-}: Props<never>) {
+}: Props) {
 	const colors = useThemeColors();
 
 	return (

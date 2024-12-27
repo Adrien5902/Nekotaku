@@ -6,7 +6,7 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import { millisToTimeStamp } from "@/types/Player";
 import Slider from "@react-native-community/slider";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useContext } from "react";
+import React from "react";
 import {
 	View,
 	ActivityIndicator,
@@ -37,6 +37,8 @@ export function PoppingControls({
 	const devices = useDevices();
 	const colors = useThemeColors();
 
+	const fullscreenMultiplier = isFullscreen ? 1.5 : 1;
+
 	return (
 		<>
 			{shouldDisplayControls && episode ? (
@@ -56,6 +58,7 @@ export function PoppingControls({
 								color: Colors.dark.text,
 								flex: 1,
 								paddingLeft: Spacing.m,
+								fontSize: TextSizes.s * fullscreenMultiplier,
 							}}
 						>
 							{media?.title?.english ?? media?.title?.romaji} -{" "}
@@ -65,9 +68,12 @@ export function PoppingControls({
 						</ThemedText>
 						<Icon
 							name="chromecast"
-							size={TextSizes.m}
+							size={TextSizes.m * fullscreenMultiplier}
 							color={Colors.dark.text}
-							style={{ marginRight: Spacing.m, padding: Spacing.m }}
+							style={{
+								marginRight: Spacing.m,
+								padding: Spacing.m * fullscreenMultiplier,
+							}}
 							onPress={async () => {
 								if (devices[0]) {
 									SessionManager.startSession(devices[0].deviceId);
@@ -86,7 +92,9 @@ export function PoppingControls({
 					</LinearGradient>
 				</>
 			) : null}
+
 			{children}
+
 			{shouldDisplayControls ? (
 				<>
 					<View
@@ -98,7 +106,7 @@ export function PoppingControls({
 						{loading ? (
 							<ActivityIndicator size="large" color={Colors.dark.text} />
 						) : (
-							<TouchableWithoutFeedback
+							<Icon
 								onPress={() => {
 									if (currentStatus?.isPlaying) {
 										playerRef.current?.pauseAsync();
@@ -106,22 +114,16 @@ export function PoppingControls({
 										playerRef.current?.playAsync();
 									}
 								}}
-							>
-								<View
-									style={{
-										padding: Spacing.m,
-										borderRadius: Spacing.xl,
-										aspectRatio: 1,
-										alignItems: "center",
-									}}
-								>
-									<Icon
-										name={currentStatus?.isPlaying ? "pause" : "play"}
-										size={TextSizes.xxl}
-										color={Colors.dark.text}
-									/>
-								</View>
-							</TouchableWithoutFeedback>
+								style={{
+									aspectRatio: 1,
+									padding: Spacing.m * fullscreenMultiplier,
+									borderRadius: Spacing.m * fullscreenMultiplier,
+									textAlign: "center",
+								}}
+								name={currentStatus?.isPlaying ? "pause" : "play"}
+								size={TextSizes.xxl * fullscreenMultiplier}
+								color={Colors.dark.text}
+							/>
 						)}
 					</View>
 
@@ -131,20 +133,28 @@ export function PoppingControls({
 							flexDirection: "row",
 							justifyContent: "space-around",
 							alignItems: "center",
-							padding: Spacing.m,
+							padding: Spacing.m * fullscreenMultiplier,
 						}}
 					>
 						{currentStatus?.durationMillis ? (
 							<>
 								<View>
-									<ThemedText style={{ color: Colors.dark.text }}>
+									<ThemedText
+										style={{
+											color: Colors.dark.text,
+											fontSize: TextSizes.s * fullscreenMultiplier,
+										}}
+									>
 										{millisToTimeStamp(currentStatus.positionMillis)}/
 										{millisToTimeStamp(currentStatus.durationMillis)}
 									</ThemedText>
 								</View>
 
 								<Slider
-									style={{ flex: 1, marginHorizontal: 4, height: 10 }}
+									style={{
+										flex: 1,
+										marginHorizontal: Spacing.s * fullscreenMultiplier,
+									}}
 									onValueChange={(value) => {
 										playerRef.current?.setPositionAsync(value);
 									}}
@@ -161,7 +171,7 @@ export function PoppingControls({
 						<Icon
 							name={isFullscreen ? "compress" : "expand"}
 							color={Colors.dark.text}
-							size={TextSizes.m}
+							size={TextSizes.m * fullscreenMultiplier}
 							onPress={() => {
 								toggleFullscreen();
 							}}
