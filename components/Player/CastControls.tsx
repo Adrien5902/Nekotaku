@@ -43,9 +43,9 @@ export default function CastControls({
 
 	useEffect(() => {
 		if (!loading && videoUri && media) {
-			const progressSub = media.onMediaProgressUpdated((progres) => {
+			const progressSub = media.onMediaProgressUpdated((progress) => {
 				if (statusRef.current)
-					statusRef.current.positionMillis = progres * 1000;
+					statusRef.current.positionMillis = progress * 1000;
 			});
 
 			const statusSub = media.onMediaStatusUpdated((currentStatus) => {
