@@ -4,7 +4,7 @@ import { ThemedText } from "../ThemedText";
 import { useEffect, useState } from "react";
 import { SelectButtons } from "../SelectButtons";
 import { RefreshControl, ScrollView, View } from "react-native";
-import { useAnimeSamaGetLecteurs as useAnimeSamaGetEpisodes } from "@/hooks/useAnimeSamaGetEpisodes";
+import { useAnimeSamaGetEpisodes } from "@/hooks/useAnimeSamaGetEpisodes";
 import PlayDownloadButton, {
 	type Props as PlayDownloadButtonProps,
 } from "../PlayDownloadButton";
@@ -19,6 +19,7 @@ import Cache, { CacheReadType } from "@/hooks/useCache";
 import { useCachedPromise } from "@/hooks/usePromise";
 import useLang from "@/hooks/useLang";
 import { useSettings } from "../Settings/Context";
+import React from "react";
 
 export default function EpisodesCollection({
 	media,
@@ -70,9 +71,11 @@ export default function EpisodesCollection({
 		customEpisodesData,
 	);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (langs) {
-			setLang(langs[0]);
+			const validLangSelected = selectedLang && langs.includes(selectedLang);
+			if (!validLangSelected) setLang(langs[0]);
 		}
 	}, [langs]);
 
