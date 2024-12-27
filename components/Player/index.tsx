@@ -1,8 +1,8 @@
 import { AppState, View } from "react-native";
-import Controls, { type Props as ControlsProps } from "./Controls";
+import Controls from "./Controls";
 import { type AVPlaybackStatusSuccess, ResizeMode, Video } from "expo-av";
 import { useContext, useEffect, useRef, useState } from "react";
-import type { Episode, Lecteur } from "@/types/AnimeSama";
+import type { Episode } from "@/types/AnimeSama";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import {
 	Directions,
@@ -12,28 +12,26 @@ import {
 import { useRemoteMediaClient } from "react-native-google-cast";
 import useStyles from "@/hooks/useStyles";
 import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
-import CastControls from "./CastControls";
+import CastControls from "./Controls/CastControls";
 import Cache, { CacheReadType } from "@/hooks/useCache";
 import { ThemedView } from "../ThemedView";
 import { ThemedText } from "../ThemedText";
 import useModal from "@/hooks/useModal";
-import Slider from "@react-native-community/slider";
-import { useThemeColors } from "@/hooks/useThemeColor";
-import { SelectButtons } from "../SelectButtons";
-import {
-	supportedLecteurs,
-	useGetVideoSource,
-} from "@/hooks/useGetVideoSource";
+import { useGetVideoSource } from "@/hooks/useGetVideoSource";
 import { useSettings } from "../Settings/Context";
 import { DownloadingContext } from "../DownloadingContext";
 import type React from "react";
 import { getPreferredLecteur } from "../Settings/types";
-import useLang from "@/hooks/useLang";
+import { PlayerSettings } from "./PlayerSettings";
+import {
+	PlayerContextProvider,
+	type PlayerContextT,
+} from "./PlayerContextProvider";
 
 interface Props {
 	isFullscreen: boolean;
 	episode: Episode;
-	media: ControlsProps["media"];
+	media: PlayerContextT["media"];
 	toggleFullscreen: (force?: boolean) => void;
 }
 
@@ -161,34 +159,33 @@ export default function Player({
 		? errorGetVideoSource
 		: new Error("Lecteur not supported");
 
+	const forceViewControls = !!googleCastMedia;
+	const playerStyle = isFullscreen ? styles.fullscreenVideo : styles.video;
+
 	return (
-		<>
+		<PlayerContextProvider
+			{...{
+				episode,
+				isFullscreen,
+				loading,
+				setIsLoadingVid,
+				media,
+				setSettingsVisible: setModalVisible,
+				toggleFullscreen,
+				playerRef,
+				statusRef,
+				forceViewControls,
+				playerStyle,
+			}}
+		>
 			<Modal>
 				<PlayerSettings
-					{...{
-						episode,
-						playbackSpeedRef,
-						playerRef,
-						selectedLecteur,
-						setSelectedLecteur,
-					}}
+					{...{ playbackSpeedRef, selectedLecteur, setSelectedLecteur }}
 				/>
 			</Modal>
 			<GestureDetector gesture={gesture}>
 				<View>
-					<Controls
-						{...{
-							setModalVisible,
-							isFullscreen,
-							playerRef,
-							statusRef,
-							loading,
-							episode,
-							toggleFullscreen,
-							media,
-						}}
-						forceView={!!googleCastMedia}
-					/>
+					<Controls />
 					{!error ? (
 						!googleCastMedia ? (
 							<Video
@@ -237,7 +234,7 @@ export default function Player({
 									setIsLoadingVid,
 									statusRef,
 								}}
-								media={googleCastMedia}
+								remoteMediaClient={googleCastMedia}
 							/>
 						)
 					) : (
@@ -252,92 +249,6 @@ export default function Player({
 					)}
 				</View>
 			</GestureDetector>
-		</>
-	);
-}
-
-function PlayerSettings({
-	episode,
-	playerRef,
-	playbackSpeedRef,
-	selectedLecteur,
-	setSelectedLecteur,
-}: {
-	selectedLecteur: Lecteur | undefined;
-	setSelectedLecteur: React.Dispatch<React.SetStateAction<Lecteur>> | undefined;
-	episode: Episode;
-	playerRef: React.MutableRefObject<PlayerFunctions | undefined>;
-	playbackSpeedRef: React.MutableRefObject<number>;
-}) {
-	const colors = useThemeColors();
-	const [playBackSpeed, setPlaybackSpeed] = useState(playbackSpeedRef.current);
-	const lang = useLang();
-
-	return (
-		<View
-			style={{
-				alignSelf: "flex-start",
-			}}
-		>
-			<ThemedText size="m">
-				{lang.pages.player.settings.playBackSpeed} :{" "}
-				{lang.pages.player.settings.playBackSpeedMultiplier(
-					playBackSpeed.toFixed(2),
-				)}
-			</ThemedText>
-
-			<Slider
-				minimumValue={0.05}
-				maximumValue={2}
-				step={0.05}
-				value={playBackSpeed}
-				onValueChange={(value) => {
-					playerRef.current?.setPlaybackSpeedAsync(value);
-					playbackSpeedRef.current = value;
-					setPlaybackSpeed(value);
-				}}
-				thumbTintColor={colors.accent}
-				minimumTrackTintColor={colors.accent}
-				maximumTrackTintColor={colors.text}
-			/>
-
-			<SelectButtons
-				buttons={[0.5, 1, 1.25, 1.5, 1.75, 2].map((n) => ({
-					key: n.toString(),
-					title: lang.pages.player.settings.playBackSpeedMultiplier(n),
-				}))}
-				defaultValue={playBackSpeed.toString()}
-				onValueChange={(value) => {
-					const n = Number.parseFloat(value);
-					playerRef.current?.setPlaybackSpeedAsync(n);
-					playbackSpeedRef.current = n;
-					setPlaybackSpeed(n);
-				}}
-			/>
-
-			<ThemedText size="m">
-				{lang.pages.player.settings.selectedLecteur} :
-			</ThemedText>
-			<SelectButtons
-				buttons={episode.lecteurs
-					.filter(
-						(l, i) =>
-							episode.lecteurs.findIndex((l2) => l2.hostname === l.hostname) ===
-								i &&
-							Object.keys(supportedLecteurs).find((l2) =>
-								l.hostname.includes(l2),
-							),
-					)
-					.map((l) => ({
-						key: l.id.toString(),
-						title: l.hostname,
-					}))}
-				defaultValue={selectedLecteur?.id.toString()}
-				onValueChange={(value) => {
-					if (setSelectedLecteur)
-						setSelectedLecteur(episode.lecteurs[Number.parseInt(value) - 1]);
-				}}
-			/>
-		</View>
+		</PlayerContextProvider>
 	);
 }

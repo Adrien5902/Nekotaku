@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Image, ScrollView } from "react-native";
 import * as NavigationBar from "expo-navigation-bar";
 import * as StatusBar from "expo-status-bar";
-import Player from "@/components/Player/Player";
+import Player from "@/components/Player";
 import { ThemedView } from "@/components/ThemedView";
 import { EpisodesList } from "@/components/Media/Episodes";
 import type { Episode } from "@/types/AnimeSama";
