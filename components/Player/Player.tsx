@@ -28,6 +28,7 @@ import { useSettings } from "../Settings/Context";
 import { DownloadingContext } from "../DownloadingContext";
 import type React from "react";
 import { getPreferredLecteur } from "../Settings/types";
+import useLang from "@/hooks/useLang";
 
 interface Props {
 	isFullscreen: boolean;
@@ -270,6 +271,8 @@ function PlayerSettings({
 }) {
 	const colors = useThemeColors();
 	const [playBackSpeed, setPlaybackSpeed] = useState(playbackSpeedRef.current);
+	const lang = useLang();
+
 	return (
 		<View
 			style={{
@@ -277,7 +280,10 @@ function PlayerSettings({
 			}}
 		>
 			<ThemedText size="m">
-				Playback speed : x{playBackSpeed.toFixed(2)}
+				{lang.pages.player.settings.playBackSpeed} :{" "}
+				{lang.pages.player.settings.playBackSpeedMultiplier(
+					playBackSpeed.toFixed(2),
+				)}
 			</ThemedText>
 
 			<Slider
@@ -298,7 +304,7 @@ function PlayerSettings({
 			<SelectButtons
 				buttons={[0.5, 1, 1.25, 1.5, 1.75, 2].map((n) => ({
 					key: n.toString(),
-					title: `x${n}`,
+					title: lang.pages.player.settings.playBackSpeedMultiplier(n),
 				}))}
 				defaultValue={playBackSpeed.toString()}
 				onValueChange={(value) => {
@@ -309,7 +315,9 @@ function PlayerSettings({
 				}}
 			/>
 
-			<ThemedText size="m">Selected Lecteur :</ThemedText>
+			<ThemedText size="m">
+				{lang.pages.player.settings.selectedLecteur} :
+			</ThemedText>
 			<SelectButtons
 				buttons={episode.lecteurs
 					.filter(

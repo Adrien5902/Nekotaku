@@ -38,6 +38,13 @@ export interface LangScheme {
     }
 
     pages: {
+        player: {
+            settings: {
+                playBackSpeed: string
+                playBackSpeedMultiplier: (multiplier: number | string) => string
+                selectedLecteur: string
+            }
+        }
         episodes: {
             episode: (n: number) => string,
             loading: string
