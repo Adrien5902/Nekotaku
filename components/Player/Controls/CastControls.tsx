@@ -4,44 +4,21 @@ import { ThemedText } from "../../ThemedText";
 import {
 	MediaPlayerState,
 	useCastDevice,
-	type RemoteMediaClient,
+	useRemoteMediaClient,
 } from "react-native-google-cast";
-import type { Lecteur } from "@/types/AnimeSama";
-import useStyles from "@/hooks/useStyles";
-import { usePromise } from "@/hooks/usePromise";
-import { getVideoUri } from "@/hooks/useGetVideoSource";
 import { useEffect } from "react";
 import usePlayerContext from "../PlayerContextProvider";
 
-export default function CastControls({
-	remoteMediaClient,
-	selectedLecteur,
-}: {
-	remoteMediaClient: RemoteMediaClient;
-	selectedLecteur?: Lecteur;
-}) {
-	const styles = useStyles();
-	const {
-		playerRef,
-		episode,
-		statusRef,
-		loading: playerContextLoading,
-		setIsLoadingVid,
-		playerStyle,
-	} = usePlayerContext();
-
-	const {
-		data: videoUri,
-		loading: getVideoUriLoading,
-		error,
-	} = usePromise(() => getVideoUri(selectedLecteur)[0], [episode?.id]);
+export default function CastControls() {
+	const remoteMediaClient = useRemoteMediaClient();
+	const { playerRef, statusRef, loading, setIsLoadingVid, playerStyle } =
+		usePlayerContext();
 
 	const device = useCastDevice();
 
-	const loading = getVideoUriLoading && playerContextLoading;
-
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		if (!loading && videoUri && remoteMediaClient) {
+		if (remoteMediaClient) {
 			const progressSub = remoteMediaClient.onMediaProgressUpdated(
 				(progress) => {
 					if (statusRef.current)
@@ -66,6 +43,11 @@ export default function CastControls({
 								case MediaPlayerState.LOADING:
 									setIsLoadingVid(true);
 									break;
+
+								case MediaPlayerState.BUFFERING:
+									setIsLoadingVid(true);
+									break;
+
 								case MediaPlayerState.PAUSED:
 									setIsLoadingVid(false);
 
@@ -79,13 +61,6 @@ export default function CastControls({
 					}
 				},
 			);
-
-			remoteMediaClient.loadMedia({
-				mediaInfo: {
-					contentUrl: videoUri,
-					contentType: "video/mp4",
-				},
-			});
 
 			playerRef.current = {
 				playAsync: remoteMediaClient.play,
@@ -105,7 +80,7 @@ export default function CastControls({
 				progressSub.remove();
 			};
 		}
-	});
+	}, [remoteMediaClient]);
 
 	return (
 		<ThemedView

@@ -9,7 +9,10 @@ import {
 	Gesture,
 	GestureDetector,
 } from "react-native-gesture-handler";
-import { useRemoteMediaClient } from "react-native-google-cast";
+import {
+	useRemoteMediaClient,
+	type RemoteMediaClient,
+} from "react-native-google-cast";
 import useStyles from "@/hooks/useStyles";
 import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
 import CastControls from "./Controls/CastControls";
@@ -120,9 +123,10 @@ export default function Player({
 		}
 	}, [loading]);
 
-	const googleCastMedia = useRemoteMediaClient();
+	const remoteMediaClient = useRemoteMediaClient();
+
 	useEffect(() => {
-		playerRef.current = !googleCastMedia
+		playerRef.current = !remoteMediaClient
 			? {
 					async playAsync() {
 						await videoPlayerRef.current?.playAsync();
@@ -138,7 +142,18 @@ export default function Player({
 					},
 				}
 			: undefined;
-	}, [googleCastMedia]);
+	}, [remoteMediaClient]);
+
+	useEffect(() => {
+		if (remoteMediaClient && videoUri) {
+			remoteMediaClient.loadMedia({
+				mediaInfo: {
+					contentUrl: videoUri,
+					contentType: "video/mp4",
+				},
+			});
+		}
+	}, [videoUri, remoteMediaClient]);
 
 	const playerRef = useRef<PlayerFunctions>();
 	const statusRef = useRef<VideoPlayStatus>({
@@ -159,7 +174,7 @@ export default function Player({
 		? errorGetVideoSource
 		: new Error("Lecteur not supported");
 
-	const forceViewControls = !!googleCastMedia;
+	const forceViewControls = !!remoteMediaClient;
 	const playerStyle = isFullscreen ? styles.fullscreenVideo : styles.video;
 
 	return (
@@ -187,7 +202,7 @@ export default function Player({
 				<View>
 					<Controls />
 					{!error ? (
-						!googleCastMedia ? (
+						!remoteMediaClient ? (
 							<Video
 								style={{
 									...(isFullscreen ? styles.fullscreenVideo : styles.video),
@@ -224,18 +239,7 @@ export default function Player({
 								}}
 							/>
 						) : (
-							<CastControls
-								{...{
-									episode,
-									isFullscreen,
-									isLoadingVid,
-									playerRef,
-									selectedLecteur,
-									setIsLoadingVid,
-									statusRef,
-								}}
-								remoteMediaClient={googleCastMedia}
-							/>
+							<CastControls />
 						)
 					) : (
 						<ThemedView
