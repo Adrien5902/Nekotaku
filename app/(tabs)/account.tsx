@@ -6,6 +6,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { Spacing } from "@/constants/Sizes";
 import useLang from "@/hooks/useLang";
 import { useThemeColors } from "@/hooks/useThemeColor";
+import React from "react";
 
 export default function Account() {
 	const lang = useLang();

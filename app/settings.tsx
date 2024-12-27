@@ -86,7 +86,9 @@ function AppearanceSettings() {
 	return (
 		<ScrollView>
 			<View>
-				<ThemedText style={{ padding: Spacing.m }}>App lang :</ThemedText>
+				<ThemedText style={{ padding: Spacing.m }}>
+					{lang.settings.lang} :
+				</ThemedText>
 				<SelectButtons
 					buttons={Object.values(Lang).map((l, i) => ({
 						key: l,
@@ -100,7 +102,9 @@ function AppearanceSettings() {
 			</View>
 
 			<View>
-				<ThemedText style={{ padding: Spacing.m }}>Theme :</ThemedText>
+				<ThemedText style={{ padding: Spacing.m }}>
+					{lang.settings.colorTheme} :
+				</ThemedText>
 				<ThemedView>
 					<SelectButtons
 						buttons={Object.values(ColorTheme).map((theme) => ({
