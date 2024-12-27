@@ -4,7 +4,7 @@ import { StyleSheet, useAnimatedValue, View } from "react-native";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { ThemedText } from "./ThemedText";
 import { type Href, router, useUnstableGlobalHref } from "expo-router";
-import type { Episode, Lecteur } from "@/types/AnimeSama";
+import type { Episode } from "@/types/AnimeSama";
 import { useContext, useEffect, useState } from "react";
 import {
 	DownloadingContext,
@@ -14,6 +14,7 @@ import type { Color } from "@/constants/Colors";
 import type { VideoPlayerMedia } from "@/app/player";
 import useModal from "@/hooks/useModal";
 import { useSettings } from "./Settings/Context";
+import type React from "react";
 
 export interface Props {
 	media: VideoPlayerMedia;
@@ -162,7 +163,7 @@ export default function PlayDownloadButton({
 				<Icon
 					onPress={async () => {
 						setState(DownloadState.Downloading);
-						await downloadingContext.startDownload(media, episode);
+						await downloadingContext.startDownload(media, episode, settings);
 						updateDownloadState();
 					}}
 					size={TextSizes.xl}

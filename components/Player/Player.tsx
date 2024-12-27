@@ -27,6 +27,7 @@ import {
 import { useSettings } from "../Settings/Context";
 import { DownloadingContext } from "../DownloadingContext";
 import type React from "react";
+import { getPreferredLecteur } from "../Settings/types";
 
 interface Props {
 	isFullscreen: boolean;
@@ -47,14 +48,7 @@ export default function Player({
 	const settings = useSettings();
 
 	const [selectedLecteur, setSelectedLecteur] = useState(
-		episode?.lecteurs.find(
-			(l) =>
-				l.hostname.includes(settings.preferredLecteur) &&
-				Object.keys(supportedLecteurs).find((l2) => l.hostname.includes(l2)),
-		) ??
-			episode?.lecteurs.find((l) =>
-				Object.keys(supportedLecteurs).find((l2) => l.hostname.includes(l2)),
-			),
+		getPreferredLecteur(episode, settings),
 	);
 
 	const downloadingContext = useContext(DownloadingContext);
@@ -269,9 +263,7 @@ function PlayerSettings({
 	setSelectedLecteur,
 }: {
 	selectedLecteur: Lecteur | undefined;
-	setSelectedLecteur:
-		| React.Dispatch<React.SetStateAction<Lecteur | undefined>>
-		| undefined;
+	setSelectedLecteur: React.Dispatch<React.SetStateAction<Lecteur>> | undefined;
 	episode: Episode;
 	playerRef: React.MutableRefObject<PlayerFunctions | undefined>;
 	playbackSpeedRef: React.MutableRefObject<number>;
