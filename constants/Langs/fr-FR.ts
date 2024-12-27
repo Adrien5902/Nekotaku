@@ -136,6 +136,34 @@ export const frFR: LangScheme = {
             system: "Système"
         }
     },
+    notifications: {
+        downloads: {
+            channelGroup: {
+                name: "Téléchargements",
+                description: "Téléchargements des épisodes"
+            },
+            completed: {
+                channel: {
+                    name: "Épisode téléchargé",
+                    description: "Notification quand un épisode a fini de se télécharger"
+                },
+                title: "✅ Téléchargement de l'épisode terminé",
+            },
+            progress: {
+                actions: {
+                    cancel: "Annuler",
+                    pause: "Pause",
+                    resume: "Reprendre"
+                },
+                body: (mediaTitle, episodeName) => `${mediaTitle} - ${typeof episodeName === "number" ? `Ep. ${episodeName}` : episodeName}`,
+                channel: {
+                    name: "Épisode en téléchargement",
+                    description: "Quand un épisode est en cours de téléchargement"
+                },
+                title: "Téléchargement"
+            }
+        }
+    },
     misc: {
         searchPlaceholder: "Rechercher...",
         cancel: "Annuler",
@@ -144,7 +172,7 @@ export const frFR: LangScheme = {
             nextEpIn: (shouldShowDays, days, hours, mins) => `Prochain épisode dans ${shouldShowDays
                 ? `${days} jours`
                 : `${hours}h ${mins}min`
-                }`
+                } `
         }
     }
 }

@@ -135,6 +135,32 @@ export const enUS: LangScheme = {
             "fr-FR": "French France 🇫🇷"
         }
     },
+    notifications: {
+        downloads: {
+            channelGroup: {
+                name: "Downloads",
+                description: "Episodes downloads"
+            },
+            completed: {
+                channel: {
+                    name: "Downloading Episodes Status",
+                    description: "Progress bar notification for episode downloading status",
+                },
+                title: "✅ Finished downloading episode"
+            },
+            progress: {
+                actions: { cancel: "Cancel", pause: "Pause", resume: "Resume" },
+                body: (mediaTitle, episodeName) => `${mediaTitle} - ${typeof episodeName === "number" ? `Ep. ${episodeName}` : episodeName}`,
+                channel: {
+                    name: "Finished Downloading episode",
+                    description:
+                        "Notification when an episode has finished downloading",
+                },
+                title: "Downloading"
+            }
+        }
+    },
+
     misc: {
         searchPlaceholder: "Search...",
         cancel: "Cancel",

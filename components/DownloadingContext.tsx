@@ -1,6 +1,6 @@
 import { getVideoUri } from "@/hooks/useGetVideoSource";
 import * as FileSystem from "expo-file-system";
-import { createContext, type ReactNode } from "react";
+import { createContext, useEffect, type ReactNode } from "react";
 import notifee, {
 	AndroidImportance,
 	type Event as NotificationEvent,
@@ -9,10 +9,15 @@ import notifee, {
 import type { Media, MediaTitle } from "@/types/Anilist/graphql";
 import { Colors } from "@/constants/Colors";
 import type { Episode, EpisodeId } from "@/types/AnimeSama";
+import { DefaultSettings, type Lang } from "./Settings/types";
+import { useSettings } from "./Settings/Context";
+import { getTranslationByLang } from "@/hooks/useLang";
 
 export class Downloader {
 	currentlyDownloading: Record<string, DownloadingState | null>;
 	downloadedEpisodes: Record<number, number[]>;
+	lang: Lang;
+
 	static DOWNLOADED_EPISODES_DIR =
 		`${FileSystem.documentDirectory}downloadedEpisodes/`;
 	static PROGRESS_NOTIFICATION_CHANNEL_ID = "downloads";
@@ -21,6 +26,23 @@ export class Downloader {
 	constructor() {
 		this.currentlyDownloading = {};
 		this.downloadedEpisodes = {};
+		this.lang = DefaultSettings.lang;
+		this.setLang(this.lang);
+
+		this.readFromFs();
+	}
+
+	getTranslations() {
+		return getTranslationByLang(this.lang);
+	}
+
+	setLang(lang: Lang) {
+		this.lang = lang;
+
+		notifee.createChannelGroup({
+			id: "downloaded_episodes",
+			...this.getTranslations().notifications.downloads.channelGroup,
+		});
 
 		notifee
 			.getChannel(Downloader.PROGRESS_NOTIFICATION_CHANNEL_ID)
@@ -28,12 +50,11 @@ export class Downloader {
 				if (!c) {
 					notifee.createChannel({
 						id: Downloader.PROGRESS_NOTIFICATION_CHANNEL_ID,
-						name: "Downloading Episodes Status",
-						description:
-							"Progress bar notification for episode downloading status",
+						groupId: "downloaded_episodes",
 						vibration: false,
 						importance: AndroidImportance.LOW,
 						badge: false,
+						...this.getTranslations().notifications.downloads.progress.channel,
 					});
 				}
 			});
@@ -44,17 +65,14 @@ export class Downloader {
 				if (!c) {
 					notifee.createChannel({
 						id: Downloader.FINISHED_DOWNLOADING_NOTIFICATION_CHANNEL_ID,
-						name: "Finished Downloading episode",
-						description:
-							"Notification when an episode has finished downloading",
+						groupId: "downloaded_episodes",
+						...this.getTranslations().notifications.downloads.completed.channel,
 						vibration: true,
 						importance: AndroidImportance.DEFAULT,
 						badge: false,
 					});
 				}
 			});
-
-		this.readFromFs();
 	}
 
 	onEvent(e: NotificationEvent) {
@@ -141,7 +159,7 @@ export class Downloader {
 
 		const notificationData: Notification = {
 			id: Downloader.notificationId(formattedFileName),
-			title: "Downloading",
+			title: this.getTranslations().notifications.downloads.progress.title,
 			subtitle: `${media.title?.english ?? media.title?.romaji} ep. ${episode.name}`,
 			body: `${media.title?.english ?? media.title?.romaji} ep. ${episode.name}`,
 			android: {
@@ -263,7 +281,7 @@ export class Downloader {
 		}
 
 		notifee.displayNotification({
-			title: "✅ Finished downloading episode",
+			title: this.lang,
 			subtitle: downloadState?.notificationData.subtitle,
 			body: downloadState?.notificationData.body,
 			android: {
@@ -350,12 +368,21 @@ export class Downloader {
 						},
 						actions: [
 							{
-								title: downloadingState.paused ? "Resume" : "Pause",
+								title: downloadingState.paused
+									? this.getTranslations().notifications.downloads.progress
+											.actions.resume
+									: this.getTranslations().notifications.downloads.progress
+											.actions.pause,
 								pressAction: {
 									id: downloadingState.paused ? "resume" : "pause",
 								},
 							},
-							{ title: "Cancel", pressAction: { id: "cancel" } },
+							{
+								title:
+									this.getTranslations().notifications.downloads.progress
+										.actions.cancel,
+								pressAction: { id: "cancel" },
+							},
 						],
 					},
 				});
@@ -387,10 +414,24 @@ export const DownloadingContext = createContext<Downloader>(
 
 interface Props {
 	children: ReactNode;
-	downloader: Downloader;
 }
 
-export default function DownloadingProvider({ children, downloader }: Props) {
+export default function DownloadingProvider({ children }: Props) {
+	const downloader = new Downloader();
+
+	const settings = useSettings();
+	useEffect(() => {
+		downloader.setLang(settings.lang);
+	}, [settings, downloader.setLang]);
+
+	notifee.requestPermission();
+	notifee.onBackgroundEvent(async (e) => {
+		downloader.onEvent(e);
+	});
+	notifee.onForegroundEvent(async (e) => {
+		downloader.onEvent(e);
+	});
+
 	return (
 		<DownloadingContext.Provider value={downloader}>
 			{children}

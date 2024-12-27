@@ -14,21 +14,11 @@ import AnilistUserInfoProvider from "@/components/AnilistUserInfoProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect } from "react";
 
-const downloader = new Downloader();
-
 export default function RootLayout() {
-	notifee.requestPermission();
-	notifee.onBackgroundEvent(async (e) => {
-		downloader.onEvent(e);
-	});
-	notifee.onForegroundEvent(async (e) => {
-		downloader.onEvent(e);
-	});
-
 	return (
 		<GestureHandlerRootView>
 			<SettingsProvider>
-				<DownloadingProvider downloader={downloader}>
+				<DownloadingProvider>
 					<AnilistLoginProvider>
 						<Providers>
 							<StackScreens />

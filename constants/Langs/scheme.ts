@@ -1,5 +1,7 @@
 import type { ColorTheme, Lang } from "@/components/Settings/types"
 import type { MediaFormat, MediaListStatus, MediaRelation, MediaSeason, MediaSource, MediaStatus, MediaType } from "@/types/Anilist/graphql"
+import type { EpisodeName } from "@/types/AnimeSama";
+import type { AndroidChannel, AndroidChannelGroup } from "@notifee/react-native"
 
 export enum CountryOfOrigin {
     Japan = "JP",
@@ -7,6 +9,9 @@ export enum CountryOfOrigin {
     China = "CN",
     Taiwan = "TW",
 }
+
+export type NotificationChannelLangScheme = Pick<AndroidChannel, "name" | "description">;
+export type NotificationChannelGroupLangScheme = Pick<AndroidChannelGroup, "name" | "description">
 
 export interface LangScheme {
     Anilist: {
@@ -86,6 +91,26 @@ export interface LangScheme {
         offlineMode: string
         defaultMode: string,
         colorTheme: string
+    }
+
+    notifications: {
+        downloads: {
+            channelGroup: NotificationChannelGroupLangScheme
+            progress: {
+                channel: NotificationChannelLangScheme
+                title: string
+                body: (mediaTitle: string, episodeName: EpisodeName) => string
+                actions: {
+                    cancel: string
+                    resume: string
+                    pause: string
+                }
+            },
+            completed: {
+                title: string
+                channel: NotificationChannelLangScheme
+            }
+        }
     }
 
     misc: {

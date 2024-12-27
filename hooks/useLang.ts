@@ -6,6 +6,10 @@ import { frFR } from "@/constants/Langs/fr-FR";
 export default function useLang() {
     const { lang } = useSettings()
 
+    return getTranslationByLang(lang)
+}
+
+export function getTranslationByLang(lang: Lang) {
     switch (lang) {
         case Lang.English:
             return enUS
