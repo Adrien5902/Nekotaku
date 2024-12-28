@@ -43,16 +43,7 @@ export function useCachedPromise<T extends CacheKey>(readType: CacheReadType, ke
     const [loading, setLoading] = useState<boolean>(true)
     const errorRef = useRef<Error>()
 
-    const refresh = async () => {
-        setLoading(true)
-        errorRef.current = undefined
-
-        const cacheHit = await Cache.read(readType, key, deps) ?? undefined
-        if (cacheHit) {
-            dataRef.current = cacheHit
-            setLoading(false)
-        }
-
+    const fetchData = async () => {
         try {
             const res = await fn()
             if (res !== undefined) {
@@ -68,9 +59,26 @@ export function useCachedPromise<T extends CacheKey>(readType: CacheReadType, ke
         }
     }
 
+    function refresh() {
+        setLoading(true)
+        return fetchData()
+    }
+
     // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
     useEffect(() => {
-        refresh()
+        (async () => {
+            setLoading(true)
+            errorRef.current = undefined
+
+            const cacheHit = await Cache.read(readType, key, deps) ?? undefined
+            if (cacheHit) {
+                dataRef.current = cacheHit
+                setLoading(false)
+            }
+
+            await fetchData()
+        })()
+
         return onUnmounted
     }, deps ?? [])
 
