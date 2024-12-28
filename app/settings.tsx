@@ -26,17 +26,17 @@ export default function Settings() {
 			<CustomTabView
 				scenes={[
 					{
-						component: () => <AppWorkSettings />,
+						component: <AppWorkSettings />,
 						icon: "wrench",
 						key: "work",
 					},
 					{
-						component: () => <AppearanceSettings />,
+						component: <AppearanceSettings />,
 						icon: "palette",
 						key: "appearance",
 					},
 					{
-						component: () => <AccountSettings />,
+						component: <AccountSettings />,
 						icon: "user",
 						key: "account",
 					},
