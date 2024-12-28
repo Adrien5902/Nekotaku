@@ -27,6 +27,7 @@ export default function CustomButton({
 	children,
 	textStyle,
 	textColor,
+	textSize,
 	backgroundColor,
 	backgroundStyle,
 	...props
@@ -42,6 +43,7 @@ export default function CustomButton({
 						padding: Spacing.m,
 						alignItems: "center",
 						justifyContent: "center",
+						flexDirection: "row",
 						borderRadius: Spacing.s,
 					},
 				]}
@@ -51,7 +53,7 @@ export default function CustomButton({
 				{typeof children === "string" ? (
 					<ThemedText
 						style={textStyle}
-						size="m"
+						size={textSize ?? "m"}
 						color={textColor}
 						weight="bold"
 					>

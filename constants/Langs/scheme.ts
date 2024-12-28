@@ -81,6 +81,11 @@ export interface LangScheme {
                 loggedInAs: string,
                 logout: string
             }
+            update: {
+                downloading: string
+                downloadLatest: (version: string) => string
+                noneAvailable: string
+            }
         },
         media: {
             details: {

@@ -18,6 +18,7 @@ import useLang from "@/hooks/useLang";
 import { MediaType } from "@/types/Anilist/graphql";
 import { ScrollView, View } from "react-native";
 import Constants from "expo-constants";
+import UpdateButton from "@/components/UpdateButton";
 
 export default function Settings() {
 	const lang = useLang();
@@ -99,9 +100,18 @@ function AppWorkSettings() {
 				title={lang.settings.offlineMode}
 			/>
 
-			<ThemedText style={{ opacity: 0.7, padding: Spacing.m }}>
-				{lang.settings.appVersion(`v${Constants.expoConfig?.version}`)}
-			</ThemedText>
+			<View
+				style={{
+					flexDirection: "row",
+					alignItems: "center",
+					justifyContent: "space-between",
+				}}
+			>
+				<ThemedText style={{ opacity: 0.7, margin: Spacing.l }}>
+					{lang.settings.appVersion(`v${Constants.expoConfig?.version}`)}
+				</ThemedText>
+				<UpdateButton />
+			</View>
 		</ScrollView>
 	);
 }

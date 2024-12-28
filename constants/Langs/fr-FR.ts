@@ -126,6 +126,11 @@ export const frFR: LangScheme = {
             title: "Épisodes téléchargés"
         },
         settings: {
+            update: {
+                downloading: "Téléchargement de la màj",
+                downloadLatest: (version) => `Télécharger la dernière màj (${version})`,
+                noneAvailable: "Aucune màj disponible"
+            },
             account: {
                 loggedInAs: "Connecté en tant que",
                 logout: "Se déconnecter"

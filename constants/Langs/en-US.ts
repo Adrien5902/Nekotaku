@@ -126,6 +126,11 @@ export const enUS: LangScheme = {
             noDownloadedEpisodes: "No downloaded episodes"
         },
         settings: {
+            update: {
+                downloading: "Downloading update...",
+                downloadLatest: (version) => `Download latest (${version})`,
+                noneAvailable: "No update available"
+            },
             tilte: "Settings",
             account: {
                 loggedInAs: "Logged in as",
