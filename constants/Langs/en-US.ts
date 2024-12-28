@@ -129,6 +129,8 @@ export const enUS: LangScheme = {
         }
     },
     settings: {
+        appVersion: (v) => `App version : ${v}`,
+        preferredLecteur: "Preferred Lecteur : ",
         colorTheme: "App color theme",
         themes: {
             dark: "Dark",

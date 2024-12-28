@@ -99,6 +99,8 @@ export interface LangScheme {
         offlineMode: string
         defaultMode: string,
         colorTheme: string
+        preferredLecteur: string
+        appVersion: (version: string) => string
     }
 
     notifications: {

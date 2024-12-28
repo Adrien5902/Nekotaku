@@ -129,6 +129,8 @@ export const frFR: LangScheme = {
         }
     },
     settings: {
+        appVersion: (v) => `Version de l'appli : ${v}`,
+        preferredLecteur: "Lecteur de préférence : ",
         colorTheme: "Thème",
         defaultMode: "Mode de l'appli par défaut",
         lang: "Langue",

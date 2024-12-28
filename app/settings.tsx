@@ -17,6 +17,7 @@ import {
 import useLang from "@/hooks/useLang";
 import { MediaType } from "@/types/Anilist/graphql";
 import { ScrollView, View } from "react-native";
+import Constants from "expo-constants";
 
 export default function Settings() {
 	const lang = useLang();
@@ -74,7 +75,7 @@ function AppWorkSettings() {
 
 			<View>
 				<ThemedText style={{ padding: Spacing.m }}>
-					Preferred Lecteur :
+					{lang.settings.preferredLecteur} :
 				</ThemedText>
 
 				<SelectButtons
@@ -97,6 +98,10 @@ function AppWorkSettings() {
 				onChange={(value) => setSettings((s) => ({ ...s, offlineMode: value }))}
 				title={lang.settings.offlineMode}
 			/>
+
+			<ThemedText style={{ opacity: 0.7, padding: Spacing.m }}>
+				{lang.settings.appVersion(`v${Constants.expoConfig?.version}`)}
+			</ThemedText>
 		</ScrollView>
 	);
 }
