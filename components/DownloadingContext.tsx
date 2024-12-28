@@ -289,7 +289,7 @@ export class Downloader {
 		}
 
 		notifee.displayNotification({
-			title: this.lang,
+			title: this.getTranslations().notifications.downloads.completed.title,
 			subtitle: downloadState?.notificationData.subtitle,
 			body: downloadState?.notificationData.body,
 			android: {
