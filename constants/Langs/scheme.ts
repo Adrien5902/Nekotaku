@@ -83,7 +83,9 @@ export interface LangScheme {
             }
             update: {
                 downloading: string
-                downloadLatest: (version: string) => string
+                downloadLatest: (version?: string) => string
+                checkAvailability: string
+                checking: string
                 noneAvailable: string
             }
         },

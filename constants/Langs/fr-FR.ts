@@ -129,7 +129,9 @@ export const frFR: LangScheme = {
         settings: {
             update: {
                 downloading: "Téléchargement de la màj",
-                downloadLatest: (version) => `Télécharger la dernière màj (${version})`,
+                downloadLatest: (version) => `Télécharger la dernière màj ${version ? `(${version})` : ""}`,
+                checkAvailability: "Rechercher des màj",
+                checking: "Recherche de màj...",
                 noneAvailable: "Aucune màj disponible"
             },
             account: {

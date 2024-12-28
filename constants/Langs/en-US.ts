@@ -129,7 +129,9 @@ export const enUS: LangScheme = {
         settings: {
             update: {
                 downloading: "Downloading update...",
-                downloadLatest: (version) => `Download latest (${version})`,
+                downloadLatest: (version) => `Download latest ${version ? `(${version})` : ""}`,
+                checkAvailability: "Check for updates",
+                checking: "Checking for updates...",
                 noneAvailable: "No update available"
             },
             tilte: "Settings",

@@ -3,7 +3,7 @@ import { ActivityIndicator } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { Spacing } from "@/constants/Sizes";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import CustomButton from "./Button";
 import React from "react";
 import useLang from "@/hooks/useLang";
@@ -12,6 +12,8 @@ export default function UpdateButton() {
 	const colors = useThemeColors();
 	const lang = useLang();
 	const {
+		isChecking,
+		isUpdateAvailable,
 		isUpdatePending,
 		isDownloading,
 		availableUpdate,
@@ -19,6 +21,8 @@ export default function UpdateButton() {
 		downloadError,
 		initializationError,
 	} = Updates.useUpdates();
+
+	const [checked, setChecked] = useState(false);
 
 	useEffect(() => {
 		if (isUpdatePending) {
@@ -33,15 +37,20 @@ export default function UpdateButton() {
 		"runtimeVersion" in availableUpdate.manifest &&
 		availableUpdate.manifest.runtimeVersion;
 
+	console.log(checked);
+
 	return (
 		<CustomButton
 			backgroundStyle={{ gap: Spacing.m }}
-			backgroundColor={error ? "alert" : availableUpdate ? "accent" : "primary"}
+			backgroundColor={error ? "alert" : "accent"}
 			textSize="s"
 			onPress={() => {
-				if (!error) {
-					if (availableUpdate && !isDownloading) {
+				if (!error && !isDownloading) {
+					if (isUpdateAvailable) {
 						Updates.fetchUpdateAsync();
+					} else {
+						Updates.checkForUpdateAsync();
+						setChecked(true);
 					}
 				}
 			}}
@@ -55,10 +64,21 @@ export default function UpdateButton() {
 					</ThemedText>
 					<ActivityIndicator color={colors.text} />
 				</>
-			) : availableUpdate ? (
-				lang.pages.settings.update.downloadLatest(`v${availableUpdateVersion}`)
-			) : (
+			) : isUpdateAvailable ? (
+				lang.pages.settings.update.downloadLatest(
+					availableUpdateVersion ? `v${availableUpdateVersion}` : undefined,
+				)
+			) : isChecking ? (
+				<>
+					<ThemedText weight="bold">
+						{lang.pages.settings.update.checking}
+					</ThemedText>
+					<ActivityIndicator color={colors.text} />
+				</>
+			) : checked ? (
 				lang.pages.settings.update.noneAvailable
+			) : (
+				lang.pages.settings.update.checkAvailability
 			)}
 		</CustomButton>
 	);
