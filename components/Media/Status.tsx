@@ -1,4 +1,3 @@
-import { View } from "react-native";
 import { ThemedText, type ThemedTextProps } from "../ThemedText";
 import {
 	type AiringSchedule,
@@ -8,6 +7,7 @@ import {
 	MediaListStatus,
 } from "@/types/Anilist/graphql";
 import useLang from "@/hooks/useLang";
+import DotSeparatedText from "../DotSeparatedText";
 
 export interface Props extends ThemedTextProps {
 	mediaList?: Pick<MediaList, "status" | "progress"> | null | undefined;
@@ -69,18 +69,5 @@ export default function MediaListStatusDisplay({
 		}
 	}
 
-	return (
-		<ThemedText {...props} style={[props.style]}>
-			{texts.flatMap((element, i) => {
-				const arr = [];
-
-				if (i !== 0) {
-					arr.push(" • ");
-				}
-				arr.push(element);
-
-				return arr;
-			})}
-		</ThemedText>
-	);
+	return <DotSeparatedText {...props} texts={texts} />;
 }

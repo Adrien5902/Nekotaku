@@ -20,6 +20,7 @@ import CustomTabView from "@/components/CustomTabView";
 import { GET_MEDIA_QUERY } from "@/types/MediaList";
 import { useSettings } from "@/components/Settings/Context";
 import React from "react";
+import MediaFollowing from "@/components/Media/MediaFollowing";
 
 export default function MediaPage() {
 	const { id } = useLocalSearchParams();
@@ -161,7 +162,7 @@ function MediaPageTabBar({
 		{
 			key: "following",
 			icon: "user-plus",
-			component: <ThemedText>following</ThemedText>,
+			component: <MediaFollowing media={media} />,
 		},
 		{
 			key: "characters",

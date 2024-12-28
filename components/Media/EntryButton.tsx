@@ -26,6 +26,7 @@ import { useEffect, useState } from "react";
 import { QUERY as MEDIA_LISTS_QUERY } from "../ToggleContext";
 import { autoUpdateMediaListByProgress } from "@/types/MediaList";
 import useLang from "@/hooks/useLang";
+import React from "react";
 
 const ADD_ONE_PROGRESS_MUTATION = gql(`
 mutation AddOneProgress($progress: Int, $status: MediaListStatus, $mediaId: Int) {
