@@ -1,6 +1,6 @@
 import { Spacing, TextSizes } from "@/constants/Sizes";
 import { useThemeColors } from "@/hooks/useThemeColor";
-import { memo, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { Dimensions, View } from "react-native";
 import {
 	type NavigationState,
@@ -12,26 +12,34 @@ import {
 } from "react-native-tab-view";
 import Icon, { type IconName } from "./Icon";
 
+interface Scene {
+	icon: string;
+	component: JSX.Element;
+	key: string;
+}
+
 export interface Props {
-	scenes: {
-		icon: string;
-		component: JSX.Element;
-		key: string;
-	}[];
+	scenes: Scene[];
+}
+
+function addMemo(scenes: Scene[]) {
+	return scenes.map((scene) => ({
+		...scene,
+		component: memo(() => scene.component),
+	}));
 }
 
 export default function CustomTabView({ scenes }: Props) {
 	const colors = useThemeColors();
 	const [index, setIndex] = useState(0);
 
-	const renderScene = ({ route }: { route: Route }) => {
-		const scene = scenes.find((s) => s.key === route.key);
-		return scene
-			? (memo(() => scene.component) as unknown as React.ReactNode)
-			: null;
-	};
+	const [routes, setRoutes] = useState(addMemo(scenes));
 
-	const [routes] = useState<Route[]>(scenes);
+	const renderScene = ({ route }: { route: Route }) => {
+		const scene = routes.find((r) => r.key === route.key);
+		if (!scene) return null;
+		return <scene.component />;
+	};
 
 	const renderTabBar: (
 		props: SceneRendererProps & {
