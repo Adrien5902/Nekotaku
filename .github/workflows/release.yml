@@ -29,6 +29,7 @@ jobs:
             echo "profile=preview" >> $GITHUB_ENV
           else
             echo "profile=release" >> $GITHUB_ENV
+          fi
 
       - name: Run EAS update
         env:
