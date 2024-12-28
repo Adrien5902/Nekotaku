@@ -6,7 +6,7 @@ import type {
 	User,
 	UserAvatar,
 } from "@/types/Anilist/graphql";
-import { Image, View } from "react-native";
+import { Image } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { Spacing, TextSizes } from "@/constants/Sizes";
 import useLang from "@/hooks/useLang";
@@ -39,10 +39,10 @@ export default function OtherUserMediaListEntry({ mediaList, media }: Props) {
 	}
 	if (mediaList?.score) {
 		texts.push(
-			<>
+			<ThemedText key="progress">
 				<ThemedText>{`${mediaList.score}/10`}</ThemedText>{" "}
 				<Icon name="star-half-stroke" size={TextSizes.s} />
-			</>,
+			</ThemedText>,
 		);
 	}
 	if (
@@ -51,10 +51,10 @@ export default function OtherUserMediaListEntry({ mediaList, media }: Props) {
 		mediaList?.progress < media?.episodes
 	) {
 		texts.push(
-			<>
+			<ThemedText key="progress">
 				<ThemedText>{`${mediaList.progress}/${media.episodes}`}</ThemedText>{" "}
 				<Icon name="list-check" size={TextSizes.s} />
-			</>,
+			</ThemedText>,
 		);
 	}
 
