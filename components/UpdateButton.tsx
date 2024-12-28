@@ -40,7 +40,13 @@ export default function UpdateButton() {
 	return (
 		<CustomButton
 			backgroundStyle={{ gap: Spacing.m }}
-			backgroundColor={error ? "alert" : "accent"}
+			backgroundColor={
+				error
+					? "alert"
+					: (checked || isChecking) && !isUpdateAvailable
+						? "primary"
+						: "accent"
+			}
 			textSize="s"
 			onPress={() => {
 				if (!error && !isDownloading) {
