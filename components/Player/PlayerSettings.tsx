@@ -88,8 +88,11 @@ export function PlayerSettings({
 				}
 				defaultValue={selectedLecteur?.id.toString()}
 				onValueChange={(value) => {
-					if (setSelectedLecteur && episode)
-						setSelectedLecteur(episode.lecteurs[Number.parseInt(value) - 1]);
+					const foundLecteur = episode?.lecteurs.find(
+						(l) => l.id === Number.parseInt(value),
+					);
+					if (setSelectedLecteur && foundLecteur)
+						setSelectedLecteur(foundLecteur);
 				}}
 			/>
 		</View>
