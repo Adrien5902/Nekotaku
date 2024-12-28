@@ -76,6 +76,7 @@ export interface LangScheme {
             details: {
                 status: string,
                 releaseDate: string,
+                unknownReleaseDate: string,
                 numberOfEpisodes: string,
                 duration: string,
                 season: string,

@@ -108,6 +108,7 @@ export const frFR: LangScheme = {
                 trailer: "Trailer",
                 status: "Status",
                 releaseDate: "Date de sortie",
+                unknownReleaseDate: "Inconnue",
                 numberOfEpisodes: "Nb. d'épisodes",
                 duration: "Durée d'un ep.",
                 season: "Saison",

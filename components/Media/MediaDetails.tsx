@@ -86,7 +86,9 @@ export default function MediaDetails({
 					},
 					{
 						label: lang.pages.media.details.releaseDate,
-						text: `${dateStrFromFuzzyDate(media?.startDate, settings.lang)} - ${dateStrFromFuzzyDate(media?.endDate, settings.lang)}`,
+						text: media?.startDate?.year
+							? `${dateStrFromFuzzyDate(media?.startDate, settings.lang)}${media?.endDate?.year ? ` - ${dateStrFromFuzzyDate(media?.endDate, settings.lang)}` : ""}`
+							: lang.pages.media.details.unknownReleaseDate,
 					},
 					{
 						label: lang.pages.media.details.numberOfEpisodes,
@@ -175,9 +177,9 @@ function dateStrFromFuzzyDate(
 	);
 
 	return datetime.toLocaleDateString(langId, {
-		month: "long",
-		day: "numeric",
-		year: "numeric",
+		month: date?.month ? "long" : undefined,
+		day: date?.day ? "numeric" : undefined,
+		year: date?.year ? "numeric" : undefined,
 	});
 }
 
