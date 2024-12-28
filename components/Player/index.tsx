@@ -34,6 +34,7 @@ import {
 interface Props {
 	isFullscreen: boolean;
 	episode: Episode;
+	episodes: Episode[];
 	media: PlayerContextT["media"];
 	toggleFullscreen: (force?: boolean) => void;
 }
@@ -43,6 +44,7 @@ export default function Player({
 	episode,
 	media,
 	toggleFullscreen,
+	episodes,
 }: Props) {
 	const videoPlayerRef = useRef<Video>(null);
 	const styles = useStyles();
@@ -196,6 +198,7 @@ export default function Player({
 				statusRef,
 				forceViewControls,
 				playerStyle,
+				episodes,
 			}}
 		>
 			<Modal>

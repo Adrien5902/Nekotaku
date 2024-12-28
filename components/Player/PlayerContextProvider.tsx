@@ -7,6 +7,7 @@ import type { ViewStyle } from "react-native";
 
 export const PlayerContext = createContext<PlayerContextT>({
 	episode: undefined,
+	episodes: [],
 	isFullscreen: false,
 	loading: true,
 	setIsLoadingVid: () => {},
@@ -25,6 +26,7 @@ export interface PlayerContextT {
 	setIsLoadingVid: React.Dispatch<React.SetStateAction<boolean>>;
 	isFullscreen: boolean;
 	episode?: Episode;
+	episodes: Episode[];
 	media:
 		| (Pick<Media, "idMal" | "id"> & {
 				title?: Pick<MediaTitle, "romaji" | "english"> | undefined | null;

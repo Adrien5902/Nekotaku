@@ -100,6 +100,7 @@ const VideoPlayer = () => {
 					episode,
 					toggleFullscreen,
 					media,
+					episodes,
 				}}
 				key={episode.id}
 			/>

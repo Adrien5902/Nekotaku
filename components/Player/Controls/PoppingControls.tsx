@@ -7,14 +7,11 @@ import { millisToTimeStamp } from "@/types/Player";
 import Slider from "@react-native-community/slider";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import {
-	View,
-	ActivityIndicator,
-	TouchableWithoutFeedback,
-} from "react-native";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
 import GoogleCast, { useDevices } from "react-native-google-cast";
 import usePlayerContext from "../PlayerContextProvider";
 import { useControlsContext } from "./useControlsContext";
+import { router } from "expo-router";
 
 export function PoppingControls({
 	children,
@@ -30,6 +27,7 @@ export function PoppingControls({
 		setSettingsVisible,
 		isFullscreen,
 		toggleFullscreen,
+		episodes,
 	} = usePlayerContext();
 
 	const { currentStatus, shouldDisplayControls } = useControlsContext();
@@ -39,8 +37,29 @@ export function PoppingControls({
 
 	const fullscreenMultiplier = isFullscreen ? 1.5 : 1;
 
+	const style = StyleSheet.create({
+		middleIcon: {
+			padding: Spacing.m * fullscreenMultiplier,
+			borderRadius: Spacing.m * fullscreenMultiplier,
+			textAlign: "center",
+		},
+	});
+
+	const middleIconProps = {
+		style: style.middleIcon,
+		size: TextSizes.xxl * fullscreenMultiplier,
+		color: Colors.dark.text,
+	};
+
+	const hasPreviousEp = episode?.id !== undefined && episode.id > 0;
+	const hasNextEp =
+		episode?.id !== undefined && episode.id < episodes.length - 1;
+
 	return (
 		<>
+			{/* Upper half */}
+
+			{/* Top part */}
 			{shouldDisplayControls && episode ? (
 				<>
 					<LinearGradient
@@ -92,17 +111,36 @@ export function PoppingControls({
 					</LinearGradient>
 				</>
 			) : null}
-
+			{/* In between */}
 			{children}
 
+			{/* Bottom half */}
 			{shouldDisplayControls ? (
 				<>
+					{/* Middle buttons */}
 					<View
 						style={{
 							flex: 1,
-							justifyContent: "center",
+							flexDirection: "row",
+							width: "80%",
+							alignItems: "center",
+							justifyContent: "space-around",
 						}}
 					>
+						{
+							<Icon
+								onPress={() => {
+									if (hasPreviousEp)
+										router.setParams({ episodeId: episode.id - 1 });
+								}}
+								name={"backward-step"}
+								{...middleIconProps}
+								style={{
+									...middleIconProps.style,
+									opacity: Number(hasPreviousEp),
+								}}
+							/>
+						}
 						{loading ? (
 							<ActivityIndicator size="large" color={Colors.dark.text} />
 						) : (
@@ -114,19 +152,24 @@ export function PoppingControls({
 										playerRef.current?.playAsync();
 									}
 								}}
-								style={{
-									aspectRatio: 1,
-									padding: Spacing.m * fullscreenMultiplier,
-									borderRadius: Spacing.m * fullscreenMultiplier,
-									textAlign: "center",
-								}}
 								name={currentStatus?.isPlaying ? "pause" : "play"}
-								size={TextSizes.xxl * fullscreenMultiplier}
-								color={Colors.dark.text}
+								{...middleIconProps}
 							/>
 						)}
+						<Icon
+							onPress={() => {
+								if (hasNextEp) router.setParams({ episodeId: episode.id + 1 });
+							}}
+							name={"forward-step"}
+							{...middleIconProps}
+							style={{
+								...middleIconProps.style,
+								opacity: Number(hasNextEp),
+							}}
+						/>
 					</View>
 
+					{/* Bottom bar */}
 					<LinearGradient
 						colors={["#00000000", "#000000ff"]}
 						style={{
