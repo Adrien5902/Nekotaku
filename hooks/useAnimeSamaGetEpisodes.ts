@@ -2,7 +2,7 @@ import type { AnimeSamaUrl, Episode, EpisodeId, EpisodeName, Lang } from "@/type
 import { useCachedPromise } from "./usePromise";
 import { CacheReadType } from "./useCache";
 
-export function useAnimeSamaGetLecteurs(url: AnimeSamaUrl | undefined, currentLang: keyof typeof Lang | null, customEpisodes?: { id: EpisodeId, name: EpisodeName }[]) {
+export function useAnimeSamaGetEpisodes(url: AnimeSamaUrl | undefined, currentLang: keyof typeof Lang | null, customEpisodes?: { id: EpisodeId, name: EpisodeName }[]) {
     return useCachedPromise(
         CacheReadType.MemoryAndIfNotDisk,
         "animeSamaEpisodes",

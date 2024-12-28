@@ -10,6 +10,10 @@ import { ColorTheme, Lang } from "@/components/Settings/types";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Spacing } from "@/constants/Sizes";
+import {
+	type SupportedLecteurs,
+	supportedLecteurs,
+} from "@/hooks/useGetVideoSource";
 import useLang from "@/hooks/useLang";
 import { MediaType } from "@/types/Anilist/graphql";
 import { ScrollView, View } from "react-native";
@@ -65,6 +69,26 @@ function AppWorkSettings() {
 						setSettings((s) => ({ ...s, defaultMode: value }));
 					}}
 					defaultValue={settings.defaultMode}
+				/>
+			</View>
+
+			<View>
+				<ThemedText style={{ padding: Spacing.m }}>
+					Preferred Lecteur :
+				</ThemedText>
+
+				<SelectButtons
+					buttons={Object.keys(supportedLecteurs).map((l) => ({
+						key: l,
+						title: l,
+					}))}
+					defaultValue={settings.preferredLecteur}
+					onValueChange={(value) =>
+						setSettings((s) => ({
+							...s,
+							preferredLecteur: value as SupportedLecteurs,
+						}))
+					}
 				/>
 			</View>
 

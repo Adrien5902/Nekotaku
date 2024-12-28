@@ -80,6 +80,13 @@ export const frFR: LangScheme = {
         }
     },
     pages: {
+        player: {
+            settings: {
+                playBackSpeed: "Playback speed",
+                playBackSpeedMultiplier: (mul) => `x${mul}`,
+                selectedLecteur: "Selected Lecteur"
+            }
+        },
         episodes: {
             episode: (n: number) => `Épisode ${n}`,
             loading: "Récupération des épisodes"

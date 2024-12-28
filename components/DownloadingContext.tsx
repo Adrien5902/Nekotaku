@@ -9,7 +9,12 @@ import notifee, {
 import type { Media, MediaTitle } from "@/types/Anilist/graphql";
 import { Colors } from "@/constants/Colors";
 import type { Episode, EpisodeId } from "@/types/AnimeSama";
-import { DefaultSettings, type Lang } from "./Settings/types";
+import {
+	DefaultSettings,
+	type Lang,
+	getPreferredLecteur,
+	type Settings,
+} from "./Settings/types";
 import { useSettings } from "./Settings/Context";
 import { getTranslationByLang } from "@/hooks/useLang";
 
@@ -142,12 +147,15 @@ export class Downloader {
 			| null
 			| undefined,
 		episode: Episode,
+		settings: Settings,
 	) {
 		if (!media?.id) {
 			return null;
 		}
 
-		const [uriPromise, headers] = getVideoUri(episode);
+		const [uriPromise, headers] = getVideoUri(
+			getPreferredLecteur(episode, settings),
+		);
 		const uri = await uriPromise;
 
 		const formattedFileName = Downloader.formatFileName(media.id, episode.id);

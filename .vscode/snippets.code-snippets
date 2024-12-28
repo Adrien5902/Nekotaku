@@ -27,7 +27,7 @@
 		"scope": "typescriptreact",
 		"prefix": "colors",
 		"body": [
-			"const colors = useThemeColor$1()",
+			"const colors = useThemeColors$1()",
 		],
 		"description": "Use colors"
 	},
@@ -38,5 +38,13 @@
 			"const styles = useStyles$1()",
 		],
 		"description": "Use styles"
+	},
+	"Use settings": {
+		"scope": "typescriptreact",
+		"prefix": "usesettings",
+		"body": [
+			"const settings = useSettings$1()",
+		],
+		"description": "Use settings"
 	},
 }
