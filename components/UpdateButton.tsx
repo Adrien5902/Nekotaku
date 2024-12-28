@@ -37,8 +37,6 @@ export default function UpdateButton() {
 		"runtimeVersion" in availableUpdate.manifest &&
 		availableUpdate.manifest.runtimeVersion;
 
-	console.log(checked);
-
 	return (
 		<CustomButton
 			backgroundStyle={{ gap: Spacing.m }}
