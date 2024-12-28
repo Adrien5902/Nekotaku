@@ -80,6 +80,11 @@ export const frFR: LangScheme = {
         }
     },
     pages: {
+        tabBar: {
+            explore: "Découvrir",
+            list: (type) => `Mes ${frFR.Anilist.MediaType[type]}s`,
+            me: "Moi",
+        },
         player: {
             settings: {
                 playBackSpeed: "Playback speed",

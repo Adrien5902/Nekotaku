@@ -80,6 +80,11 @@ export const enUS: LangScheme = {
         }
     },
     pages: {
+        tabBar: {
+            list: (type) => `${enUS.Anilist.MediaType[type]} List`,
+            explore: "Explore",
+            me: "Me"
+        },
         player: {
             settings: {
                 playBackSpeed: "Playback speed",

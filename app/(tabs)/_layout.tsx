@@ -3,9 +3,12 @@ import CustomTabBar from "@/components/CustomTabBar";
 import Icon from "@/components/Icon";
 import { useToggle } from "@/components/ToggleContext";
 import { MediaType } from "@/types/Anilist/graphql";
+import useLang from "@/hooks/useLang";
 
 export default function TabLayout() {
 	const { appMode } = useToggle();
+	const lang = useLang();
+
 	return (
 		<Tabs
 			tabBar={(props) => <CustomTabBar {...props} />}
@@ -16,7 +19,7 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="index"
 				options={{
-					title: "List",
+					title: lang.pages.tabBar.list(appMode),
 					tabBarIcon: ({ color }) => (
 						<Icon
 							name={appMode === MediaType.Manga ? "book-open" : "film"}
@@ -28,14 +31,14 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="explore"
 				options={{
-					title: "Explore",
+					title: lang.pages.tabBar.explore,
 					tabBarIcon: ({ color }) => <Icon name="compass" color={color} />,
 				}}
 			/>
 			<Tabs.Screen
 				name="account"
 				options={{
-					title: "Me",
+					title: lang.pages.tabBar.me,
 					tabBarIcon: ({ color }) => <Icon name="user" color={color} />,
 				}}
 			/>

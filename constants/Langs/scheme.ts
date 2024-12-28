@@ -43,6 +43,11 @@ export interface LangScheme {
     }
 
     pages: {
+        tabBar: {
+            list: (type: MediaType) => string
+            explore: string
+            me: string
+        }
         player: {
             settings: {
                 playBackSpeed: string
