@@ -19,6 +19,7 @@ import Cache, { CacheReadType } from "@/hooks/useCache";
 import CustomTabView from "@/components/CustomTabView";
 import { GET_MEDIA_QUERY } from "@/types/MediaList";
 import { useSettings } from "@/components/Settings/Context";
+import React from "react";
 
 export default function MediaPage() {
 	const { id } = useLocalSearchParams();
@@ -129,7 +130,7 @@ function MediaPageTabBar({
 						key: "episodes",
 						icon: "film",
 
-						component: () => (
+						component: (
 							<EpisodesCollection
 								media={media}
 								progress={media.mediaListEntry?.progress}
@@ -140,14 +141,14 @@ function MediaPageTabBar({
 			: []),
 
 		{
-			component: () => <MediaDetails media={media} />,
+			component: <MediaDetails media={media} />,
 			key: "details",
 			icon: "align-left",
 		},
 		{
 			key: "relations",
 			icon: "link",
-			component: () => (
+			component: (
 				<MediaRelations
 					nodes={media?.relations?.edges?.map((edge, index) => ({
 						media: media.relations?.nodes?.[index],
@@ -160,15 +161,15 @@ function MediaPageTabBar({
 		{
 			key: "following",
 			icon: "user-plus",
-			component: () => <ThemedText>following</ThemedText>,
+			component: <ThemedText>following</ThemedText>,
 		},
 		{
 			key: "characters",
 			icon: "user-group",
-			component: () => <ThemedText>Characters</ThemedText>,
+			component: <ThemedText>Characters</ThemedText>,
 		},
 		{
-			component: () => <ThemedText>staff</ThemedText>,
+			component: <ThemedText>staff</ThemedText>,
 			key: "staff",
 			icon: "user-tie",
 		},

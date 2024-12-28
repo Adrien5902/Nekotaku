@@ -1,23 +1,21 @@
 import { Spacing, TextSizes } from "@/constants/Sizes";
 import { useThemeColors } from "@/hooks/useThemeColor";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Dimensions, View } from "react-native";
 import {
 	type NavigationState,
 	type Route,
-	SceneMap,
 	type SceneRendererProps,
 	TabBar,
 	type TabDescriptor,
 	TabView,
 } from "react-native-tab-view";
 import Icon, { type IconName } from "./Icon";
-import { ThemedText } from "./ThemedText";
 
 export interface Props {
 	scenes: {
 		icon: string;
-		component: React.ComponentType<unknown>;
+		component: JSX.Element;
 		key: string;
 	}[];
 }
@@ -28,7 +26,9 @@ export default function CustomTabView({ scenes }: Props) {
 
 	const renderScene = ({ route }: { route: Route }) => {
 		const scene = scenes.find((s) => s.key === route.key);
-		return scene ? <scene.component /> : null;
+		return scene
+			? (memo(() => scene.component) as unknown as React.ReactNode)
+			: null;
 	};
 
 	const [routes] = useState<Route[]>(scenes);
