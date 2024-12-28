@@ -98,6 +98,7 @@ export interface LangScheme {
                 source: string,
                 origin: string,
                 trailer: string
+                synonyms: string
             }
         }
     },

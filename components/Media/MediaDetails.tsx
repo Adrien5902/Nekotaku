@@ -41,6 +41,7 @@ export default function MediaDetails({
 				| "source"
 				| "countryOfOrigin"
 				| "seasonYear"
+				| "synonyms"
 		  > &
 				MediaStatsProps["media"] & {
 					trailer?:
@@ -161,6 +162,25 @@ export default function MediaDetails({
 						</ThemedText>
 					</View>
 				</TouchableOpacity>
+			) : null}
+
+			{media?.synonyms?.length ? (
+				<View>
+					<ThemedText
+						weight="bold"
+						style={{ paddingHorizontal: Spacing.l, marginTop: Spacing.m }}
+					>
+						{lang.pages.media.details.synonyms} :
+					</ThemedText>
+					<DetailsTable
+						lines={media.synonyms
+							.filter((s) => s !== null)
+							.map((synonym) => ({
+								label: synonym,
+								text: "",
+							}))}
+					/>
+				</View>
 			) : null}
 		</ScrollView>
 	);

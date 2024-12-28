@@ -119,6 +119,7 @@ export const frFR: LangScheme = {
                 season: "Saison",
                 source: "Source",
                 origin: "Origine",
+                synonyms: "Synonymes"
             }
         },
         downloadedEpisodes: {
