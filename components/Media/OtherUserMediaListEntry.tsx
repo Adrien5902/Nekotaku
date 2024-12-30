@@ -39,7 +39,7 @@ export default function OtherUserMediaListEntry({ mediaList, media }: Props) {
 	}
 	if (mediaList?.score) {
 		texts.push(
-			<ThemedText key="progress">
+			<ThemedText key="score">
 				<ThemedText>{`${mediaList.score}/10`}</ThemedText>{" "}
 				<Icon name="star-half-stroke" size={TextSizes.s} />
 			</ThemedText>,
