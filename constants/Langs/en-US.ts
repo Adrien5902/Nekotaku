@@ -120,7 +120,10 @@ export const enUS: LangScheme = {
                 season: "Season",
                 source: "Source",
                 origin: "Origin",
-                synonyms: "Synonyms"
+                synonyms: "Synonyms",
+            },
+            relations: {
+                noRelations: "No relations"
             }
         },
         downloadedEpisodes: {

@@ -103,6 +103,9 @@ export interface LangScheme {
                 trailer: string
                 synonyms: string
             }
+            relations: {
+                noRelations: string
+            }
         }
     },
 
