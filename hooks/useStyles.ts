@@ -20,6 +20,14 @@ export function useStyles() {
             justifyContent: "space-between"
         },
 
+        topTextDescriptor: {
+            position: "absolute",
+            paddingHorizontal: Spacing.m,
+            backgroundColor: colors.primary,
+            top: -Spacing.m,
+            left: Spacing.m,
+        },
+
         fullscreenContainer: {
             position: "absolute",
             top: 0,

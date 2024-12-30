@@ -11,6 +11,7 @@ import {
 	Image,
 	Linking,
 	ScrollView,
+	TouchableHighlight,
 	TouchableOpacity,
 	View,
 } from "react-native";
@@ -24,6 +25,7 @@ import useLang from "@/hooks/useLang";
 import type { CountryOfOrigin } from "@/constants/Langs/scheme";
 import type { Lang } from "../Settings/types";
 import { useSettings } from "../Settings/Context";
+import { useState } from "react";
 
 export default function MediaDetails({
 	media,
@@ -60,21 +62,62 @@ export default function MediaDetails({
 	const hours = Math.floor(duration / 60);
 	const lang = useLang();
 	const settings = useSettings();
+	const defaultDescriptionHeight = Dimensions.get("window").height / 10;
+	const [descriptionHeight, setDescriptionHeight] = useState(
+		defaultDescriptionHeight,
+	);
+	const [documentHeight, setDocumentHeight] = useState(
+		defaultDescriptionHeight,
+	);
 
 	return (
-		<ScrollView style={{ flex: 1 }}>
+		<ScrollView
+			style={{ flex: 1 }}
+			contentContainerStyle={{ paddingVertical: Spacing.m }}
+		>
 			{media?.description ? (
-				<View
-					style={[
-						styles.PrimaryElement,
-						{ height: Dimensions.get("window").height / 4 },
-					]}
+				<TouchableHighlight
+					onPress={() => {
+						setDescriptionHeight((d) =>
+							d === defaultDescriptionHeight
+								? documentHeight + Spacing.m
+								: defaultDescriptionHeight,
+						);
+					}}
 				>
-					<WebView
-						source={{ html: style + media.description }}
-						style={{ backgroundColor: colors.background }}
-					/>
-				</View>
+					<View
+						style={[
+							styles.PrimaryElement,
+							{
+								overflow: "visible",
+								height: descriptionHeight,
+							},
+						]}
+					>
+						<ThemedText
+							weight="bold"
+							style={[
+								styles.topTextDescriptor,
+								{ backgroundColor: colors.background },
+							]}
+						>
+							{lang.pages.media.details.description}
+						</ThemedText>
+						<WebView
+							injectedJavaScript={
+								"window.location.hash = 1; document.title = document.body.offsetHeight * 0.45;"
+							}
+							automaticallyAdjustContentInsets={false}
+							scrollEnabled={false}
+							source={{ html: style + media.description }}
+							style={{ backgroundColor: colors.background }}
+							onNavigationStateChange={(navState) => {
+								console.log(navState.title);
+								setDocumentHeight(Number.parseFloat(navState.title));
+							}}
+						/>
+					</View>
+				</TouchableHighlight>
 			) : null}
 
 			<MediaStats media={media} />

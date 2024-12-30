@@ -110,6 +110,7 @@ export const enUS: LangScheme = {
         },
         media: {
             details: {
+                description: "Description",
                 trailer: "Trailer",
                 status: "Media Status",
                 releaseDate: "Release Date",

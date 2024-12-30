@@ -91,6 +91,7 @@ export interface LangScheme {
         },
         media: {
             details: {
+                description: string;
                 status: string,
                 releaseDate: string,
                 unknownReleaseDate: string,

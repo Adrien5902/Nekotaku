@@ -460,17 +460,7 @@ function PlusMinusNumberInput({
 				style,
 			]}
 		>
-			<ThemedText
-				style={{
-					position: "absolute",
-					paddingHorizontal: Spacing.m,
-					backgroundColor: colors.primary,
-					top: -Spacing.m,
-					left: Spacing.m,
-				}}
-			>
-				{tilte}
-			</ThemedText>
+			<ThemedText style={styles.topTextDescriptor}>{tilte}</ThemedText>
 			<Icon
 				size={TextSizes.m}
 				style={{ padding: Spacing.m, paddingRight: Spacing.xl }}

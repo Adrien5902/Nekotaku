@@ -110,6 +110,7 @@ export const frFR: LangScheme = {
         },
         media: {
             details: {
+                description: "Description",
                 trailer: "Trailer",
                 status: "Status",
                 releaseDate: "Date de sortie",
