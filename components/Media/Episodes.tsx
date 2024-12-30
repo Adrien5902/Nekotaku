@@ -34,12 +34,11 @@ export default function EpisodesCollection({
 	const settings = useSettings();
 	const {
 		loading: loadingAnimeSama,
-		data: animeSamaData,
+		data: searchResult,
 		error: errorSearch,
 		refresh: refreshAnimeSamaSearch,
 	} = useAnimeSamaSearch(media);
 
-	const searchResult = animeSamaData?.result;
 	const url = searchResult?.url
 		? (AnimeSamaUrl.fromURL(searchResult?.url) ?? undefined)
 		: undefined;
@@ -53,7 +52,7 @@ export default function EpisodesCollection({
 		CacheReadType.MemoryAndIfNotDisk,
 		"langsAndEpisodes",
 		async () => await url?.getAvailableLangsAndEpisodes(),
-		[animeSamaData],
+		[searchResult],
 	);
 	const langs = data?.langs;
 	const customEpisodesData = data?.customEpisodes;
@@ -195,10 +194,9 @@ function EpisodeButton({
 				}}
 			>
 				<ThemedText
-					style={{ paddingLeft: Spacing.m }}
+					style={{ paddingLeft: Spacing.m, flex: 1 }}
 					size="m"
 					weight={selected ? "bold" : undefined}
-					numberOfLines={1}
 				>
 					{typeof episode.name === "string"
 						? episode.name

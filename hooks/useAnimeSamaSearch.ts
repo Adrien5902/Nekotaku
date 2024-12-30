@@ -1,19 +1,22 @@
-import { MediaStatus, type Media, type MediaTitle } from "@/types/Anilist/graphql";
+import { type MediaFormat, MediaRelation, MediaStatus, type Media, type MediaTitle } from "@/types/Anilist/graphql";
 import { DOMParser } from 'react-native-html-parser';
 import { CacheReadType } from "./useCache";
 import { useCachedPromise } from "./usePromise";
 import { distance } from 'fastest-levenshtein';
+import { gql } from "@/types/Anilist";
+import { type ApolloClient, useApolloClient } from "@apollo/client";
 
 interface SeasonData {
     season: number;
     part: number | null;
 }
 
-export type AnimeSamaSearchMediaType = Pick<Media, "synonyms" | "format" | "status"> & {
+export type AnimeSamaSearchMediaType = Pick<Media, "id" | "synonyms" | "format" | "status"> & {
     title?: Pick<MediaTitle, "english" | "romaji"> | null | undefined
 } | null | undefined
 
 export function useAnimeSamaSearch(media?: AnimeSamaSearchMediaType) {
+    const apolloClient = useApolloClient()
     return useCachedPromise(CacheReadType.MemoryAndIfNotDisk, "animeSamaSearch", async () => {
         if (!media) {
             return undefined
@@ -23,12 +26,12 @@ export function useAnimeSamaSearch(media?: AnimeSamaSearchMediaType) {
             throw new Error("Media not yet released")
         }
 
-        const searchRes = await searchMedia(media)
+        const searchRes = await searchMedia(media, apolloClient)
         if (!searchRes) {
             throw new Error("Anime not found on AnimeSama")
         }
         return searchRes
-    }, [media])
+    }, [media?.id ?? 0])
 }
 
 export async function searchResultHTML(query: string): Promise<string> {
@@ -46,19 +49,19 @@ export async function searchResultHTML(query: string): Promise<string> {
     return html;
 }
 
-interface SearchResult {
+export interface AnimeSamaSearchResult {
     title: string,
     subtitles: string[],
     url: string,
 }
 
-export function parseSearchResultFromHTML(html: string): SearchResult[] {
+export function parseSearchResultFromHTML(html: string): AnimeSamaSearchResult[] {
     const parser = new DOMParser();
     const document = parser.parseFromString(html, 'text/html');
 
     const links = document.getElementsByTagName('a');
 
-    const results: SearchResult[] = [];
+    const results: AnimeSamaSearchResult[] = [];
     for (let i = 0; i < links.length; i++) {
         const linkElement = links[i];
         const href = linkElement.getAttribute('href');
@@ -93,13 +96,13 @@ export async function searchBestMatch(query: string) {
             return prev
         }
 
-        return [curr, smallest_dist] as [SearchResult, number]
+        return [curr, smallest_dist] as [AnimeSamaSearchResult, number]
 
-    }, null as [SearchResult, number] | null)
+    }, null as [AnimeSamaSearchResult, number] | null)
     return result?.[0]
 }
 
-function getSeasonFromString(s: string): ApplyTitleResult<SeasonData> | null {
+function getSeasonFromString(s: string) {
     const seasonDigitRegex = /season (\d+)/gim;
     const seasonDigitThRegex = /(\d+)(?:st|nd|rd|th) season/gim;
     const seasonEndOfStrDigitRegex = / (\b\d)$/gim
@@ -107,107 +110,142 @@ function getSeasonFromString(s: string): ApplyTitleResult<SeasonData> | null {
 
     const partRegex = /part (\d+)/gim
     const partMatch = s.matchAll(partRegex).next().value;
-    let newString = s;
+    let newTitle = s;
     let part: number | null = null;
     if (partMatch) {
-        newString = s.replace(partMatch[0], "")
+        newTitle = s.replace(partMatch[0], "")
         part = partMatch ? Number.parseInt(partMatch[1]) : null
     }
 
     for (const regex of [seasonDigitRegex, seasonDigitThRegex, seasonEndOfStrDigitRegex]) {
-        const match = newString.matchAll(regex).next().value
+        const match = newTitle.matchAll(regex).next().value
         if (match) {
-            return { newString: newString.replace(match[0], ""), data: { season: Number.parseInt(match[1]), part } }
+            return { newTitle: newTitle.replace(match[0], ""), data: { season: Number.parseInt(match[1]), part } }
         }
     }
 
-    const seasonNameMatch = newString.matchAll(seasonNameRegex).next().value
+    const seasonNameMatch = newTitle.matchAll(seasonNameRegex).next().value
     if (seasonNameMatch) {
         const season = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth"].indexOf(seasonNameMatch[1]) + 1;
-        return { newString: newString.replace(seasonNameMatch[0], ""), data: { part, season } }
+        return { newTitle: newTitle.replace(seasonNameMatch[0], ""), data: { part, season } }
     }
 
-    return { newString, data: { season: 1, part } }
+    return { newTitle, data: { season: 1, part } }
 }
 
-function getFormatData(media: AnimeSamaSearchMediaType): {
-    urlAppending: (data?: SeasonData) => string
-    searchResultApplyTitle?: (s: string) => ApplyTitleResult<SeasonData> | null,
-} {
-    switch (media?.format) {
+type FormatData = {
+    appendToUrl: string
+    newTitles: string[]
+};
+
+function getFormatData(mediaFormat: MediaFormat | undefined, searchFriendlyMediaNames: string[]): FormatData {
+    const titlesSeasonData = searchFriendlyMediaNames.map(s => getSeasonFromString(s))
+    const seasonData = titlesSeasonData.find(s => !!s)?.data
+    const newTitles = titlesSeasonData.map(t => searchFriendly(t.newTitle))
+
+    let appendToUrl: string;
+
+    switch (mediaFormat) {
         case "MOVIE":
-            return {
-                urlAppending: () => "film"
-            }
+            appendToUrl = "film";
+            break;
 
         case "OVA":
-            return {
-                urlAppending: () => "oav"
-            }
+            appendToUrl = "oav";
+            break;
 
         case "MANGA":
-            return {
-                urlAppending: () => "scan"
-            }
+            appendToUrl = "scan";
+            break;
 
         default: {
-            return {
-                searchResultApplyTitle: getSeasonFromString,
-                urlAppending: (data?: {
-                    season: number;
-                    part: number | null;
-                    // biome-ignore lint/style/useTemplate: <explanation>
-                }) => data?.season ? "saison" + data.season : "saison1"
-            };
+            appendToUrl = seasonData?.season ? `saison${seasonData.season}` : "saison1"
         }
     }
+
+    return { appendToUrl, newTitles }
 }
 
-interface ApplyTitleResult<T> { newString: string, data: T };
-type ApplyTitle<T> = (s: string) => ApplyTitleResult<T> | null;
-async function searchTitles<T>(media: AnimeSamaSearchMediaType, apply?: ApplyTitle<T>): Promise<AnimeSamaSearch<T> | undefined> {
-    for (const synonym of searchFriendlyMediaNames(media)) {
-        if (synonym) {
-            const { newString, data } = apply ? apply(synonym) ?? { newString: null } : { newString: synonym };
-            if (!newString) {
-                continue
-            }
-
-            const result = await searchBestMatch(newString.trim())
-            if (result) {
-                return { result, data }
-            }
+async function searchTitles(searchFriendlyMediaNames: string[]): Promise<AnimeSamaSearchResult | undefined> {
+    for (const synonym of searchFriendlyMediaNames) {
+        const result = await searchBestMatch(synonym)
+        if (result) {
+            return result
         }
     }
 }
 
 export function mediaNames(media: AnimeSamaSearchMediaType) {
-    return [[media?.title?.english ?? undefined, media?.title?.english?.split(":")[0] ?? undefined, media?.title?.romaji ?? undefined], media?.synonyms].flat()
+    return [[media?.title?.english ?? undefined, media?.title?.english?.split(":")[0] ?? undefined, media?.title?.romaji ?? undefined], media?.synonyms ?? []]
+        .flat()
+        .filter(s => s !== undefined && s !== null)
 }
 
 export function searchFriendlyMediaNames(media: AnimeSamaSearchMediaType) {
-    return mediaNames(media).map(s => s ? searchFriendly(s) : undefined)
+    return mediaNames(media).map(s => searchFriendly(s))
 }
 
-export async function searchMedia(media: AnimeSamaSearchMediaType) {
-    const { urlAppending, searchResultApplyTitle } = getFormatData(media)
-    const searchResult = await searchTitles(media, searchResultApplyTitle)
+export async function searchMedia(media: AnimeSamaSearchMediaType, apolloClient: ApolloClient<object>, recursiveAppendToUrl?: FormatData["appendToUrl"]): Promise<AnimeSamaSearchResult | null> {
+    const searchFriendlyNames = searchFriendlyMediaNames(media)
+    const formatData = getFormatData(media?.format ?? undefined, searchFriendlyNames)
+    const appendToUrl = recursiveAppendToUrl ?? formatData.appendToUrl
+
+    const searchResult = await searchTitles(formatData.newTitles)
+
     if (!searchResult) {
-        return null
+        if (!media?.id) return null
+
+        const relations = await fetchRelations(media.id, apolloClient)
+        const prequels = relations?.filter(relation => relation?.relationType === MediaRelation.Prequel).map(r => r?.node)
+        return prequels?.map(async (prequel) => await searchMedia(prequel, apolloClient, appendToUrl)).find(result => !!result) ?? null
     }
-    searchResult.result.url = searchResult.result.url.trim()
-    if (searchResult.result.url[searchResult.result.url.length - 1] !== "/") {
-        searchResult.result.url += "/"
+
+    searchResult.url = searchResult.url.trim()
+    if (searchResult.url[searchResult.url.length - 1] !== "/") {
+        searchResult.url += "/"
     }
-    searchResult.result.url += urlAppending(searchResult.data ?? undefined)
+    searchResult.url += appendToUrl
+
     return searchResult
 }
 
 export function searchFriendly(s?: string) {
-    return s?.trim().replaceAll("-", "").toLowerCase() ?? ""
+    return s?.trim().replaceAll("-", " ").toLowerCase() ?? ""
 }
 
 export interface AnimeSamaSearch<T> {
     data?: T | undefined;
-    result: SearchResult;
+    result: AnimeSamaSearchResult;
+}
+
+const RELATIONS_QUERY = gql(`
+    query Relations($mediaId: Int) {
+        Media(id: $mediaId) {
+            relations {
+                edges {
+                    node {
+                    id
+                    synonyms
+                    format
+                    status
+                        title {
+                            english
+                            romaji
+                        }
+                    }
+                    relationType
+                }
+            }
+        }
+    }
+`)
+
+async function fetchRelations(mediaId: number, apolloClient: ApolloClient<object>) {
+    const result = await apolloClient.query({ query: RELATIONS_QUERY, variables: { mediaId } })
+
+    if (result.error) {
+        throw result.error
+    }
+
+    return result.data.Media?.relations?.edges
 }

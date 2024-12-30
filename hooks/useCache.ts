@@ -1,6 +1,6 @@
 import * as FileSystem from 'expo-file-system';
 import type { AnimeSamaMediaType, AnimeSamaUrl, Episode, EpisodeId, Lang, LangsAndEpisodes, Lecteur } from "@/types/AnimeSama"
-import type { AnimeSamaSearch, AnimeSamaSearchMediaType } from "./useAnimeSamaSearch"
+import type { AnimeSamaSearch, AnimeSamaSearchMediaType, AnimeSamaSearchResult } from "./useAnimeSamaSearch"
 import type { Media, MediaQuery } from "@/types/Anilist/graphql"
 import type { AniskipData } from "./useAniskip"
 import { useEffect, useRef, useState } from 'react';
@@ -131,8 +131,8 @@ export type CacheValues<T extends CacheKey> = Record<string, CacheValue<T>>
 
 export interface CacheKeys {
     episodeProgress: { data: { positionMillis: number, durationMillis?: number }, deps: [Media["id"], EpisodeId] }
-    langsAndEpisodes: { data: LangsAndEpisodes, deps: [AnimeSamaSearch<unknown> | undefined] }
-    animeSamaSearch: { data: AnimeSamaSearch<unknown>, deps: [AnimeSamaSearchMediaType] }
+    langsAndEpisodes: { data: LangsAndEpisodes, deps: [AnimeSamaSearchResult | undefined] }
+    animeSamaSearch: { data: AnimeSamaSearchResult, deps: [Media["id"]] }
     animeSamaEpisodes: { data: Episode[], deps: [keyof typeof Lang | null, string | undefined, number | undefined, boolean | undefined, AnimeSamaMediaType | undefined] }
     media: { data: MediaQuery["Media"], deps: [Media["id"]] }
     aniskip: { data: AniskipData["results"] | null, deps: [Media["id"], EpisodeId, number | undefined] }
