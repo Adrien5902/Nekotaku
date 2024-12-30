@@ -16,7 +16,9 @@ export function PlayerSettings({
 	setSelectedLecteur,
 }: {
 	selectedLecteur: Lecteur | undefined;
-	setSelectedLecteur: React.Dispatch<React.SetStateAction<Lecteur>> | undefined;
+	setSelectedLecteur:
+		| React.Dispatch<React.SetStateAction<Lecteur | undefined>>
+		| undefined;
 	playbackSpeedRef: React.MutableRefObject<number>;
 }) {
 	const { episode, playerRef } = usePlayerContext();

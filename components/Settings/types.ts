@@ -1,6 +1,6 @@
 import { supportedLecteurs, type SupportedLecteurs } from "@/hooks/useGetVideoSource"
 import { MediaType } from "@/types/Anilist/graphql"
-import type { Episode } from "@/types/AnimeSama"
+import type { Episode, Lecteur } from "@/types/AnimeSama"
 
 export interface Settings {
     colorTheme: ColorTheme
@@ -29,7 +29,7 @@ export const DefaultSettings: Settings = {
     preferredLecteur: "sendvid.com"
 }
 
-export function getPreferredLecteur(episode: Episode, settings: Settings) {
+export function getPreferredLecteur(episode: Episode, settings: Settings): Lecteur | undefined {
     const supportedLecteursForEpisode = episode?.lecteurs.filter((l) =>
         Object.keys(supportedLecteurs).find((l2) => l.hostname.includes(l2)),
     );

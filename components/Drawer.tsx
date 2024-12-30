@@ -96,7 +96,7 @@ export default function Drawer({
 							setFilterEntries(
 								() => (entry: Entry) =>
 									searchFriendlyMediaNames(entry?.media)
-										.map((s) => s.includes(searchStr))
+										.map((s) => s?.includes(searchStr) ?? false)
 										.reduce((prev, curr) => prev || curr),
 							);
 						} else {

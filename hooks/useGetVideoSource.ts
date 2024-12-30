@@ -4,10 +4,6 @@ import { useCachedPromise } from "./usePromise";
 import { CacheReadType } from "./useCache";
 
 export function useGetVideoSource(downloadingContext: Downloader, mediaId: number, episodeId: EpisodeId | undefined, selectedLecteur?: Lecteur) {
-    if (!selectedLecteur) {
-        throw new Error("Lecteur not selected")
-    }
-
     return useCachedPromise(CacheReadType.Memory, "videoUri", () => {
         if (episodeId === undefined) {
             throw new Error("Episode not found")
@@ -19,7 +15,7 @@ export function useGetVideoSource(downloadingContext: Downloader, mediaId: numbe
 
         return getVideoUri(selectedLecteur)[0]
     },
-        [mediaId, episodeId ?? 0, selectedLecteur.url]
+        [mediaId, episodeId ?? 0, selectedLecteur?.url ?? ""]
     );
 };
 
