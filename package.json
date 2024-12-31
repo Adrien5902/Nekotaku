@@ -1,5 +1,7 @@
 {
 	"name": "nekotaku",
+	"displayName": "Nekotaku",
+	"description": "⛩️ An anime watching app 🐱",
 	"main": "expo-router/entry",
 	"version": "0.8.3",
 	"scripts": {

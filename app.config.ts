@@ -1,16 +1,15 @@
 import 'ts-node/register'; // Add this to import TypeScript files
 import type { ExpoConfig } from 'expo/config';
-
-const packageName = process.env.npm_package_name as string;
-const appName = packageName[0].toUpperCase() + packageName.slice(1)
+import { version, name, displayName, description } from './package.json';
 
 const config: ExpoConfig = {
-    name: appName,
-    slug: appName,
+    name: displayName,
+    slug: displayName,
     owner: "adrien5902",
-    version: process.env.npm_package_version,
+    description,
+    version,
     icon: "./assets/app-icons/icon.png",
-    scheme: packageName,
+    scheme: name,
     userInterfaceStyle: "automatic",
     githubUrl: "https://github.com/Adrien5902/Nekotaku",
     backgroundColor: "#151718",
@@ -26,7 +25,7 @@ const config: ExpoConfig = {
     },
     ios: {
         supportsTablet: true,
-        bundleIdentifier: `net.ddns.adrien5902.${packageName}`
+        bundleIdentifier: `net.ddns.adrien5902.${name}`
     },
     notification: {
         icon: "./assets/app-icons/icon-notifications.png",
@@ -38,7 +37,7 @@ const config: ExpoConfig = {
             monochromeImage: "./assets/app-icons/icon-monochrome.png",
             backgroundColor: "#151718"
         },
-        package: `net.ddns.adrien5902.${packageName}`
+        package: `net.ddns.adrien5902.${name}`
     },
     web: {
         bundler: "metro",
