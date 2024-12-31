@@ -6,7 +6,7 @@ import {
 import Icon from "./Icon";
 import {
 	Dimensions,
-	Modal,
+	Modal as ReactModal,
 	ScrollView,
 	TextInput,
 	TouchableOpacity,
@@ -23,7 +23,7 @@ import useStyles from "@/hooks/useStyles";
 import { useApolloClient } from "@apollo/client";
 import { gql } from "@/types/Anilist";
 import { BooleanInput } from "./BooleanInput";
-import useModal from "@/hooks/useModal";
+import Modal, { type ModalState } from "./Modal";
 import { GET_MEDIA_QUERY } from "@/types/MediaList";
 import useLang from "@/hooks/useLang";
 
@@ -179,11 +179,10 @@ function EditMediaListStatusModal({
 		refetch();
 	}
 
-	const { modal: DeleteModal, setModalVisible: setDeleteModalVisible } =
-		useModal(lang.misc.cancel);
+	const deleteModal = useRef<ModalState>(null);
 
 	return (
-		<Modal
+		<ReactModal
 			visible={modalVisible}
 			animationType="slide"
 			transparent={true}
@@ -191,7 +190,7 @@ function EditMediaListStatusModal({
 				setModalVisible(false);
 			}}
 		>
-			<DeleteModal
+			<Modal
 				title={lang.pages.editMediaListStatus.deleteConfirm}
 				buttons={[
 					{
@@ -205,11 +204,13 @@ function EditMediaListStatusModal({
 								},
 								refetchQueries: [GET_MEDIA_QUERY],
 							});
-							setDeleteModalVisible(false);
+							deleteModal.current?.setVisible(false);
 							setModalVisible(false);
 						},
 					},
 				]}
+				closeButton={lang.misc.cancel}
+				ref={deleteModal}
 			/>
 			<ScrollView
 				onScrollEndDrag={(e) => {
@@ -379,7 +380,7 @@ function EditMediaListStatusModal({
 					<TouchableOpacity
 						activeOpacity={0.7}
 						onPress={() => {
-							setDeleteModalVisible(true);
+							deleteModal.current?.setVisible(true);
 						}}
 					>
 						<View style={[styles.PrimaryElement]}>
@@ -412,7 +413,7 @@ function EditMediaListStatusModal({
 					</View>
 				</TouchableOpacity>
 			</ThemedView>
-		</Modal>
+		</ReactModal>
 	);
 }
 

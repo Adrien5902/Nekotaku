@@ -1,30 +1,40 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { useState } from "react";
-import { Dimensions, Modal, TouchableHighlight, View } from "react-native";
+import type React from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { Modal as ReactModal, TouchableHighlight, View } from "react-native";
 import { Spacing } from "@/constants/Sizes";
-import { useThemeColors } from "./useThemeColor";
+import { useThemeColors } from "../hooks/useThemeColor";
 import type { Color } from "@/constants/Colors";
 
-export interface Props {
-	children?: string | JSX.Element;
+export interface ModalProps {
+	children?: React.ReactNode;
 	title?: string;
 	buttons?: { title: string; color?: Color; onPress?: () => void }[];
+	closeButton?: string;
 }
 
-export default function useModal(closeButton?: string) {
-	const [modalVisible, setModalVisible] = useState(false);
-	const colors = useThemeColors();
+export interface ModalState {
+	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-	const modal = ({ children, buttons, title }: Props) => {
-		const b: Props["buttons"] = [
+const Modal = forwardRef<ModalState, ModalProps>(
+	({ closeButton, children, buttons, title }, ref) => {
+		const [visible, setVisible] = useState(false);
+		const colors = useThemeColors();
+
+		useImperativeHandle(ref, () => ({
+			setVisible,
+		}));
+
+		const b: ModalProps["buttons"] = [
 			...(buttons ?? []),
 			...(closeButton
 				? [
 						{
 							title: closeButton,
 							color: "text" as Color,
-							onPress: () => setModalVisible(false),
+							onPress: () => setVisible(false),
 						},
 					]
 				: []),
@@ -32,24 +42,24 @@ export default function useModal(closeButton?: string) {
 
 		return (
 			<>
-				<Modal
-					visible={modalVisible}
+				<ReactModal
+					visible={visible}
 					transparent
 					onRequestClose={() => {
-						setModalVisible(false);
+						setVisible(false);
 					}}
 				>
 					<View
 						style={{ backgroundColor: `${colors.background}aa`, flex: 1 }}
 					/>
-				</Modal>
+				</ReactModal>
 
-				<Modal
-					visible={modalVisible}
+				<ReactModal
+					visible={visible}
 					animationType="slide"
 					transparent={true}
 					onRequestClose={() => {
-						setModalVisible(false);
+						setVisible(false);
 					}}
 				>
 					<View
@@ -100,10 +110,9 @@ export default function useModal(closeButton?: string) {
 							</View>
 						</ThemedView>
 					</View>
-				</Modal>
+				</ReactModal>
 			</>
 		);
-	};
-
-	return { modal, setModalVisible };
-}
+	},
+);
+export default Modal;

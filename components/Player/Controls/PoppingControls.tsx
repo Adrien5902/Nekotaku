@@ -6,12 +6,18 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import { millisToTimeStamp } from "@/types/Player";
 import Slider from "@react-native-community/slider";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useRef } from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
-import GoogleCast, { useDevices } from "react-native-google-cast";
+import GoogleCast, {
+	useCastDevice,
+	useDevices,
+} from "react-native-google-cast";
 import usePlayerContext from "../PlayerContextProvider";
 import { useControlsContext } from "./useControlsContext";
 import { router } from "expo-router";
+import Modal, { type ModalState } from "@/components/Modal";
+import useLang from "@/hooks/useLang";
+import DeviceSelector from "./DeviceSelector";
 
 export function PoppingControls({
 	children,
@@ -19,6 +25,8 @@ export function PoppingControls({
 	viewControls: boolean;
 	children: JSX.Element;
 }) {
+	const lang = useLang();
+	const colors = useThemeColors();
 	const {
 		playerRef,
 		media,
@@ -32,8 +40,8 @@ export function PoppingControls({
 
 	const { currentStatus, shouldDisplayControls } = useControlsContext();
 	const SessionManager = GoogleCast.getSessionManager();
+	const connectedDevice = useCastDevice();
 	const devices = useDevices();
-	const colors = useThemeColors();
 
 	const fullscreenMultiplier = isFullscreen ? 1.5 : 1;
 
@@ -55,8 +63,34 @@ export function PoppingControls({
 	const hasNextEp =
 		episode?.id !== undefined && episode.id < episodes.length - 1;
 
+	const deviceSelectorModal = useRef<ModalState>(null);
+
 	return (
 		<>
+			{/* Remote Media Client device selector */}
+			<Modal
+				buttons={
+					connectedDevice
+						? [
+								{
+									title: "Disconnect",
+									color: "alert",
+									onPress() {
+										SessionManager.endCurrentSession();
+									},
+								},
+							]
+						: []
+				}
+				closeButton={lang.pages.player.remoteMediaCast.cancel}
+				title={`${lang.pages.player.remoteMediaCast.title} :`}
+				ref={deviceSelectorModal}
+			>
+				{devices.map((device) => (
+					<DeviceSelector key={device.deviceId} device={device} />
+				))}
+			</Modal>
+
 			{/* Upper half */}
 
 			{/* Top part */}
@@ -94,9 +128,7 @@ export function PoppingControls({
 								padding: Spacing.m * fullscreenMultiplier,
 							}}
 							onPress={async () => {
-								if (devices[0]) {
-									SessionManager.startSession(devices[0].deviceId);
-								}
+								deviceSelectorModal.current?.setVisible(true);
 							}}
 						/>
 						<Icon
@@ -105,7 +137,7 @@ export function PoppingControls({
 							color={Colors.dark.text}
 							style={{ marginRight: Spacing.m, padding: Spacing.m }}
 							onPress={() => {
-								setSettingsVisible((s) => !s);
+								setSettingsVisible?.((s) => !s);
 							}}
 						/>
 					</LinearGradient>

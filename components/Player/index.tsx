@@ -9,17 +9,14 @@ import {
 	Gesture,
 	GestureDetector,
 } from "react-native-gesture-handler";
-import {
-	useRemoteMediaClient,
-	type RemoteMediaClient,
-} from "react-native-google-cast";
+import { useRemoteMediaClient } from "react-native-google-cast";
 import useStyles from "@/hooks/useStyles";
 import type { PlayerFunctions, VideoPlayStatus } from "@/types/Player";
 import CastControls from "./Controls/CastControls";
 import Cache, { CacheReadType } from "@/hooks/useCache";
 import { ThemedView } from "../ThemedView";
 import { ThemedText } from "../ThemedText";
-import useModal from "@/hooks/useModal";
+import Modal, { type ModalState } from "@/components/Modal";
 import { useGetVideoSource } from "@/hooks/useGetVideoSource";
 import { useSettings } from "../Settings/Context";
 import { DownloadingContext } from "../DownloadingContext";
@@ -30,6 +27,7 @@ import {
 	PlayerContextProvider,
 	type PlayerContextT,
 } from "./PlayerContextProvider";
+import useLang from "@/hooks/useLang";
 
 interface Props {
 	isFullscreen: boolean;
@@ -174,7 +172,6 @@ export default function Player({
 		toggleFullscreen();
 	});
 
-	const { modal: Modal, setModalVisible } = useModal("Close");
 	const playbackSpeedRef = useRef(1);
 
 	const error = selectedLecteur
@@ -184,6 +181,9 @@ export default function Player({
 	const forceViewControls = !!remoteMediaClient;
 	const playerStyle = isFullscreen ? styles.fullscreenVideo : styles.video;
 
+	const lang = useLang();
+	const settingsModal = useRef<ModalState>(null);
+
 	return (
 		<PlayerContextProvider
 			{...{
@@ -192,7 +192,7 @@ export default function Player({
 				loading,
 				setIsLoadingVid,
 				media,
-				setSettingsVisible: setModalVisible,
+				setSettingsVisible: settingsModal.current?.setVisible,
 				toggleFullscreen,
 				playerRef,
 				statusRef,
@@ -201,7 +201,7 @@ export default function Player({
 				episodes,
 			}}
 		>
-			<Modal>
+			<Modal closeButton={lang.pages.player.settings.close} ref={settingsModal}>
 				<PlayerSettings
 					{...{ playbackSpeedRef, selectedLecteur, setSelectedLecteur }}
 				/>

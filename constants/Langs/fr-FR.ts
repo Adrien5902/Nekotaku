@@ -86,13 +86,30 @@ export const frFR: LangScheme = {
             me: "Moi",
         },
         player: {
+            remoteMediaCast: {
+                connectionState: {
+                    CantConnect: "Connexion Impossible",
+                    Connected: "Connecté",
+                    Connecting: "Connexion...",
+                    NotConnected: "Non connecté"
+                },
+                connectPrompt: "Se connecter ?",
+                title: "Sélectionner un appareil",
+                cancel: "Annuler"
+            },
             settings: {
+                close: "Fermer",
                 playBackSpeed: "Playback speed",
                 playBackSpeedMultiplier: (mul) => `x${mul}`,
                 selectedLecteur: "Selected Lecteur"
             }
         },
         episodes: {
+            deleteDownloadedConfirm: {
+                confirm: "Supprimer",
+                title: "Supprimer l'épisode ?",
+                cancel: "Annuler"
+            },
             episode: (n: number) => `Épisode ${n}`,
             loading: "Récupération des épisodes"
         },

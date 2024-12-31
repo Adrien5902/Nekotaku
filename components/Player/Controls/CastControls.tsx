@@ -11,7 +11,7 @@ import usePlayerContext from "../PlayerContextProvider";
 
 export default function CastControls() {
 	const remoteMediaClient = useRemoteMediaClient();
-	const { playerRef, statusRef, loading, setIsLoadingVid, playerStyle } =
+	const { playerRef, statusRef, setIsLoadingVid, playerStyle } =
 		usePlayerContext();
 
 	const device = useCastDevice();

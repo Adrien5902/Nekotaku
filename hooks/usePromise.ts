@@ -22,15 +22,20 @@ export function usePromise<R>(fn: () => Promise<R | undefined>, deps?: unknown[]
     useEffect(() => {
         setLoading(true)
         errorRef.current = undefined
-        fn().then((res) => {
-            if (res !== undefined) {
-                dataRef.current = res
+        try {
+            fn().then((res) => {
+                if (res !== undefined) {
+                    dataRef.current = res
+                    setLoading(false)
+                }
+            }).catch((error) => {
+                errorRef.current = error
                 setLoading(false)
-            }
-        }).catch((err) => {
-            errorRef.current = err
+            })
+        } catch (error) {
+            errorRef.current = error as Error
             setLoading(false)
-        })
+        }
 
         return onUnmounted
     }, deps ?? [])

@@ -5,16 +5,17 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import { ThemedText } from "./ThemedText";
 import { type Href, router, useUnstableGlobalHref } from "expo-router";
 import type { Episode } from "@/types/AnimeSama";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
 	DownloadingContext,
 	type DownloadingState,
 } from "./DownloadingContext";
 import type { Color } from "@/constants/Colors";
 import type { VideoPlayerMedia } from "@/app/player";
-import useModal from "@/hooks/useModal";
+import Modal, { type ModalState } from "@/components/Modal";
 import { useSettings } from "./Settings/Context";
 import type React from "react";
+import useLang from "@/hooks/useLang";
 
 export interface Props {
 	media: VideoPlayerMedia;
@@ -34,6 +35,8 @@ export default function PlayDownloadButton({
 		return <ThemedText>Error</ThemedText>;
 	}
 
+	const settings = useSettings();
+	const lang = useLang();
 	const colors = useThemeColors();
 	const iconColor = colors[color ?? "text"];
 	const downloadingContext = useContext(DownloadingContext);
@@ -111,19 +114,17 @@ export default function PlayDownloadButton({
 		},
 	};
 
-	const settings = useSettings();
-
-	const { modal: Modal, setModalVisible } = useModal("Cancel");
+	const deleteConfirmModal = useRef<ModalState>(null);
 
 	let child: React.ReactNode;
 	if (state === DownloadState.Downloaded) {
 		child = (
 			<>
 				<Modal
-					title={"Delete downloaded episode ?"}
+					title={lang.pages.episodes.deleteDownloadedConfirm.title}
 					buttons={[
 						{
-							title: "Delete",
+							title: lang.pages.episodes.deleteDownloadedConfirm.confirm,
 							color: "alert",
 							async onPress() {
 								await downloadingContext.deleteDownloadedEpisode(
@@ -131,16 +132,18 @@ export default function PlayDownloadButton({
 									episode.id,
 								);
 								updateDownloadState();
-								setModalVisible(false);
+								deleteConfirmModal.current?.setVisible(false);
 							},
 						},
 					]}
+					closeButton={lang.pages.episodes.deleteDownloadedConfirm.cancel}
+					ref={deleteConfirmModal}
 				/>
 				<Icon
 					name={"trash"}
 					style={styles.icon}
 					onPress={() => {
-						setModalVisible(true);
+						deleteConfirmModal.current?.setVisible(true);
 					}}
 					color={iconColor}
 				/>

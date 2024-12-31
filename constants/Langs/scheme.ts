@@ -1,3 +1,4 @@
+import type { ConnectionState } from "@/components/Player/Controls/DeviceSelector";
 import type { ColorTheme, Lang } from "@/components/Settings/types"
 import type { MediaFormat, MediaListStatus, MediaRelation, MediaSeason, MediaSource, MediaStatus, MediaType } from "@/types/Anilist/graphql"
 import type { EpisodeName } from "@/types/AnimeSama";
@@ -49,7 +50,14 @@ export interface LangScheme {
             me: string
         }
         player: {
+            remoteMediaCast: {
+                title: string
+                cancel: string
+                connectPrompt: string,
+                connectionState: { [key in ConnectionState]: string }
+            },
             settings: {
+                close: string
                 playBackSpeed: string
                 playBackSpeedMultiplier: (multiplier: number | string) => string
                 selectedLecteur: string
@@ -58,6 +66,11 @@ export interface LangScheme {
         episodes: {
             episode: (n: number) => string,
             loading: string
+            deleteDownloadedConfirm: {
+                cancel: string
+                title: string
+                confirm: string
+            }
         }
         editMediaListStatus: {
             save: string

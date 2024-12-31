@@ -35,7 +35,7 @@ export interface PlayerContextT {
 		| null;
 	toggleFullscreen: (force?: boolean) => void;
 	forceViewControls?: boolean;
-	setSettingsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	setSettingsVisible?: React.Dispatch<React.SetStateAction<boolean>>;
 	playerStyle: Partial<ViewStyle>;
 }
 
