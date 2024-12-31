@@ -84,7 +84,7 @@ const DELETE_ENTRY_QUERY = gql(`
 `);
 
 const QUERY = gql(`
-	mutation Mutation(
+	mutation SaveMediaListEntry(
 	$mediaId: Int
 	$score: Float
 	$status: MediaListStatus
@@ -114,6 +114,17 @@ const QUERY = gql(`
 		}
 	}
 `);
+
+const TOGGLE_FAVORITE = gql(`
+mutation Mutation( $animeId: Int){
+	ToggleFavourite(animeId: $animeId) {
+		anime {
+			nodes {
+				isFavourite
+			}
+		}
+	}
+}`);
 
 interface ModalProps {
 	media: Pick<Media, "isFavourite" | "id" | "title" | "episodes">;
@@ -170,11 +181,20 @@ function EditMediaListStatusModal({
 
 	async function save() {
 		const status = newStatus.current;
-		const result = await api.mutate({
+		await api.mutate({
 			mutation: QUERY,
 			variables: status,
 		});
-		result.data?.SaveMediaListEntry;
+
+		if (isFavourite.current !== media.isFavourite) {
+			await api.mutate({
+				mutation: TOGGLE_FAVORITE,
+				variables: {
+					animeId: media.id,
+				},
+			});
+		}
+
 		setModalVisible(false);
 		refetch();
 	}
