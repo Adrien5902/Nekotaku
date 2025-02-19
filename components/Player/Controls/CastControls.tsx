@@ -1,5 +1,4 @@
 import { Spacing, TextSizes } from "@/constants/Sizes";
-import { ThemedView } from "../../ThemedView";
 import { ThemedText } from "../../ThemedText";
 import {
 	MediaPlayerState,
@@ -8,6 +7,7 @@ import {
 } from "react-native-google-cast";
 import { useEffect } from "react";
 import usePlayerContext from "../PlayerContextProvider";
+import { View } from "react-native";
 
 export default function CastControls() {
 	const remoteMediaClient = useRemoteMediaClient();
@@ -83,7 +83,7 @@ export default function CastControls() {
 	}, [remoteMediaClient]);
 
 	return (
-		<ThemedView
+		<View
 			style={{
 				...playerStyle,
 				zIndex: -1,
@@ -96,6 +96,6 @@ export default function CastControls() {
 				Casting on{" "}
 				{`${device?.friendlyName ?? "?"} - ${device?.modelName ?? "ChromeCast"}`}
 			</ThemedText>
-		</ThemedView>
+		</View>
 	);
 }

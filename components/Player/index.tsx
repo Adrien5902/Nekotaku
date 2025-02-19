@@ -28,6 +28,7 @@ import {
 	type PlayerContextT,
 } from "./PlayerContextProvider";
 import useLang from "@/hooks/useLang";
+import { Spacing } from "@/constants/Sizes";
 
 interface Props {
 	isFullscreen: boolean;
@@ -207,7 +208,7 @@ export default function Player({
 				/>
 			</Modal>
 			<GestureDetector gesture={gesture}>
-				<View>
+				<View style={{ backgroundColor: "#000" }}>
 					<Controls />
 					{!error ? (
 						!remoteMediaClient ? (
@@ -215,7 +216,6 @@ export default function Player({
 								style={{
 									...(isFullscreen ? styles.fullscreenVideo : styles.video),
 									zIndex: -1,
-									backgroundColor: "#000",
 								}}
 								source={videoUri ? { uri: videoUri } : undefined}
 								ref={videoPlayerRef}
@@ -253,7 +253,11 @@ export default function Player({
 						<ThemedView
 							style={[
 								styles.video,
-								{ zIndex: 10, justifyContent: "center", alignItems: "center" },
+								{
+									paddingTop: Spacing.xxl,
+									alignItems: "center",
+									paddingBottom: Spacing.xxl,
+								},
 							]}
 						>
 							<ThemedText>Error : {error.message}</ThemedText>
