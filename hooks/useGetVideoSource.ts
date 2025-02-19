@@ -80,11 +80,18 @@ export const supportedLecteurs: Record<SupportedLecteurs, GetVideoSourceFromLect
     },
     "sendvid.com": (url: string) => {
         return [(async () => {
+
             const res = await fetch(url)
             const html = await res.text()
             const regex = /<meta property="og:video" content="([\S]*)"\/>/g
 
-            return Array.from(html.matchAll(regex))[0][1]
+            const data = Array.from(html.matchAll(regex))[0];
+            if (!data) {
+                throw new Error("Lecteur indisponible")
+            }
+
+            return data[1]
         })(), {}]
     }
 }
+

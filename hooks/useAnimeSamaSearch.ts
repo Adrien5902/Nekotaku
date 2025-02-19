@@ -40,13 +40,11 @@ export async function searchResultHTML(query: string): Promise<string> {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: new URLSearchParams({
-            query,
-        }).toString(),
+        body: `query=${query}`,
     });
 
     const html = await res.text();
-    return html;
+    return html
 }
 
 export interface AnimeSamaSearchResult {
@@ -79,13 +77,20 @@ export function parseSearchResultFromHTML(html: string): AnimeSamaSearchResult[]
     return results
 }
 
-export async function search(query: string) {
-    return parseSearchResultFromHTML(await searchResultHTML(query))
+export async function search(query: string): Promise<AnimeSamaSearchResult[] | undefined> {
+    const data = await searchResultHTML(query);
+    if (data) {
+        return parseSearchResultFromHTML(data)
+    }
 }
 
 export async function searchBestMatch(query: string) {
     const search_friendly_query = query;
     const results = await search(search_friendly_query);
+    if (!results) {
+        return null
+    }
+
     const result = results.reduce((prev, curr) => {
         const title_dist = distance(searchFriendly(curr.title), search_friendly_query);
         const subtitles_dist = curr.subtitles.map(subtitle => distance(searchFriendly(subtitle), search_friendly_query))
@@ -130,7 +135,7 @@ function getSeasonFromString(s: string) {
         return { newTitle: newTitle.replace(seasonNameMatch[0], ""), data: { part, season } }
     }
 
-    return { newTitle, data: { season: 1, part } }
+    return { newTitle, data: { season: undefined, part } }
 }
 
 type FormatData = {
@@ -140,7 +145,8 @@ type FormatData = {
 
 function getFormatData(mediaFormat: MediaFormat | undefined, searchFriendlyMediaNames: string[]): FormatData {
     const titlesSeasonData = searchFriendlyMediaNames.map(s => getSeasonFromString(s))
-    const seasonData = titlesSeasonData.find(s => !!s)?.data
+    const seasonData = titlesSeasonData.find(s => !!s.data.season)?.data
+    console.log(seasonData);
     const newTitles = titlesSeasonData.map(t => searchFriendly(t.newTitle))
 
     let appendToUrl: string;
@@ -210,7 +216,7 @@ export async function searchMedia(media: AnimeSamaSearchMediaType, apolloClient:
 }
 
 export function searchFriendly(s?: string) {
-    return s?.trim().replaceAll("-", " ").toLowerCase() ?? ""
+    return s?.trim().replaceAll("-", " ").toLowerCase().replaceAll("‘", "'") ?? ""
 }
 
 export interface AnimeSamaSearch<T> {
