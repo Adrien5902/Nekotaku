@@ -112,7 +112,6 @@ export default function MediaDetails({
 							source={{ html: style + media.description }}
 							style={{ backgroundColor: colors.background }}
 							onNavigationStateChange={(navState) => {
-								console.log(navState.title);
 								setDocumentHeight(Number.parseFloat(navState.title));
 							}}
 						/>
