@@ -22,11 +22,11 @@ export class AnimeSamaUrl {
     }
 
     makeURL() {
-        return `https://anime-sama.fr/catalogue/${this.animeName}/${this.type}${this.season ? this.season : ""}${this.horsSerie ? "hs" : ""}/${this.lang ? this.lang.toLowerCase() : ""}`
+        return `https://anime-sama.si/catalogue/${this.animeName}/${this.type}${this.season ? this.season : ""}${this.horsSerie ? "hs" : ""}/${this.lang ? this.lang.toLowerCase() : ""}`
     }
 
     static fromURL(url: string): AnimeSamaUrl | null {
-        const regex = /https:\/\/anime-sama\.fr\/catalogue\/([a-z0-9-]+)(?:\/(oav|film|saison(\d+))?)?(?:\/(hs)?)?(?:\/([^\/]+)?)?\/?/;
+        const regex = /https:\/\/anime-sama\.si\/catalogue\/([a-z0-9-]+)(?:\/(oav|film|saison(\d+))?)?(?:\/(hs)?)?(?:\/([^\/]+)?)?\/?/;
 
         const match = url.match(regex);
 
